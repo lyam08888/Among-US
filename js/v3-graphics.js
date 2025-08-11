@@ -912,7 +912,6 @@ class AmongUsV3Graphics {
                 break;
         }
         
-        ctx.restore();
         this.performance.drawCalls++;
     }
     
