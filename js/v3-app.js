@@ -677,6 +677,8 @@ class AmongUsV3App {
     }
     
     updatePlayerMovement() {
+        if (!this.gameState.localPlayer) return;
+        
         const player = this.gameState.localPlayer;
         const speed = 150; // pixels per second
         const deltaTime = this.engine.deltaTime / 1000;
@@ -705,15 +707,62 @@ class AmongUsV3App {
             velocityY = (velocityY / length) * speed;
         }
         
-        // Update physics body
-        this.engine.physics.setVelocity('localPlayer', velocityX, velocityY);
+        // Update player animation state
+        const isMoving = velocityX !== 0 || velocityY !== 0;
+        player.animation = isMoving ? 'walk' : 'idle';
         
-        // Update player position from physics
-        const body = this.engine.physics.getBody('localPlayer');
-        if (body) {
-            player.position.x = body.position.x;
-            player.position.y = body.position.y;
+        // Update player direction
+        if (velocityX !== 0) {
+            player.direction = velocityX > 0 ? 'right' : 'left';
         }
+        
+        // Update physics body
+        if (this.engine.physics) {
+            this.engine.physics.setVelocity('localPlayer', velocityX, velocityY);
+            
+            // Update player position from physics
+            const body = this.engine.physics.getBody('localPlayer');
+            if (body) {
+                player.position.x = body.position.x;
+                player.position.y = body.position.y;
+            }
+        } else {
+            // Fallback direct movement
+            player.position.x += velocityX * deltaTime;
+            player.position.y += velocityY * deltaTime;
+        }
+        
+        // Update player in graphics system
+        this.updatePlayerInGraphics(player);
+        
+        // Update camera to follow player
+        if (this.engine.graphics) {
+            this.engine.graphics.camera.target = player.position;
+        }
+    }
+    
+    updatePlayerInGraphics(player) {
+        if (!this.engine.graphics) return;
+        
+        // Remove old player from graphics
+        this.engine.graphics.layers.players = this.engine.graphics.layers.players.filter(
+            obj => obj.id !== player.id
+        );
+        
+        // Add updated player to graphics
+        this.engine.graphics.layers.players.push({
+            type: 'player',
+            id: player.id,
+            x: player.position.x,
+            y: player.position.y,
+            color: player.color,
+            name: player.name,
+            animation: player.animation,
+            direction: player.direction,
+            isDead: player.isDead,
+            isImpostor: player.isImpostor,
+            showImpostorIndicator: false // Only show for debugging
+        });
     }
     
     updateGameLogic() {

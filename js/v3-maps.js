@@ -607,8 +607,109 @@ class AmongUsV3Maps {
         // Generate collision map
         this.generateCollisionMap();
         
+        // Add map objects to graphics system
+        this.addMapToGraphics();
+        
         console.log(`🗺️ Loaded map: ${mapData.name}`);
         return true;
+    }
+    
+    addMapToGraphics() {
+        if (!this.engine.graphics) return;
+        
+        // Clear existing map objects from graphics
+        this.engine.graphics.layers.background = [];
+        this.engine.graphics.layers.environment = [];
+        
+        // Add background
+        this.engine.graphics.layers.background.push({
+            type: 'background',
+            x: this.currentMap.size.width / 2,
+            y: this.currentMap.size.height / 2,
+            width: this.currentMap.size.width,
+            height: this.currentMap.size.height,
+            color: this.currentMap.background || '#1a1a2e'
+        });
+        
+        // Add rooms
+        for (let room of this.currentMap.rooms) {
+            this.engine.graphics.layers.environment.push({
+                type: 'room',
+                x: room.bounds.x + room.bounds.width / 2,
+                y: room.bounds.y + room.bounds.height / 2,
+                width: room.bounds.width,
+                height: room.bounds.height,
+                color: room.color,
+                name: room.name,
+                id: room.id
+            });
+        }
+        
+        // Add corridors
+        if (this.currentMap.corridors) {
+            for (let corridor of this.currentMap.corridors) {
+                const length = Math.sqrt(
+                    Math.pow(corridor.to.x - corridor.from.x, 2) + 
+                    Math.pow(corridor.to.y - corridor.from.y, 2)
+                );
+                const angle = Math.atan2(
+                    corridor.to.y - corridor.from.y,
+                    corridor.to.x - corridor.from.x
+                );
+                
+                this.engine.graphics.layers.environment.push({
+                    type: 'corridor',
+                    x: (corridor.from.x + corridor.to.x) / 2,
+                    y: (corridor.from.y + corridor.to.y) / 2,
+                    width: corridor.width,
+                    length: length,
+                    rotation: angle
+                });
+            }
+        }
+        
+        // Add vents
+        for (let vent of this.currentMap.vents) {
+            this.engine.graphics.layers.environment.push({
+                type: 'vent',
+                x: vent.position.x,
+                y: vent.position.y,
+                id: vent.id,
+                connections: vent.connections
+            });
+        }
+        
+        // Add task locations
+        for (let room of this.currentMap.rooms) {
+            if (room.tasks && room.tasks.length > 0) {
+                for (let i = 0; i < room.tasks.length; i++) {
+                    this.engine.graphics.layers.environment.push({
+                        type: 'task',
+                        x: room.bounds.x + 30 + (i * 40),
+                        y: room.bounds.y + room.bounds.height / 2,
+                        taskId: room.tasks[i],
+                        icon: this.getTaskIcon(room.tasks[i])
+                    });
+                }
+            }
+        }
+    }
+    
+    getTaskIcon(taskId) {
+        const taskIcons = {
+            'cafeteria-empty-garbage': '🗑️',
+            'weapons-clear-asteroids': '🎯',
+            'o2-clean-filter': '💨',
+            'navigation-chart-course': '🧭',
+            'shields-prime-shields': '🛡️',
+            'communications-download-data': '📡',
+            'storage-fuel-engines': '⛽',
+            'admin-swipe-card': '💳',
+            'electrical-fix-wiring': '⚡',
+            'reactor-start-reactor': '⚛️',
+            'medbay-submit-scan': '🏥'
+        };
+        return taskIcons[taskId] || '⚙️';
     }
     
     initializeRooms(roomsData) {

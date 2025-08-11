@@ -598,6 +598,255 @@ class AmongUsV3Graphics {
             ctx.scale(obj.scaleX || 1, obj.scaleY || 1);
         }
         
+        // Render based on object type
+        switch (obj.type) {
+            case 'room':
+                this.renderRoom(ctx, obj);
+                break;
+            case 'corridor':
+                this.renderCorridor(ctx, obj);
+                break;
+            case 'player':
+                this.renderPlayer(ctx, obj);
+                break;
+            case 'vent':
+                this.renderVent(ctx, obj);
+                break;
+            case 'task':
+                this.renderTask(ctx, obj);
+                break;
+            case 'wall':
+                this.renderWall(ctx, obj);
+                break;
+            default:
+                this.renderDefault(ctx, obj);
+        }
+        
+        ctx.restore();
+        this.performance.drawCalls++;
+    }
+    
+    renderRoom(ctx, room) {
+        // Room background
+        ctx.fillStyle = room.color || '#4a4a6a';
+        ctx.fillRect(-room.width/2, -room.height/2, room.width, room.height);
+        
+        // Room border
+        ctx.strokeStyle = this.darkenColor(room.color || '#4a4a6a', 0.3);
+        ctx.lineWidth = 3;
+        ctx.strokeRect(-room.width/2, -room.height/2, room.width, room.height);
+        
+        // Room name
+        if (room.name && this.camera.zoom > 0.5) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `${16 * this.camera.zoom}px 'Orbitron', monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(room.name, 0, -room.height/2 + 20);
+        }
+        
+        // Room lighting effect
+        if (this.settings.lighting) {
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(room.width, room.height)/2);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.2)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-room.width/2, -room.height/2, room.width, room.height);
+        }
+    }
+    
+    renderCorridor(ctx, corridor) {
+        ctx.fillStyle = '#3a3a5a';
+        ctx.fillRect(-corridor.width/2, -corridor.length/2, corridor.width, corridor.length);
+        
+        // Corridor borders
+        ctx.strokeStyle = '#2a2a4a';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-corridor.width/2, -corridor.length/2, corridor.width, corridor.length);
+    }
+    
+    renderPlayer(ctx, player) {
+        // Player shadow
+        if (this.settings.shadows) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(2, 35, 30, 15, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Get player texture
+        const texture = this.assets.textures.get('crewmate');
+        if (texture) {
+            // Apply player color tint
+            if (player.color) {
+                ctx.globalCompositeOperation = 'multiply';
+                ctx.fillStyle = player.color;
+                ctx.fillRect(-50, -50, 100, 100);
+                ctx.globalCompositeOperation = 'destination-atop';
+            }
+            
+            ctx.drawImage(texture, -50, -50, 100, 100);
+            ctx.globalCompositeOperation = 'source-over';
+        } else {
+            // Fallback rendering
+            this.renderCrewmateFallback(ctx, player);
+        }
+        
+        // Player name
+        if (player.name && this.camera.zoom > 0.3) {
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.font = `${12 * this.camera.zoom}px 'Inter', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.strokeText(player.name, 0, 55);
+            ctx.fillText(player.name, 0, 55);
+        }
+        
+        // Player status indicators
+        if (player.isDead) {
+            this.renderDeadPlayer(ctx, player);
+        }
+        
+        if (player.isImpostor && player.showImpostorIndicator) {
+            this.renderImpostorIndicator(ctx);
+        }
+    }
+    
+    renderCrewmateFallback(ctx, player) {
+        // Body
+        ctx.fillStyle = player.color || '#ff3838';
+        ctx.beginPath();
+        ctx.ellipse(0, 10, 35, 28, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Visor
+        ctx.fillStyle = 'rgba(200, 230, 255, 0.9)';
+        ctx.beginPath();
+        ctx.ellipse(0, -5, 25, 20, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Visor reflection
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.beginPath();
+        ctx.ellipse(-8, -12, 8, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Backpack
+        ctx.fillStyle = this.darkenColor(player.color || '#ff3838', 0.2);
+        ctx.fillRect(20, -5, 15, 25);
+        ctx.beginPath();
+        ctx.arc(27.5, -5, 7.5, Math.PI, 0);
+        ctx.fill();
+    }
+    
+    renderDeadPlayer(ctx, player) {
+        // Bone
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        
+        // Bone shaft
+        ctx.beginPath();
+        ctx.moveTo(-15, -10);
+        ctx.lineTo(15, 10);
+        ctx.stroke();
+        
+        // Bone ends
+        ctx.beginPath();
+        ctx.arc(-15, -10, 3, 0, Math.PI * 2);
+        ctx.arc(-12, -15, 3, 0, Math.PI * 2);
+        ctx.arc(-18, -5, 3, 0, Math.PI * 2);
+        ctx.arc(15, 10, 3, 0, Math.PI * 2);
+        ctx.arc(18, 5, 3, 0, Math.PI * 2);
+        ctx.arc(12, 15, 3, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    renderImpostorIndicator(ctx) {
+        ctx.fillStyle = '#ff0000';
+        ctx.beginPath();
+        ctx.arc(25, -25, 8, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '12px bold sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('!', 25, -25);
+    }
+    
+    renderVent(ctx, vent) {
+        // Vent base
+        ctx.fillStyle = '#2a2a2a';
+        ctx.beginPath();
+        ctx.arc(0, 0, 25, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Vent grill
+        ctx.strokeStyle = '#1a1a1a';
+        ctx.lineWidth = 2;
+        for (let i = -15; i <= 15; i += 5) {
+            ctx.beginPath();
+            ctx.moveTo(i, -20);
+            ctx.lineTo(i, 20);
+            ctx.stroke();
+        }
+        
+        // Vent highlight
+        if (vent.isHighlighted) {
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(0, 0, 28, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
+    
+    renderTask(ctx, task) {
+        // Task panel
+        ctx.fillStyle = task.color || '#4a90e2';
+        ctx.fillRect(-20, -15, 40, 30);
+        
+        // Task border
+        ctx.strokeStyle = this.darkenColor(task.color || '#4a90e2', 0.3);
+        ctx.lineWidth = 2;
+        ctx.strokeRect(-20, -15, 40, 30);
+        
+        // Task icon
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '16px FontAwesome';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(task.icon || '⚙', 0, 0);
+        
+        // Task highlight
+        if (task.isHighlighted) {
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-22, -17, 44, 34);
+        }
+    }
+    
+    renderWall(ctx, wall) {
+        ctx.fillStyle = '#666666';
+        ctx.fillRect(-wall.width/2, -wall.height/2, wall.width, wall.height);
+        
+        // Wall texture
+        const texture = this.assets.textures.get('wall');
+        if (texture) {
+            ctx.drawImage(texture, -wall.width/2, -wall.height/2, wall.width, wall.height);
+        }
+    }
+    
+    renderDefault(ctx, obj) {
+        // Default rectangle rendering
+        ctx.fillStyle = obj.color || '#888888';
+        const width = obj.width || 50;
+        const height = obj.height || 50;
+        ctx.fillRect(-width/2, -height/2, width, height);
+        
         if (obj.alpha !== undefined) {
             ctx.globalAlpha = obj.alpha;
         }
