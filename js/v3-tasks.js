@@ -16,7 +16,34 @@ class AmongUsV3Tasks {
             COMMON: 'common',
             SHORT: 'short',
             LONG: 'long',
-            VISUAL: 'visual'
+            VISUAL: 'visual',
+            SPECIAL: 'special',
+            SABOTAGE: 'sabotage'
+        };
+        
+        // Task minigame components
+        this.minigames = {
+            wireConnection: new WireMinigame(this),
+            cardSwipe: new CardSwipeMinigame(this),
+            uploadData: new UploadMinigame(this),
+            sampleAnalysis: new SampleAnalysisMinigame(this),
+            asteroids: new AsteroidsMinigame(this),
+            shields: new ShieldsMinigame(this),
+            reactor: new ReactorMinigame(this),
+            medbay: new MedbayMinigame(this)
+        };
+        
+        // Task difficulty scaling
+        this.difficultySystem = {
+            enabled: true,
+            currentLevel: 1,
+            maxLevel: 5,
+            adaptationRate: 0.1,
+            factors: {
+                completionTime: 1.0,
+                failureRate: 1.0,
+                complexity: 1.0
+            }
         };
         
         // Task locations

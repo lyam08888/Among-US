@@ -20,7 +20,31 @@ class AmongUsV3Physics {
             minVelocity: 0.1,
             collisionIterations: 3,
             enableSpatialPartitioning: true,
-            enableContinuousCollision: true
+            enableContinuousCollision: true,
+            enablePredictiveCollision: true,
+            enableDynamicFriction: true,
+            particleSimulation: true,
+            weatherEffects: true
+        };
+        
+        // Advanced movement
+        this.movementSystem = {
+            acceleration: 2000,
+            deceleration: 1500,
+            turnSpeed: Math.PI,
+            slideThreshold: 0.7,
+            dashForce: 1000,
+            dashCooldown: 2000,
+            ventSpeed: 300
+        };
+        
+        // Environmental effects
+        this.environment = {
+            snowAccumulation: 0,
+            windForce: { x: 0, y: 0 },
+            fogDensity: 0,
+            temperature: 20,
+            surfaces: new Map() // Different surface types affecting movement
         };
         
         console.log('⚡ Physics engine initialized');

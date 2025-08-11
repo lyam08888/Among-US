@@ -1,13 +1,6 @@
-// Among Us V3 - Game Logic System
-class AmongUsV3GameLogic {
-    constructor(engine) {
-        this.engine = engine;
-        this.isInitialized = false;
-        
-        // Game state
-        this.gamePhase = 'lobby'; // lobby, playing, meeting, voting, ended
+// Amon        // Game settings
         this.gameSettings = {
-            maxPlayers: 10,
+            maxPlayers: 15,
             numImpostors: 2,
             killCooldown: 45,
             emergencyMeetings: 1,
@@ -24,7 +17,80 @@ class AmongUsV3GameLogic {
             shortTasks: 2,
             visualTasks: true,
             confirmEjects: true,
-            anonymousVotes: false
+            anonymousVotes: false,
+            // Nouvelles options avancées
+            roleSettings: {
+                detective: { enabled: true, cooldown: 30 },
+                medic: { enabled: true, shieldCooldown: 45 },
+                engineer: { enabled: true, ventCooldown: 30 },
+                scientist: { enabled: true, batteryCooldown: 60 }
+            },
+            advancedOptions: {
+                bodyDragEnabled: true,
+                ventRandomization: true,
+                taskShuffling: true,
+                adaptiveDifficulty: true,
+                hiddenRoles: false,
+                proximityChat: true,
+                customWinConditions: true
+            },
+            mapModifiers: {
+                randomEvents: true,
+                dynamicHazards: true,
+                secretPassages: true,
+                weatherEffects: true
+            },
+            gameBalance: {
+                taskCompletionWeight: 1.0,
+                killPenaltyWeight: 1.5,
+                votingAccuracyBonus: 0.5,
+                sabotageImpact: 1.0
+            } System
+class AmongUsV3GameLogic {
+    constructor(engine) {
+        this.engine = engine;
+        this.isInitialized = false;
+        
+        // Game state
+        this.gamePhase = 'lobby'; // lobby, playing, meeting, voting, ended
+        this.gameSettings = {
+            maxPlayers: 15,
+            numImpostors: 2,
+            killCooldown: 45,
+            emergencyMeetings: 1,
+            emergencyCooldown: 15,
+            discussionTime: 15,
+            votingTime: 120,
+            playerSpeed: 1.0,
+            crewmateVision: 1.0,
+            impostorVision: 1.5,
+            killDistance: 1.0,
+            taskBarUpdates: 'always',
+            commonTasks: 1,
+            longTasks: 1,
+            shortTasks: 2,
+            visualTasks: true,
+            confirmEjects: true,
+            anonymousVotes: false,
+            roles: {
+                detective: { enabled: true, cooldown: 30 },
+                medic: { enabled: true, cooldown: 45 },
+                engineer: { enabled: true, cooldown: 30 },
+                scientist: { enabled: true, cooldown: 60 }
+            },
+            advanced: {
+                bodyDragging: true,
+                ventRandomization: true,
+                taskShuffling: true,
+                adaptiveDifficulty: true,
+                proximityChat: true
+            },
+            modifiers: {
+                randomEvents: true,
+                hazards: true,
+                secretPassages: true,
+                weather: true
+            }
         };
         
         // Game data

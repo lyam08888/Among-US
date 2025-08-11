@@ -45,7 +45,47 @@ class AmongUsV3Graphics {
             ambientColor: { r: 0.3, g: 0.3, b: 0.4, a: 1 },
             lights: new Map(),
             shadowMap: null,
-            lightMap: null
+            lightMap: null,
+            dynamicShadows: true,
+            volumetricLighting: true,
+            lightOccluders: new Set(),
+            lightBounces: 2,
+            shadowQuality: 'high',
+            shadowResolution: 2048
+        };
+        
+        // Post-processing effects
+        this.postProcessing = {
+            enabled: true,
+            effects: new Map(),
+            bloom: {
+                enabled: true,
+                threshold: 0.8,
+                intensity: 1.5,
+                radius: 0.4
+            },
+            chromaticAberration: {
+                enabled: true,
+                intensity: 0.005
+            },
+            vignetteEffect: {
+                enabled: true,
+                darkness: 0.5,
+                offset: 0.15
+            }
+        };
+        
+        // Particle systems
+        this.particleSystems = new Map();
+        
+        // Weather effects
+        this.weatherSystem = {
+            enabled: true,
+            currentWeather: null,
+            particles: null,
+            snowAccumulation: 0,
+            windDirection: { x: 0, y: 0 },
+            fogDensity: 0
         };
         
         // Particle system
