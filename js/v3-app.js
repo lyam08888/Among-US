@@ -194,12 +194,16 @@ class AmongUsV3App {
         this.gameState.localPlayer = {
             id: this.generatePlayerId(),
             name: this.getPlayerName(),
-            color: 0, // Red by default
+            color: '#ff3838', // Red by default
             isImpostor: false,
             isAlive: true,
-            position: { x: 0, y: 0 },
+            position: { x: 900, y: 325 }, // Start at cafeteria
             tasks: [],
-            completedTasks: 0
+            completedTasks: 0,
+            animation: 'idle',
+            direction: 'right',
+            velocity: { x: 0, y: 0 },
+            lastPosition: { x: 900, y: 325 }
         };
         
         // Add to players map
@@ -210,6 +214,24 @@ class AmongUsV3App {
         
         // Initialize map system
         this.initializeMapSystem();
+        
+        // Initialize player in physics system
+        this.initializePlayerPhysics();
+    }
+    
+    initializePlayerPhysics() {
+        if (this.engine.physics) {
+            this.engine.physics.createBody('localPlayer', {
+                x: this.gameState.localPlayer.position.x,
+                y: this.gameState.localPlayer.position.y,
+                width: 50,
+                height: 50,
+                type: 'dynamic',
+                mass: 1,
+                friction: 0.8,
+                restitution: 0
+            });
+        }
     }
     
     initializeTaskSystem() {
