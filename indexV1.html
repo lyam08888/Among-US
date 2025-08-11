@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Among Us - Interface Prototype</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/menus.css">
+    <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen active">
+            <div class="menu-container">
+                <div class="logo">
+                    <h1>AMONG US</h1>
+                </div>
+                <nav class="main-nav">
+                    <button class="menu-btn primary" data-action="matchmaking_quick">
+                        <span class="btn-text">Jouer (Rapide)</span>
+                    </button>
+                    <button class="menu-btn" data-action="goto_lobby">
+                        <span class="btn-text">Partie Personnalisée</span>
+                    </button>
+                    <button class="menu-btn" data-action="goto_cosmetics">
+                        <span class="btn-text">Cosmétiques</span>
+                    </button>
+                    <button class="menu-btn" data-action="goto_missions">
+                        <span class="btn-text">Missions / Défis</span>
+                    </button>
+                    <button class="menu-btn beta" data-action="goto_ranked">
+                        <span class="btn-text">Classé (Optionnel)</span>
+                        <span class="badge">BETA</span>
+                    </button>
+                    <button class="menu-btn" data-action="goto_tutorial">
+                        <span class="btn-text">Tutoriel & Entraînement</span>
+                    </button>
+                    <button class="menu-btn" data-action="goto_settings">
+                        <span class="btn-text">Paramètres</span>
+                    </button>
+                    <button class="menu-btn" data-action="goto_account">
+                        <span class="btn-text">Compte & Sécurité</span>
+                    </button>
+                    <button class="menu-btn" data-action="goto_help">
+                        <span class="btn-text">Aide & Guide</span>
+                    </button>
+                    <button class="menu-btn" data-action="show_credits">
+                        <span class="btn-text">Crédits</span>
+                    </button>
+                    <button class="menu-btn danger desktop-only" data-action="confirm_exit">
+                        <span class="btn-text">Quitter</span>
+                    </button>
+                </nav>
+                <footer class="menu-footer">
+                    <div class="footer-controls">
+                        <select id="region-selector" class="footer-select">
+                            <option value="auto">Région: Auto</option>
+                            <option value="eu-west">EU-Ouest</option>
+                            <option value="us-east">US-Est</option>
+                            <option value="ap-south">AP-Sud</option>
+                        </select>
+                        <select id="lang-selector" class="footer-select">
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                            <option value="de">Deutsch</option>
+                            <option value="it">Italiano</option>
+                            <option value="ar">العربية</option>
+                        </select>
+                        <button id="pwa-install" class="footer-btn">Installer l'app</button>
+                    </div>
+                    <div class="server-status">
+                        <span class="status-chip online">Serveurs en ligne</span>
+                        <span class="build-label">wmh5</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+        <!-- Quick Matchmaking -->
+        <div id="matchmaking-screen" class="screen">
+            <div class="matchmaking-container">
+                <h2>Matchmaking Rapide</h2>
+                <div class="matchmaking-filters">
+                    <div class="filter-group">
+                        <label>Région:</label>
+                        <select id="mm-region">
+                            <option value="auto">Auto</option>
+                            <option value="eu-west">EU-Ouest</option>
+                            <option value="us-east">US-Est</option>
+                            <option value="ap-south">AP-Sud</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Joueurs:</label>
+                        <input type="range" id="mm-players-min" min="4" max="15" value="6">
+                        <span id="mm-players-display">6-15</span>
+                        <input type="range" id="mm-players-max" min="4" max="15" value="15">
+                    </div>
+                    <div class="filter-group">
+                        <label>Imposteurs:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" value="1" checked> 1</label>
+                            <label><input type="checkbox" value="2" checked> 2</label>
+                            <label><input type="checkbox" value="3"> 3</label>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Cartes:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" value="the_skeld" checked> The Skeld</label>
+                            <label><input type="checkbox" value="polus" checked> Polus</label>
+                            <label><input type="checkbox" value="airship" checked> Airship</label>
+                            <label><input type="checkbox" value="fungle" checked> The Fungle</label>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Rôles activés:</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" value="guardian_angel" checked> Ange Gardien</label>
+                            <label><input type="checkbox" value="shapeshifter" checked> Métamorphe</label>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Ping limite:</label>
+                        <input type="number" id="mm-ping" value="220" min="50" max="500">
+                        <span>ms</span>
+                    </div>
+                </div>
+                <div class="matchmaking-actions">
+                    <button class="btn-large primary" id="start-matchmaking">Lancer</button>
+                    <div class="privacy-note">Public uniquement</div>
+                    <label class="toggle-option">
+                        <input type="checkbox" id="fill-empty-bots">
+                        <span>Remplir avec des bots</span>
+                    </label>
+                </div>
+                <button class="back-btn" data-action="goto_main">← Retour</button>
+            </div>
+        </div>
+
+        <!-- Lobby Screen -->
+        <div id="lobby-screen" class="screen">
+            <div class="lobby-container">
+                <div class="lobby-header">
+                    <h2>Salon de jeu</h2>
+                    <div class="room-info">
+                        <span class="room-code">Code: <strong id="room-code-display">ABCDEF</strong></span>
+                        <button class="copy-code-btn">📋</button>
+                    </div>
+                </div>
+                
+                <div class="lobby-content">
+                    <div class="lobby-settings">
+                        <div class="tabs">
+                            <button class="tab active" data-tab="general">Général</button>
+                            <button class="tab" data-tab="roles">Carte & Rôles</button>
+                            <button class="tab" data-tab="tasks">Tâches & Vision</button>
+                            <button class="tab" data-tab="timers">Timers</button>
+                            <button class="tab" data-tab="votes">Votes</button>
+                            <button class="tab" data-tab="advanced">Avancé</button>
+                            <button class="tab" data-tab="invite">Invite</button>
+                        </div>
+
+                        <!-- General Tab -->
+                        <div class="tab-content active" id="tab-general">
+                            <div class="setting-group">
+                                <label>Confidentialité:</label>
+                                <select id="privacy-setting">
+                                    <option value="private">Privée</option>
+                                    <option value="public">Publique</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Région:</label>
+                                <select id="lobby-region">
+                                    <option value="auto">Auto</option>
+                                    <option value="eu-west">EU-Ouest</option>
+                                    <option value="us-east">US-Est</option>
+                                    <option value="ap-south">AP-Sud</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Carte:</label>
+                                <select id="map-setting">
+                                    <option value="the_skeld">The Skeld</option>
+                                    <option value="mira_hq">Mira HQ</option>
+                                    <option value="polus">Polus</option>
+                                    <option value="airship">Airship</option>
+                                    <option value="fungle">The Fungle</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Joueurs max:</label>
+                                <input type="range" id="max-players" min="4" max="15" value="10">
+                                <span id="max-players-display">10</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Nombre d'imposteurs:</label>
+                                <input type="range" id="num-impostors" min="1" max="3" value="2">
+                                <span id="num-impostors-display">2</span>
+                            </div>
+                        </div>
+
+                        <!-- Roles Tab -->
+                        <div class="tab-content" id="tab-roles">
+                            <div class="role-setting">
+                                <h4>Scientifique</h4>
+                                <label>Taux d'apparition:</label>
+                                <input type="range" id="scientist-rate" min="0" max="1" step="0.1" value="0">
+                                <span>0%</span>
+                                <label><input type="checkbox" id="scientist-battery"> Utilise la batterie</label>
+                            </div>
+                            <div class="role-setting">
+                                <h4>Ingénieur</h4>
+                                <label>Taux d'apparition:</label>
+                                <input type="range" id="engineer-rate" min="0" max="1" step="0.1" value="0">
+                                <span>0%</span>
+                                <label>Fenêtre de ventilation:</label>
+                                <input type="number" id="engineer-vent" value="10" min="1" max="60">
+                                <span>s</span>
+                            </div>
+                            <div class="role-setting">
+                                <h4>Ange Gardien</h4>
+                                <label>Taux d'apparition:</label>
+                                <input type="range" id="guardian-rate" min="0" max="1" step="0.1" value="1">
+                                <span>100%</span>
+                                <label>Durée du bouclier:</label>
+                                <input type="number" id="guardian-shield" value="10" min="1" max="60">
+                                <span>s</span>
+                            </div>
+                            <div class="role-setting">
+                                <h4>Métamorphe</h4>
+                                <label>Taux d'apparition:</label>
+                                <input type="range" id="shapeshifter-rate" min="0" max="1" step="0.1" value="0.1">
+                                <span>10%</span>
+                                <label>Durée:</label>
+                                <input type="number" id="shapeshifter-duration" value="30" min="5" max="120">
+                                <span>s</span>
+                                <label>Indices visuels:</label>
+                                <select id="shapeshifter-tells">
+                                    <option value="none">Aucun</option>
+                                    <option value="peel">Mue visible</option>
+                                    <option value="optional">Optionnel</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Tasks & Vision Tab -->
+                        <div class="tab-content" id="tab-tasks">
+                            <div class="tasks-section">
+                                <h4>Tâches</h4>
+                                <div class="setting-group">
+                                    <label>Tâches communes:</label>
+                                    <input type="range" id="common-tasks" min="0" max="3" value="2">
+                                    <span id="common-tasks-display">2</span>
+                                </div>
+                                <div class="setting-group">
+                                    <label>Tâches courtes:</label>
+                                    <input type="range" id="short-tasks" min="0" max="8" value="3">
+                                    <span id="short-tasks-display">3</span>
+                                </div>
+                                <div class="setting-group">
+                                    <label>Tâches longues:</label>
+                                    <input type="range" id="long-tasks" min="0" max="6" value="2">
+                                    <span id="long-tasks-display">2</span>
+                                </div>
+                                <div class="setting-group">
+                                    <label><input type="checkbox" id="visual-tasks"> Tâches visuelles</label>
+                                </div>
+                            </div>
+                            <div class="vision-section">
+                                <h4>Vision</h4>
+                                <div class="setting-group">
+                                    <label>Vision équipage:</label>
+                                    <input type="range" id="crew-vision" min="0.25" max="1.5" step="0.05" value="0.8">
+                                    <span id="crew-vision-display">0.8x</span>
+                                </div>
+                                <div class="setting-group">
+                                    <label>Vision imposteur:</label>
+                                    <input type="range" id="impostor-vision" min="0.25" max="1.5" step="0.05" value="1.1">
+                                    <span id="impostor-vision-display">1.1x</span>
+                                </div>
+                                <div class="setting-group">
+                                    <label>Sabotage lumières:</label>
+                                    <select id="lights-sabotage">
+                                        <option value="low">Faible (1.5x)</option>
+                                        <option value="med" selected>Moyen (1.0x)</option>
+                                        <option value="high">Fort (0.5x)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timers Tab -->
+                        <div class="tab-content" id="tab-timers">
+                            <div class="setting-group">
+                                <label>Cooldown de kill:</label>
+                                <input type="range" id="kill-cooldown" min="10" max="60" value="27">
+                                <span id="kill-cooldown-display">27s</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Cooldown réunion d'urgence:</label>
+                                <input type="range" id="emergency-cooldown" min="0" max="60" value="15">
+                                <span id="emergency-cooldown-display">15s</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Réunions par joueur:</label>
+                                <input type="range" id="emergency-meetings" min="0" max="2" value="1">
+                                <span id="emergency-meetings-display">1</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Temps de discussion:</label>
+                                <input type="range" id="discussion-time" min="0" max="180" value="45">
+                                <span id="discussion-time-display">45s</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Temps de vote:</label>
+                                <input type="range" id="voting-time" min="15" max="180" value="75">
+                                <span id="voting-time-display">75s</span>
+                            </div>
+                            <div class="setting-group">
+                                <label><input type="checkbox" id="anonymous-votes"> Votes anonymes</label>
+                            </div>
+                        </div>
+
+                        <!-- Votes Tab -->
+                        <div class="tab-content" id="tab-votes">
+                            <div class="setting-group">
+                                <label><input type="checkbox" id="confirm-ejects"> Confirmer les éjections</label>
+                            </div>
+                            <div class="setting-group">
+                                <label>Éjection en cas d'égalité:</label>
+                                <select id="eject-tie">
+                                    <option value="none" selected>Aucune éjection</option>
+                                    <option value="random">Éjecter aléatoirement</option>
+                                    <option value="top">Éjecter joueur le plus voté</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label><input type="checkbox" id="skip-ties"> Ignorer égalités avec le plus voté</label>
+                            </div>
+                            <div class="setting-group">
+                                <label>Visibilité des votes:</label>
+                                <select id="vote-visibility">
+                                    <option value="public" selected>Public</option>
+                                    <option value="anonymous">Anonyme</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Tab -->
+                        <div class="tab-content" id="tab-advanced">
+                            <div class="setting-group">
+                                <label>Mise à jour barre de tâches:</label>
+                                <select id="taskbar-updates">
+                                    <option value="always">Toujours</option>
+                                    <option value="meetings" selected>Réunions</option>
+                                    <option value="never">Jamais</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Révélation du rôle à l'éjection:</label>
+                                <select id="role-reveal">
+                                    <option value="none">Aucun</option>
+                                    <option value="alignment" selected>Alignement</option>
+                                    <option value="exact">Rôle exact</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Vitesse des fantômes:</label>
+                                <input type="range" id="ghost-speed" min="1.0" max="2.0" step="0.1" value="1.0">
+                                <span id="ghost-speed-display">1.0x</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Vitesse des joueurs:</label>
+                                <input type="range" id="player-speed" min="0.5" max="3.0" step="0.05" value="1.1">
+                                <span id="player-speed-display">1.1x</span>
+                            </div>
+                            <div class="setting-group">
+                                <label>Distance de kill:</label>
+                                <select id="kill-distance">
+                                    <option value="short" selected>Courte</option>
+                                    <option value="medium">Moyenne</option>
+                                    <option value="long">Longue</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label>Systèmes désactivés par comms:</label>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" value="tasks_ui" checked> Interface tâches</label>
+                                    <label><input type="checkbox" value="cams" checked> Caméras</label>
+                                    <label><input type="checkbox" value="vitals"> Signes vitaux</label>
+                                    <label><input type="checkbox" value="admin_map"> Carte admin</label>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <label>Durée verrouillage portes:</label>
+                                <input type="range" id="doors-lock" min="5" max="30" value="10">
+                                <span id="doors-lock-display">10s</span>
+                            </div>
+                        </div>
+
+                        <!-- Invite Tab -->
+                        <div class="tab-content" id="tab-invite">
+                            <div class="invite-section">
+                                <h4>Partager la partie</h4>
+                                <div class="invite-actions">
+                                    <button class="invite-btn" id="share-native">📤 Partager</button>
+                                    <button class="invite-btn" id="copy-invite">📋 Copier</button>
+                                    <button class="invite-btn" id="show-qr">📱 QR Code</button>
+                                </div>
+                                <div class="invite-text">
+                                    <p>Rejoins ma partie ! Code: <strong>ABCDEF</strong> — EU-Ouest</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lobby-players">
+                        <h3>Joueurs (1/10)</h3>
+                        <div class="player-list" id="player-list">
+                            <!-- Players will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lobby-actions">
+                    <button class="btn-large primary" id="start-game" disabled>Démarrer</button>
+                    <div class="host-controls">
+                        <button class="control-btn" id="shuffle-colors">🎲 Mélanger couleurs</button>
+                        <button class="control-btn" id="toggle-privacy">🔒 Privé/Public</button>
+                    </div>
+                </div>
+
+                <button class="back-btn" data-action="goto_main">← Retour au menu</button>
+            </div>
+        </div>
+
+        <!-- Other screens will be added here -->
+        <div id="cosmetics-screen" class="screen">
+            <div class="cosmetics-container">
+                <h2>Cosmétiques</h2>
+                <div class="cosmetics-tabs">
+                    <button class="tab active" data-tab="colors">Couleurs</button>
+                    <button class="tab" data-tab="hats">Chapeaux</button>
+                    <button class="tab" data-tab="skins">Skins</button>
+                    <button class="tab" data-tab="visors">Visières</button>
+                    <button class="tab" data-tab="pets">Animaux</button>
+                    <button class="tab" data-tab="nameplates">Plaques</button>
+                </div>
+                <div class="cosmetics-filters">
+                    <button class="filter-btn active" data-filter="all">Tous</button>
+                    <button class="filter-btn" data-filter="owned">Possédé</button>
+                    <button class="filter-btn" data-filter="not-owned">Non possédé</button>
+                    <button class="filter-btn" data-filter="sale">En promo</button>
+                </div>
+                <div class="cosmetics-grid" id="cosmetics-grid">
+                    <!-- Cosmetic items will be dynamically added here -->
+                </div>
+                <button class="back-btn" data-action="goto_main">← Retour</button>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settings-screen" class="screen">
+            <div class="settings-container">
+                <h2>Paramètres</h2>
+                <div class="settings-tabs">
+                    <button class="tab active" data-tab="display">Affichage</button>
+                    <button class="tab" data-tab="audio">Audio</button>
+                    <button class="tab" data-tab="controls">Contrôles</button>
+                    <button class="tab" data-tab="accessibility">Accessibilité</button>
+                    <button class="tab" data-tab="network">Réseau</button>
+                    <button class="tab" data-tab="system">Système</button>
+                </div>
+                <div class="settings-content">
+                    <!-- Settings content will be dynamically loaded -->
+                </div>
+                <button class="back-btn" data-action="goto_main">← Retour</button>
+            </div>
+        </div>
+
+        <!-- In-Game HUD (for demonstration) -->
+        <div id="game-hud" class="screen">
+            <div class="hud-container">
+                <!-- Top Left -->
+                <div class="hud-top-left">
+                    <button class="hud-btn" id="task-list-btn">📋</button>
+                    <div class="task-progress-bar">
+                        <div class="progress-fill" style="width: 45%"></div>
+                        <span class="progress-text">45%</span>
+                    </div>
+                </div>
+
+                <!-- Top Right -->
+                <div class="hud-top-right">
+                    <button class="hud-btn" id="minimap-btn">🗺️</button>
+                    <button class="hud-btn" id="settings-quick-btn">⚙️</button>
+                    <div class="ping-indicator">120ms</div>
+                </div>
+
+                <!-- Bottom Left -->
+                <div class="hud-bottom-left">
+                    <div class="virtual-stick" id="virtual-stick">
+                        <div class="stick-knob"></div>
+                    </div>
+                    <button class="hud-btn use-btn" id="use-btn">Utiliser</button>
+                </div>
+
+                <!-- Bottom Right -->
+                <div class="hud-bottom-right">
+                    <button class="hud-btn report-btn" id="report-btn">Report</button>
+                    <button class="hud-btn kill-btn impostor-only" id="kill-btn">
+                        <span>Kill</span>
+                        <div class="cooldown-ring"></div>
+                    </button>
+                    <button class="hud-btn sabotage-btn impostor-only" id="sabotage-btn">Sabotage</button>
+                </div>
+
+                <!-- Role-specific widgets -->
+                <div class="role-widgets">
+                    <div class="scientist-panel role-panel" id="scientist-panel">
+                        <button class="vitals-btn">💓 Signes vitaux</button>
+                        <div class="battery-bar">
+                            <div class="battery-fill" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="engineer-panel role-panel" id="engineer-panel">
+                        <div class="vent-timer">Ventilation: 8s</div>
+                    </div>
+                    <div class="guardian-panel role-panel" id="guardian-panel">
+                        <button class="shield-btn">🛡️ Protéger</button>
+                        <div class="cooldown-display">Cooldown: 15s</div>
+                    </div>
+                    <div class="shapeshifter-panel role-panel" id="shapeshifter-panel">
+                        <button class="shift-btn">🔄 Métamorphose</button>
+                        <div class="shift-timer">Durée: 25s</div>
+                    </div>
+                </div>
+
+                <!-- Status toasts -->
+                <div class="status-toasts" id="status-toasts">
+                    <!-- Toasts will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal overlays -->
+        <div id="modal-overlay" class="modal-overlay">
+            <div class="modal-content" id="modal-content">
+                <!-- Modal content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/lobby.js"></script>
+    <script src="js/matchmaking.js"></script>
+    <script src="js/cosmetics.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/hud.js"></script>
+</body>
+</html>
