@@ -197,13 +197,13 @@ class AmongUsV3App {
             color: '#ff3838', // Red by default
             isImpostor: false,
             isAlive: true,
-            position: { x: 900, y: 325 }, // Start at cafeteria
+            position: { x: 0, y: 0 }, // Start at center
             tasks: [],
             completedTasks: 0,
             animation: 'idle',
             direction: 'right',
             velocity: { x: 0, y: 0 },
-            lastPosition: { x: 900, y: 325 }
+            lastPosition: { x: 0, y: 0 }
         };
         
         // Add to players map
@@ -608,29 +608,51 @@ class AmongUsV3App {
     }
     
     createMapElements() {
-        // Create walls, floors, and interactive objects
-        // This would be expanded with actual map data
-        
-        // Example: Create a wall
-        const wall = {
-            type: 'shape',
-            x: 100,
+        // Create a basic room to make the world visible
+        const room = {
+            type: 'room',
+            x: 0,
             y: 0,
-            shape: 'rectangle',
-            width: 20,
-            height: 100,
-            fillColor: '#4a5568',
-            fill: true
+            width: 800,
+            height: 600,
+            color: '#3a3a5a',
+            name: 'Cafeteria'
         };
+        this.engine.graphics.addToLayer('environment', room);
+
+        // Create physics bodies for the walls of the room
+        const wallThickness = 20;
+
+        // Top wall
+        this.engine.physics.createBody('wall_top', {
+            x: 0,
+            y: -300 - wallThickness / 2,
+            isStatic: true,
+            shape: { type: 'rectangle', width: 800 + 2 * wallThickness, height: wallThickness }
+        });
         
-        this.engine.graphics.addToLayer('environment', wall);
-        
-        // Create physics body for wall
-        this.engine.physics.createBody('wall1', {
-            x: 100,
+        // Bottom wall
+        this.engine.physics.createBody('wall_bottom', {
+            x: 0,
+            y: 300 + wallThickness / 2,
+            isStatic: true,
+            shape: { type: 'rectangle', width: 800 + 2 * wallThickness, height: wallThickness }
+        });
+
+        // Left wall
+        this.engine.physics.createBody('wall_left', {
+            x: -400 - wallThickness / 2,
             y: 0,
             isStatic: true,
-            shape: { type: 'rectangle', width: 20, height: 100 }
+            shape: { type: 'rectangle', width: wallThickness, height: 600 }
+        });
+        
+        // Right wall
+        this.engine.physics.createBody('wall_right', {
+            x: 400 + wallThickness / 2,
+            y: 0,
+            isStatic: true,
+            shape: { type: 'rectangle', width: wallThickness, height: 600 }
         });
     }
     

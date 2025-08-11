@@ -218,24 +218,6 @@ class AmongUsV3Particles {
             rotationSpeed: { min: -30, max: 30 }
         });
         
-        // Walking dust
-        this.presetConfigs.set('walkingDust', {
-            type: this.particleTypes.DUST,
-            count: 3,
-            duration: 800,
-            position: { x: 0, y: 0, spread: 8 },
-            velocity: {
-                x: { min: -20, max: 20 },
-                y: { min: 5, max: 15 },
-                z: { min: -2, max: 2 }
-            },
-            size: { min: 1, max: 3 },
-            color: { r: 150, g: 150, b: 150, a: 0.4 },
-            gravity: 50,
-            friction: 0.95,
-            fadeOut: 0.8
-        });
-        
         // Button click effect
         this.presetConfigs.set('buttonClick', {
             type: this.particleTypes.STAR,
@@ -253,26 +235,6 @@ class AmongUsV3Particles {
             friction: 0.96,
             fadeOut: 0.5,
             rotationSpeed: { min: -180, max: 180 }
-        });
-        
-        // Ambient space particles
-        this.presetConfigs.set('spaceAmbient', {
-            type: this.particleTypes.STAR,
-            count: 50,
-            duration: 10000,
-            position: { x: 0, y: 0, spread: 500 },
-            velocity: {
-                x: { min: -5, max: 5 },
-                y: { min: -5, max: 5 },
-                z: { min: -2, max: 2 }
-            },
-            size: { min: 1, max: 3 },
-            color: { r: 255, g: 255, b: 255, a: 0.6 },
-            gravity: 0,
-            friction: 1,
-            fadeIn: 2,
-            fadeOut: 2,
-            rotationSpeed: { min: -10, max: 10 }
         });
     }
     

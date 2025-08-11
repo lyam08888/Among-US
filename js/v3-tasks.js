@@ -104,30 +104,6 @@ class AmongUsV3Tasks {
             minigame: 'fixWiring'
         });
         
-        // Visual Tasks (others can see you doing these)
-        this.taskDefinitions.set('medbay-submit-scan', {
-            id: 'medbay-submit-scan',
-            name: 'Medbay: Submit Scan',
-            category: this.taskCategories.VISUAL,
-            location: 'medbay',
-            duration: 10000,
-            visual: true,
-            description: 'Submit to medical scan',
-            steps: ['Step on scanner', 'Wait for scan', 'Review results'],
-            minigame: 'medbayScan'
-        });
-        
-        this.taskDefinitions.set('weapons-clear-asteroids', {
-            id: 'weapons-clear-asteroids',
-            name: 'Weapons: Clear Asteroids',
-            category: this.taskCategories.VISUAL,
-            location: 'weapons',
-            duration: 15000,
-            visual: true,
-            description: 'Destroy incoming asteroids',
-            steps: ['Aim at asteroids', 'Fire weapons', 'Clear all targets'],
-            minigame: 'clearAsteroids'
-        });
         
         // Short Tasks
         this.taskDefinitions.set('shields-prime-shields', {
@@ -154,29 +130,6 @@ class AmongUsV3Tasks {
             minigame: 'cleanFilter'
         });
         
-        this.taskDefinitions.set('navigation-chart-course', {
-            id: 'navigation-chart-course',
-            name: 'Navigation: Chart Course',
-            category: this.taskCategories.SHORT,
-            location: 'navigation',
-            duration: 4000,
-            visual: false,
-            description: 'Set navigation coordinates',
-            steps: ['Enter coordinates', 'Confirm route', 'Engage autopilot'],
-            minigame: 'chartCourse'
-        });
-        
-        this.taskDefinitions.set('cafeteria-empty-garbage', {
-            id: 'cafeteria-empty-garbage',
-            name: 'Cafeteria: Empty Garbage',
-            category: this.taskCategories.SHORT,
-            location: 'cafeteria',
-            duration: 2500,
-            visual: false,
-            description: 'Empty the garbage chute',
-            steps: ['Pull lever', 'Wait for disposal'],
-            minigame: 'emptyGarbage'
-        });
         
         // Long Tasks
         this.taskDefinitions.set('reactor-start-reactor', {
@@ -191,40 +144,6 @@ class AmongUsV3Tasks {
             minigame: 'startReactor'
         });
         
-        this.taskDefinitions.set('storage-fuel-engines', {
-            id: 'storage-fuel-engines',
-            name: 'Storage: Fuel Engines',
-            category: this.taskCategories.LONG,
-            location: 'storage',
-            duration: 8000,
-            visual: false,
-            description: 'Refuel the ship engines',
-            steps: ['Get fuel canister', 'Go to engines', 'Fill fuel tank'],
-            minigame: 'fuelEngines',
-            multiStep: true,
-            steps: [
-                { location: 'storage', action: 'Get fuel canister' },
-                { location: 'upper-engine', action: 'Fill upper engine' },
-                { location: 'lower-engine', action: 'Fill lower engine' }
-            ]
-        });
-        
-        this.taskDefinitions.set('communications-download-data', {
-            id: 'communications-download-data',
-            name: 'Communications: Download Data',
-            category: this.taskCategories.LONG,
-            location: 'communications',
-            duration: 9000,
-            visual: false,
-            description: 'Download communication data',
-            steps: ['Start download', 'Wait for completion', 'Upload to admin'],
-            minigame: 'downloadData',
-            multiStep: true,
-            steps: [
-                { location: 'communications', action: 'Start download' },
-                { location: 'admin', action: 'Upload data' }
-            ]
-        });
     }
     
     initializeTaskLocations() {
