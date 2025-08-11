@@ -23,7 +23,7 @@ class AmongUsV3App {
             activeModal: null,
             notifications: [],
             chatMessages: [],
-            isChatOpen: true,
+            isChatOpen: false,
             selectedPlayer: null
         };
         
