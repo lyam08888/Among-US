@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Among Us V3 - Premium Game Experience</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/v3-main.css">
+    <link rel="stylesheet" href="styles/v3-game.css">
+    <link rel="stylesheet" href="styles/v3-ui.css">
+    <link rel="stylesheet" href="styles/v3-animations.css">
+    <link rel="stylesheet" href="styles/v3-particles.css">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="assets/sounds/ambient.mp3" as="audio">
+    <link rel="preload" href="assets/sounds/button-click.mp3" as="audio">
+    
+    <meta name="description" content="Among Us V3 - Experience the ultimate premium Among Us game with advanced graphics, physics, and complete gameplay mechanics">
+    <meta name="keywords" content="among us, game, multiplayer, premium, v3">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen active">
+            <div class="loading-content">
+                <div class="loading-logo">
+                    <div class="crewmate-loader">
+                        <div class="crewmate-body"></div>
+                        <div class="crewmate-visor"></div>
+                        <div class="crewmate-backpack"></div>
+                    </div>
+                </div>
+                <h1 class="loading-title">
+                    <span class="title-among">AMONG</span>
+                    <span class="title-us">US</span>
+                    <span class="version-badge-v3">V3</span>
+                </h1>
+                <div class="loading-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="loading-progress-fill"></div>
+                    </div>
+                    <div class="loading-text" id="loading-text">Initialisation du moteur de jeu...</div>
+                    <div class="loading-percentage" id="loading-percentage">0%</div>
+                </div>
+                <div class="loading-tips">
+                    <div class="tip-container">
+                        <i class="fas fa-lightbulb"></i>
+                        <span id="loading-tip">Astuce: Utilisez les évents pour vous déplacer rapidement sur la carte!</span>
+                    </div>
+                </div>
+            </div>
+            <div class="loading-particles"></div>
+        </div>
+
+        <!-- Main Menu V3 -->
+        <div id="main-menu-v3" class="screen">
+            <div class="menu-background">
+                <canvas id="menu-background-canvas"></canvas>
+                <div class="space-overlay"></div>
+            </div>
+            
+            <div class="menu-container-v3">
+                <!-- Header Section -->
+                <header class="menu-header">
+                    <div class="logo-section-v3">
+                        <div class="logo-container-v3">
+                            <div class="animated-crewmate">
+                                <div class="crewmate-body"></div>
+                                <div class="crewmate-visor"></div>
+                                <div class="crewmate-backpack"></div>
+                                <div class="crewmate-shadow"></div>
+                            </div>
+                            <div class="title-container">
+                                <h1 class="game-title-v3">
+                                    <span class="title-among">AMONG</span>
+                                    <span class="title-us">US</span>
+                                </h1>
+                                <div class="version-info">
+                                    <span class="version-badge-v3">V3</span>
+                                    <span class="version-subtitle">PREMIUM EDITION</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- User Profile -->
+                    <div class="user-profile">
+                        <div class="profile-avatar">
+                            <div class="avatar-crewmate" data-color="red">
+                                <div class="avatar-body"></div>
+                                <div class="avatar-visor"></div>
+                            </div>
+                            <div class="profile-status online"></div>
+                        </div>
+                        <div class="profile-info">
+                            <div class="profile-name" id="player-name">Joueur</div>
+                            <div class="profile-level">
+                                <i class="fas fa-star"></i>
+                                <span id="player-level">Niveau 15</span>
+                            </div>
+                        </div>
+                        <button class="profile-settings" data-action="profile-settings">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Main Actions Grid -->
+                <div class="main-actions-v3">
+                    <div class="action-card-v3 primary-card" data-action="quick-play-v3">
+                        <div class="card-background"></div>
+                        <div class="card-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Partie Rapide</h3>
+                            <p>Rejoindre une partie immédiatement</p>
+                            <div class="card-stats">
+                                <span><i class="fas fa-users"></i> ~30s d'attente</span>
+                            </div>
+                        </div>
+                        <div class="card-glow"></div>
+                        <div class="card-particles"></div>
+                    </div>
+
+                    <div class="action-card-v3 secondary-card" data-action="create-room-v3">
+                        <div class="card-background"></div>
+                        <div class="card-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Créer une Partie</h3>
+                            <p>Personnaliser toutes les règles</p>
+                            <div class="card-stats">
+                                <span><i class="fas fa-sliders-h"></i> Configuration avancée</span>
+                            </div>
+                        </div>
+                        <div class="card-glow"></div>
+                    </div>
+
+                    <div class="action-card-v3 secondary-card" data-action="join-room-v3">
+                        <div class="card-background"></div>
+                        <div class="card-icon">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Rejoindre</h3>
+                            <p>Entrer un code de partie</p>
+                            <div class="card-stats">
+                                <span><i class="fas fa-keyboard"></i> Code à 6 lettres</span>
+                            </div>
+                        </div>
+                        <div class="card-glow"></div>
+                    </div>
+
+                    <div class="action-card-v3 tertiary-card" data-action="training-mode">
+                        <div class="card-background"></div>
+                        <div class="card-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Mode Entraînement</h3>
+                            <p>Apprendre les mécaniques</p>
+                            <div class="card-stats">
+                                <span><i class="fas fa-brain"></i> Tutoriel interactif</span>
+                            </div>
+                        </div>
+                        <div class="card-glow"></div>
+                    </div>
+                </div>
+
+                <!-- Game Modes -->
+                <div class="game-modes-section">
+                    <h3 class="section-title">Modes de Jeu</h3>
+                    <div class="game-modes-grid">
+                        <div class="mode-card" data-mode="classic">
+                            <div class="mode-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="mode-info">
+                                <h4>Classique</h4>
+                                <p>Le mode Among Us traditionnel</p>
+                            </div>
+                            <div class="mode-players">4-15 joueurs</div>
+                        </div>
+                        
+                        <div class="mode-card" data-mode="hide-seek">
+                            <div class="mode-icon">
+                                <i class="fas fa-eye-slash"></i>
+                            </div>
+                            <div class="mode-info">
+                                <h4>Cache-Cache</h4>
+                                <p>Les imposteurs se cachent</p>
+                            </div>
+                            <div class="mode-players">4-10 joueurs</div>
+                        </div>
+                        
+                        <div class="mode-card" data-mode="racing">
+                            <div class="mode-icon">
+                                <i class="fas fa-flag-checkered"></i>
+                            </div>
+                            <div class="mode-info">
+                                <h4>Course</h4>
+                                <p>Terminer les tâches en premier</p>
+                            </div>
+                            <div class="mode-players">4-12 joueurs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Menu -->
+                <div class="secondary-menu-v3">
+                    <button class="menu-item-v3" data-action="customize-v3">
+                        <div class="item-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <span>Personnaliser</span>
+                        <div class="item-badge">Nouveau</div>
+                    </button>
+                    
+                    <button class="menu-item-v3" data-action="achievements">
+                        <div class="item-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <span>Succès</span>
+                        <div class="item-progress">75%</div>
+                    </button>
+                    
+                    <button class="menu-item-v3" data-action="statistics">
+                        <div class="item-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <span>Statistiques</span>
+                    </button>
+                    
+                    <button class="menu-item-v3" data-action="settings-v3">
+                        <div class="item-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <span>Paramètres</span>
+                    </button>
+                </div>
+
+                <!-- Status Bar -->
+                <div class="status-bar-v3">
+                    <div class="status-section">
+                        <div class="server-status">
+                            <div class="status-indicator online"></div>
+                            <span>Serveurs en ligne</span>
+                            <div class="ping-display">
+                                <i class="fas fa-wifi"></i>
+                                <span id="ping-value">23ms</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="status-section">
+                        <div class="player-count">
+                            <i class="fas fa-users"></i>
+                            <span id="online-players-v3">24,891</span>
+                            <span class="players-label">joueurs en ligne</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-section">
+                        <div class="region-selector">
+                            <i class="fas fa-globe"></i>
+                            <select id="region-select-v3">
+                                <option value="auto">Auto (23ms)</option>
+                                <option value="eu">Europe (23ms)</option>
+                                <option value="na">Amérique du Nord (89ms)</option>
+                                <option value="as">Asie (156ms)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-container">
+                <!-- Game Canvas -->
+                <canvas id="game-canvas" width="1920" height="1080"></canvas>
+                
+                <!-- Game UI Overlay -->
+                <div class="game-ui-overlay">
+                    <!-- Top HUD -->
+                    <div class="top-hud">
+                        <div class="game-info">
+                            <div class="room-code">
+                                <i class="fas fa-key"></i>
+                                <span id="current-room-code">ABCDEF</span>
+                                <button class="copy-code-btn" data-action="copy-room-code">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <div class="game-timer">
+                                <i class="fas fa-clock"></i>
+                                <span id="game-timer">05:30</span>
+                            </div>
+                        </div>
+                        
+                        <div class="player-count-hud">
+                            <div class="alive-count">
+                                <i class="fas fa-heart"></i>
+                                <span id="alive-players">8</span>
+                            </div>
+                            <div class="total-count">
+                                <i class="fas fa-users"></i>
+                                <span id="total-players">10</span>
+                            </div>
+                        </div>
+                        
+                        <div class="game-controls">
+                            <button class="control-btn" data-action="toggle-map">
+                                <i class="fas fa-map"></i>
+                            </button>
+                            <button class="control-btn" data-action="toggle-settings">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                            <button class="control-btn emergency" data-action="emergency-meeting">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Task List -->
+                    <div class="task-list" id="task-list">
+                        <div class="task-header">
+                            <h3>Tâches</h3>
+                            <div class="task-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="task-progress-fill"></div>
+                                </div>
+                                <span id="task-progress-text">3/7</span>
+                            </div>
+                        </div>
+                        <div class="task-items" id="task-items">
+                            <!-- Tasks will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Use Button -->
+                    <div class="use-button" id="use-button">
+                        <button class="use-btn" data-action="use-interact">
+                            <span class="use-text">Utiliser</span>
+                            <div class="use-key">E</div>
+                        </button>
+                    </div>
+                    
+                    <!-- Kill Button (for impostors) -->
+                    <div class="kill-button" id="kill-button">
+                        <button class="kill-btn" data-action="kill-player">
+                            <i class="fas fa-skull"></i>
+                            <span class="kill-text">Éliminer</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Sabotage Panel (for impostors) -->
+                    <div class="sabotage-panel" id="sabotage-panel">
+                        <div class="sabotage-header">
+                            <h3>Sabotages</h3>
+                            <button class="close-sabotage" data-action="close-sabotage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="sabotage-options">
+                            <button class="sabotage-btn" data-sabotage="lights">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Lumières</span>
+                            </button>
+                            <button class="sabotage-btn" data-sabotage="oxygen">
+                                <i class="fas fa-wind"></i>
+                                <span>Oxygène</span>
+                            </button>
+                            <button class="sabotage-btn" data-sabotage="reactor">
+                                <i class="fas fa-radiation"></i>
+                                <span>Réacteur</span>
+                            </button>
+                            <button class="sabotage-btn" data-sabotage="comms">
+                                <i class="fas fa-satellite-dish"></i>
+                                <span>Communications</span>
+                            </button>
+                            <button class="sabotage-btn" data-sabotage="doors">
+                                <i class="fas fa-door-closed"></i>
+                                <span>Portes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voting Screen -->
+        <div id="voting-screen" class="screen">
+            <div class="voting-container">
+                <div class="voting-header">
+                    <h2>Qui est l'imposteur ?</h2>
+                    <div class="voting-timer">
+                        <div class="timer-circle">
+                            <svg class="timer-svg">
+                                <circle class="timer-bg" cx="25" cy="25" r="20"></circle>
+                                <circle class="timer-progress" cx="25" cy="25" r="20" id="voting-timer-progress"></circle>
+                            </svg>
+                            <span class="timer-text" id="voting-time">120</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="voting-grid" id="voting-grid">
+                    <!-- Voting options will be populated by JavaScript -->
+                </div>
+                
+                <div class="voting-actions">
+                    <button class="vote-skip-btn" data-action="vote-skip">
+                        <i class="fas fa-forward"></i>
+                        Passer le vote
+                    </button>
+                </div>
+                
+                <div class="voting-results" id="voting-results">
+                    <!-- Results will be shown here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Interface -->
+        <div id="task-interface" class="modal-overlay">
+            <div class="task-modal">
+                <div class="task-header">
+                    <h3 id="task-title">Tâche</h3>
+                    <button class="close-task-btn" data-action="close-task">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="task-content" id="task-content">
+                    <!-- Task-specific content will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal-overlay">
+            <div class="settings-modal">
+                <div class="modal-header">
+                    <h3>Paramètres</h3>
+                    <button class="close-modal-btn" data-action="close-settings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-content">
+                    <div class="settings-tabs">
+                        <button class="tab-btn active" data-tab="graphics">Graphismes</button>
+                        <button class="tab-btn" data-tab="audio">Audio</button>
+                        <button class="tab-btn" data-tab="controls">Contrôles</button>
+                        <button class="tab-btn" data-tab="gameplay">Gameplay</button>
+                    </div>
+                    <div class="settings-content" id="settings-content">
+                        <!-- Settings content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification System -->
+        <div id="notification-container" class="notification-container">
+            <!-- Notifications will be added here dynamically -->
+        </div>
+
+        <!-- Chat System -->
+        <div id="chat-container" class="chat-container">
+            <div class="chat-header">
+                <h4>Chat</h4>
+                <button class="toggle-chat-btn" data-action="toggle-chat">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- Chat messages will be added here -->
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Tapez votre message..." maxlength="100">
+                <button class="send-chat-btn" data-action="send-chat">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Audio Elements -->
+        <audio id="ambient-audio" loop>
+            <source src="assets/sounds/ambient.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="button-click-audio">
+            <source src="assets/sounds/button-click.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="task-complete-audio">
+            <source src="assets/sounds/task-complete.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="emergency-audio">
+            <source src="assets/sounds/emergency.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="kill-audio">
+            <source src="assets/sounds/kill.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/v3-engine.js"></script>
+    <script src="js/v3-physics.js"></script>
+    <script src="js/v3-graphics.js"></script>
+    <script src="js/v3-audio.js"></script>
+    <script src="js/v3-networking.js"></script>
+    <script src="js/v3-game-logic.js"></script>
+    <script src="js/v3-ui.js"></script>
+    <script src="js/v3-animations.js"></script>
+    <script src="js/v3-particles.js"></script>
+    <script src="js/v3-tasks.js"></script>
+    <script src="js/v3-maps.js"></script>
+    <script src="js/v3-app.js"></script>
+</body>
+</html>
