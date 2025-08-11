@@ -729,6 +729,21 @@ class AmongUsV3Networking {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
     
+    // Update method called by engine
+    update(deltaTime) {
+        if (!this.isInitialized) return;
+        
+        // Update network statistics
+        this.updateNetworkStats();
+        
+        // Update simulated players
+        this.updateSimulatedPlayers();
+        
+        // Process any pending messages
+        this.processIncomingMessages();
+        this.processOutgoingMessages();
+    }
+    
     // Debug methods
     getDebugInfo() {
         return {
