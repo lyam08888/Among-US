@@ -581,13 +581,18 @@ class AmongUsV3App {
         });
         
         // Create player visual representation
+        const player = this.gameState.localPlayer;
         const playerSprite = {
-            type: 'custom',
-            x: this.gameState.localPlayer.position.x,
-            y: this.gameState.localPlayer.position.y,
-            render: (ctx) => {
-                this.engine.graphics.drawCrewmate(ctx, 0, 0, '#ff3838', 1);
-            }
+            type: 'player',
+            id: player.id,
+            x: player.position.x,
+            y: player.position.y,
+            color: player.color,
+            name: player.name,
+            isDead: !player.isAlive,
+            isImpostor: player.isImpostor,
+            animation: player.animation,
+            direction: player.direction
         };
         
         this.engine.graphics.addToLayer('players', playerSprite);
