@@ -157,16 +157,16 @@ class AmongUsV3Audio {
     
     async loadDefaultSounds() {
         const soundList = [
-            { name: 'buttonClick', url: 'assets/sounds/button-click.mp3', type: 'sfx' },
-            { name: 'taskComplete', url: 'assets/sounds/task-complete.mp3', type: 'sfx' },
-            { name: 'kill', url: 'assets/sounds/kill.mp3', type: 'sfx' },
-            { name: 'emergency', url: 'assets/sounds/emergency.mp3', type: 'sfx' },
-            { name: 'sabotage', url: 'assets/sounds/sabotage.mp3', type: 'sfx' },
-            { name: 'vent', url: 'assets/sounds/vent.mp3', type: 'sfx' },
-            { name: 'footstep', url: 'assets/sounds/footstep.mp3', type: 'sfx' },
-            { name: 'ambient', url: 'assets/sounds/ambient.mp3', type: 'music' },
-            { name: 'lobby', url: 'assets/sounds/lobby.mp3', type: 'music' },
-            { name: 'discussion', url: 'assets/sounds/discussion.mp3', type: 'music' }
+            { name: 'buttonClick', url: 'assets/sounds/button-click.mp3', fallbackUrl: 'assets/sounds/default-click.mp3', type: 'sfx' },
+            { name: 'taskComplete', url: 'assets/sounds/task-complete.mp3', fallbackUrl: 'assets/sounds/default-complete.mp3', type: 'sfx' },
+            { name: 'kill', url: 'assets/sounds/kill.mp3', fallbackUrl: 'assets/sounds/default-kill.mp3', type: 'sfx' },
+            { name: 'emergency', url: 'assets/sounds/emergency.mp3', fallbackUrl: 'assets/sounds/default-emergency.mp3', type: 'sfx' },
+            { name: 'sabotage', url: 'assets/sounds/sabotage.mp3', fallbackUrl: 'assets/sounds/default-sabotage.mp3', type: 'sfx' },
+            { name: 'vent', url: 'assets/sounds/vent.mp3', fallbackUrl: 'assets/sounds/default-vent.mp3', type: 'sfx' },
+            { name: 'footstep', url: 'assets/sounds/footstep.mp3', fallbackUrl: 'assets/sounds/default-footstep.mp3', type: 'sfx' },
+            { name: 'ambient', url: 'assets/sounds/ambient.mp3', fallbackUrl: 'assets/sounds/default-ambient.mp3', type: 'music' },
+            { name: 'lobby', url: 'assets/sounds/lobby.mp3', fallbackUrl: 'assets/sounds/default-lobby.mp3', type: 'music' },
+            { name: 'discussion', url: 'assets/sounds/discussion.mp3', fallbackUrl: 'assets/sounds/default-discussion.mp3', type: 'music' }
         ];
         
         // Create fallback sounds if files don't exist
@@ -174,12 +174,88 @@ class AmongUsV3Audio {
             try {
                 await this.loadSound(sound.name, sound.url, sound.type);
             } catch (error) {
-                console.warn(`Failed to load ${sound.name}, creating fallback`);
-                this.createFallbackSound(sound.name, sound.type);
+                console.warn(`Failed to load ${sound.name}, trying fallback`);
+                try {
+                    await this.loadSound(sound.name, sound.fallbackUrl, sound.type);
+                } catch (fallbackError) {
+                    console.warn(`Failed to load fallback for ${sound.name}, creating synthetic sound`);
+                    this.createSyntheticSound(sound.name, sound.type);
+                }
             }
         }
     }
     
+    createSyntheticSound(name, type) {
+        const audioContext = this.context;
+        const sampleRate = audioContext.sampleRate;
+        const duration = type === 'music' ? 4.0 : 0.5;
+        const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate);
+        const channelData = buffer.getChannelData(0);
+
+        // Create different synthetic sounds based on the name
+        switch(name) {
+            case 'buttonClick':
+                this.generateClickSound(channelData, sampleRate);
+                break;
+            case 'taskComplete':
+                this.generateCompletionSound(channelData, sampleRate);
+                break;
+            case 'kill':
+                this.generateDramaticSound(channelData, sampleRate);
+                break;
+            default:
+                this.generateDefaultSound(channelData, sampleRate);
+        }
+
+        const soundData = {
+            buffer,
+            type,
+            volume: 1.0,
+            loop: type === 'music',
+            spatial: false
+        };
+
+        if (type === 'music') {
+            this.music.set(name, soundData);
+        } else {
+            this.sounds.set(name, soundData);
+        }
+    }
+
+    generateClickSound(channelData, sampleRate) {
+        const frequency = 800;
+        for (let i = 0; i < channelData.length; i++) {
+            const t = i / sampleRate;
+            channelData[i] = Math.sin(2 * Math.PI * frequency * t) * Math.exp(-8 * t);
+        }
+    }
+
+    generateCompletionSound(channelData, sampleRate) {
+        const frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5
+        for (let i = 0; i < channelData.length; i++) {
+            const t = i / sampleRate;
+            channelData[i] = frequencies.reduce((acc, freq, index) => {
+                return acc + Math.sin(2 * Math.PI * freq * t) * Math.exp(-4 * t);
+            }, 0) / frequencies.length;
+        }
+    }
+
+    generateDramaticSound(channelData, sampleRate) {
+        const frequency = 150;
+        for (let i = 0; i < channelData.length; i++) {
+            const t = i / sampleRate;
+            channelData[i] = Math.sin(2 * Math.PI * frequency * t) * Math.exp(-2 * t);
+        }
+    }
+
+    generateDefaultSound(channelData, sampleRate) {
+        const frequency = 440;
+        for (let i = 0; i < channelData.length; i++) {
+            const t = i / sampleRate;
+            channelData[i] = Math.sin(2 * Math.PI * frequency * t) * Math.exp(-4 * t);
+        }
+    }
+
     async loadSound(name, url, type = 'sfx') {
         if (this.loadingPromises.has(name)) {
             return this.loadingPromises.get(name);
