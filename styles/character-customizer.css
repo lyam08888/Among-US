@@ -1,11 +1,14 @@
 /* Character Customizer Styles */
 
 /* Panel Layout */
-.large-panel {
+.large-panel .panel-content {
     width: 90vw;
     max-width: 1200px;
     height: 80vh;
     max-height: 800px;
+    max-width: none;
+    padding: 0;
+    overflow: hidden;
 }
 
 .panel-actions {
@@ -19,6 +22,7 @@
     grid-template-columns: 300px 1fr;
     gap: 20px;
     height: 100%;
+    padding: 20px;
 }
 
 /* Preview Section */

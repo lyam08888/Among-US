@@ -121,6 +121,7 @@ class CharacterCustomizer {
                 
                 slider.addEventListener('input', (e) => {
                     this.currentOptions.anatomy[control.property] = parseFloat(e.target.value);
+                    this.updateSliderValue(control.id, e.target.value);
                     this.updatePreview();
                 });
             }
@@ -144,6 +145,7 @@ class CharacterCustomizer {
                 
                 slider.addEventListener('input', (e) => {
                     this.currentOptions[control.property] = parseFloat(e.target.value);
+                    this.updateSliderValue(control.id, e.target.value);
                     this.updatePreview();
                 });
             }
@@ -283,6 +285,13 @@ class CharacterCustomizer {
         this.setupVisorControls();
         this.setupAccessoryControls();
         this.setupDecalControls();
+    }
+    
+    updateSliderValue(sliderId, value) {
+        const valueSpan = document.getElementById(sliderId.replace('-slider', '-value'));
+        if (valueSpan) {
+            valueSpan.textContent = parseFloat(value).toFixed(2);
+        }
     }
     
     updatePreview() {
