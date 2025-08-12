@@ -30,6 +30,9 @@ class AmongUsV3App {
         // Mobile controls
         this.mobileControls = null;
         
+        // Mobile popup system
+        this.popupSystem = null;
+        
         // Loading progress
         this.loadingProgress = {
             current: 0,
@@ -75,6 +78,9 @@ class AmongUsV3App {
             
             // Initialize mobile controls
             this.initializeMobileControls();
+            
+            // Initialize popup system
+            this.initializePopupSystem();
             
             // Complete initialization
             this.completeInitialization();
@@ -570,6 +576,216 @@ class AmongUsV3App {
         }
     }
     
+    initializePopupSystem() {
+        // Initialize popup system if available
+        if (typeof MobilePopupSystem !== 'undefined') {
+            this.popupSystem = new MobilePopupSystem();
+            
+            // Setup popup event listeners
+            document.addEventListener('popup:action', this.handlePopupAction.bind(this));
+            
+            // Create game-specific popups
+            this.createGamePopups();
+            
+            console.log('📱 Popup system integrated');
+        }
+    }
+    
+    createGamePopups() {
+        if (!this.popupSystem) return;
+        
+        // Create floating action menu
+        this.popupSystem.showPopup('game-menu', 'floating', {
+            icon: 'fas fa-bars',
+            items: [
+                { icon: 'fas fa-cog', label: 'Paramètres', action: 'settings' },
+                { icon: 'fas fa-map', label: 'Carte', action: 'map' },
+                { icon: 'fas fa-list', label: 'Tâches', action: 'tasks' },
+                { icon: 'fas fa-comments', label: 'Chat', action: 'chat' },
+                { icon: 'fas fa-home', label: 'Menu', action: 'main-menu' }
+            ],
+            position: { x: window.innerWidth - 80, y: window.innerHeight - 160 }
+        });
+        
+        // Create task popup (minimizable)
+        this.popupSystem.showPopup('task-tracker', 'minimizable', {
+            title: 'Suivi des Tâches',
+            content: this.generateTaskTrackerContent(),
+            position: { x: 20, y: 80 }
+        });
+        
+        // Create player list popup (slide-up, hidden by default)
+        // Will be shown when needed
+    }
+    
+    generateTaskTrackerContent() {
+        const tasks = this.gameState.tasks || [];
+        
+        if (tasks.length === 0) {
+            return `
+                <div class="task-tracker-empty">
+                    <i class="fas fa-clipboard-list" style="font-size: 48px; color: var(--text-muted); margin-bottom: 15px;"></i>
+                    <p>Aucune tâche assignée</p>
+                    <small>Les tâches apparaîtront ici une fois la partie commencée</small>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="task-tracker-list">
+                ${tasks.map(task => `
+                    <div class="task-item ${task.completed ? 'completed' : ''}">
+                        <div class="task-icon">
+                            <i class="${task.icon || 'fas fa-wrench'}"></i>
+                        </div>
+                        <div class="task-info">
+                            <div class="task-name">${task.name}</div>
+                            <div class="task-location">${task.location}</div>
+                        </div>
+                        <div class="task-status">
+                            ${task.completed ? '<i class="fas fa-check"></i>' : '<i class="fas fa-circle"></i>'}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="task-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${(tasks.filter(t => t.completed).length / tasks.length) * 100}%"></div>
+                </div>
+                <div class="progress-text">
+                    ${tasks.filter(t => t.completed).length}/${tasks.length} tâches terminées
+                </div>
+            </div>
+        `;
+    }
+    
+    handlePopupAction(event) {
+        const { id, action } = event.detail;
+        
+        switch (action) {
+            case 'settings':
+                this.showSettings();
+                break;
+            case 'map':
+                this.toggleMap();
+                break;
+            case 'tasks':
+                this.showTaskList();
+                break;
+            case 'chat':
+                this.toggleChat();
+                break;
+            case 'main-menu':
+                this.showMainMenu();
+                break;
+            case 'player-list':
+                this.showPlayerList();
+                break;
+            case 'emergency':
+                this.callEmergencyMeeting();
+                break;
+        }
+    }
+    
+    showSettings() {
+        if (this.popupSystem) {
+            this.popupSystem.showPopup('settings', 'slide-up', {
+                title: 'Paramètres',
+                content: this.generateSettingsContent()
+            });
+        }
+    }
+    
+    generateSettingsContent() {
+        return `
+            <div class="settings-sections">
+                <div class="setting-section">
+                    <h4>Audio</h4>
+                    <div class="setting-item">
+                        <label>Volume Principal</label>
+                        <input type="range" class="mobile-slider" min="0" max="100" value="80" data-setting="masterVolume">
+                    </div>
+                    <div class="setting-item">
+                        <label>Effets Sonores</label>
+                        <input type="range" class="mobile-slider" min="0" max="100" value="70" data-setting="sfxVolume">
+                    </div>
+                </div>
+                
+                <div class="setting-section">
+                    <h4>Graphismes</h4>
+                    <div class="setting-item">
+                        <label>Qualité</label>
+                        <div class="mobile-button-group">
+                            <button class="mobile-option-btn" data-value="low">Faible</button>
+                            <button class="mobile-option-btn active" data-value="medium">Moyen</button>
+                            <button class="mobile-option-btn" data-value="high">Élevé</button>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>Éclairage</label>
+                        <div class="mobile-toggle active" data-setting="lighting"></div>
+                    </div>
+                </div>
+                
+                <div class="setting-section">
+                    <h4>Contrôles</h4>
+                    <div class="setting-item">
+                        <label>Sensibilité du Joystick</label>
+                        <input type="range" class="mobile-slider" min="0.5" max="2" step="0.1" value="1" data-setting="joystickSensitivity">
+                    </div>
+                    <div class="setting-item">
+                        <label>Vibrations</label>
+                        <div class="mobile-toggle active" data-setting="hapticFeedback"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    showPlayerList() {
+        if (this.popupSystem) {
+            this.popupSystem.showPopup('player-list', 'slide-up', {
+                title: 'Liste des Joueurs',
+                content: this.generatePlayerListContent()
+            });
+        }
+    }
+    
+    generatePlayerListContent() {
+        const players = Array.from(this.gameState.players.values()) || [];
+        
+        return `
+            <div class="player-list-container">
+                ${players.map(player => `
+                    <div class="player-item ${player.isDead ? 'dead' : ''} ${player.isImpostor ? 'impostor' : ''}">
+                        <div class="player-avatar" style="background-color: ${player.color}">
+                            <div class="crewmate-mini"></div>
+                        </div>
+                        <div class="player-info">
+                            <div class="player-name">${player.name}</div>
+                            <div class="player-status">
+                                ${player.isDead ? 'Mort' : 'Vivant'}
+                                ${player.isImpostor && this.gameState.localPlayer?.isDead ? ' - Imposteur' : ''}
+                            </div>
+                        </div>
+                        <div class="player-actions">
+                            ${!player.isDead && this.gameState.gamePhase === 'discussion' ? 
+                                `<button class="vote-btn" data-player="${player.id}">Voter</button>` : 
+                                ''
+                            }
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    updateTaskTracker() {
+        if (this.popupSystem && this.popupSystem.isPopupActive('task-tracker')) {
+            this.popupSystem.updatePopupContent('task-tracker', this.generateTaskTrackerContent());
+        }
+    }
+    
     completeInitialization() {
         this.updateLoadingProgress(100, 'Initialisation terminée!');
         
@@ -577,6 +793,11 @@ class AmongUsV3App {
             this.hideLoadingScreen();
             this.showMainMenu();
             this.isInitialized = true;
+            
+            // Start the game engine
+            if (this.engine) {
+                this.engine.start();
+            }
             
             // Show welcome notification
             this.showNotification('Bienvenue dans Among Us V3!', 'Profitez de l\'expérience premium complète.', 'success');
@@ -716,7 +937,8 @@ class AmongUsV3App {
         setTimeout(() => {
             this.showNotification('Partie trouvée!', 'Connexion en cours...', 'success');
             setTimeout(() => {
-                this.joinGame('ABCDEF');
+                this.showGameScreen();
+                this.initializeGameSession();
             }, 2000);
         }, 3000);
     }
@@ -733,7 +955,8 @@ class AmongUsV3App {
         this.showNotification('Mode Entraînement', 'Lancement du tutoriel interactif...', 'info');
         
         setTimeout(() => {
-            this.startGame('training');
+            this.showGameScreen();
+            this.initializeTrainingSession();
         }, 1500);
     }
     

@@ -1,5 +1,760 @@
 /* Among Us V3 - Mobile Popups & Modals */
 
+/* Mobile Popup Container */
+.mobile-popup-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 8000;
+}
+
+/* Base Mobile Popup */
+.mobile-popup {
+    position: absolute;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-accent);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-large);
+    backdrop-filter: blur(20px);
+    pointer-events: all;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+.mobile-popup.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Minimizable Popup */
+.mobile-popup.minimizable {
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    max-height: 400px;
+    resize: both;
+    min-width: 250px;
+    min-height: 150px;
+}
+
+.mobile-popup.minimizable.minimized {
+    height: 50px !important;
+    overflow: hidden;
+}
+
+.mobile-popup.minimizable.minimized .popup-content {
+    display: none;
+}
+
+/* Floating Action Popup */
+.mobile-popup.floating {
+    bottom: 80px;
+    right: 20px;
+    width: auto;
+    height: auto;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+.floating-trigger {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: var(--shadow-large);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.floating-trigger:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-glow);
+}
+
+.floating-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--primary-orange);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+.floating-menu {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-accent);
+    border-radius: var(--radius-lg);
+    padding: 10px;
+    min-width: 200px;
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.mobile-popup.floating.expanded .floating-menu {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+.floating-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+}
+
+.floating-item:hover {
+    background: var(--bg-glass-hover);
+    transform: translateX(5px);
+}
+
+.floating-item i {
+    width: 20px;
+    text-align: center;
+    color: var(--text-accent);
+}
+
+/* Slide-up Popup */
+.mobile-popup.slide-up {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transform: translateY(100%);
+    border-bottom: none;
+}
+
+.mobile-popup.slide-up.active {
+    transform: translateY(0);
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: -1;
+}
+
+.popup-panel {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    overflow: hidden;
+}
+
+.popup-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--text-muted);
+    border-radius: 2px;
+    margin: 12px auto 8px;
+    cursor: grab;
+}
+
+.popup-handle:active {
+    cursor: grabbing;
+}
+
+/* Popup Header */
+.popup-header {
+    padding: 15px 20px;
+    background: var(--gradient-primary);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-accent);
+}
+
+.popup-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.popup-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.popup-minimize-btn,
+.popup-close-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.popup-minimize-btn:hover,
+.popup-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.popup-close-btn:hover {
+    background: rgba(255, 0, 0, 0.3);
+}
+
+/* Popup Content */
+.popup-content {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+.mobile-popup.slide-up .popup-content {
+    max-height: 60vh;
+}
+
+/* Quick Action Popups */
+.quick-action-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-accent);
+    border-radius: var(--radius-xl);
+    padding: 30px;
+    text-align: center;
+    box-shadow: var(--shadow-large);
+    backdrop-filter: blur(20px);
+    z-index: 9000;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+    transition: all 0.3s ease;
+}
+
+.quick-action-popup.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.quick-action-popup .popup-icon {
+    font-size: 48px;
+    color: var(--primary-blue);
+    margin-bottom: 20px;
+}
+
+.quick-action-popup .popup-message {
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.quick-action-popup .popup-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.quick-action-btn {
+    padding: 12px 24px;
+    border: 2px solid var(--border-accent);
+    border-radius: var(--radius-lg);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn.primary {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: white;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* Compact Popups for Small Screens */
+@media (max-width: 480px) {
+    .mobile-popup.minimizable {
+        width: calc(100vw - 40px);
+        right: 20px;
+        left: 20px;
+        max-height: 60vh;
+    }
+    
+    .floating-trigger {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .floating-menu {
+        right: -10px;
+        min-width: 180px;
+    }
+    
+    .popup-content {
+        padding: 15px;
+    }
+    
+    .quick-action-popup {
+        width: calc(100vw - 40px);
+        margin: 0 20px;
+        padding: 25px;
+    }
+    
+    .quick-action-popup .popup-actions {
+        flex-direction: column;
+    }
+    
+    .quick-action-btn {
+        width: 100%;
+    }
+}
+
+/* Landscape Mobile Adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+    .mobile-popup.slide-up {
+        max-height: 70vh;
+    }
+    
+    .mobile-popup.minimizable {
+        max-height: 50vh;
+    }
+    
+    .popup-content {
+        max-height: 200px;
+    }
+}
+
+/* Animation Classes */
+@keyframes popupSlideIn {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes popupBounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.popup-slide-in {
+    animation: popupSlideIn 0.3s ease-out;
+}
+
+.popup-fade-in {
+    animation: popupFadeIn 0.3s ease-out;
+}
+
+.popup-bounce-in {
+    animation: popupBounceIn 0.5s ease-out;
+}
+
+/* Touch Improvements */
+@media (hover: none) and (pointer: coarse) {
+    .popup-minimize-btn,
+    .popup-close-btn,
+    .floating-trigger {
+        min-width: 44px;
+        min-height: 44px;
+    }
+    
+    .floating-item {
+        min-height: 48px;
+        padding: 15px;
+    }
+    
+    .quick-action-btn {
+        min-height: 48px;
+        padding: 15px 24px;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .mobile-popup {
+        border-width: 3px;
+    }
+    
+    .floating-trigger {
+        border: 3px solid white;
+    }
+    
+    .popup-minimize-btn,
+    .popup-close-btn {
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .mobile-popup,
+    .floating-menu,
+    .quick-action-popup {
+        transition: opacity 0.2s ease;
+    }
+    
+    .mobile-popup.active {
+        transform: none;
+    }
+    
+    .floating-trigger:hover,
+    .quick-action-btn:hover {
+        transform: none;
+    }
+    
+    .popup-slide-in,
+    .popup-fade-in,
+    .popup-bounce-in {
+        animation: none;
+    }
+}
+
+/* Game-Specific Popup Content */
+
+/* Task Tracker */
+.task-tracker-empty {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-muted);
+}
+
+.task-tracker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    border-color: var(--border-accent);
+    transform: translateX(5px);
+}
+
+.task-item.completed {
+    opacity: 0.6;
+    background: var(--bg-glass);
+}
+
+.task-item.completed .task-icon {
+    color: var(--primary-green);
+}
+
+.task-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.task-location {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.task-status {
+    color: var(--text-muted);
+}
+
+.task-item.completed .task-status {
+    color: var(--primary-green);
+}
+
+.task-progress {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-primary);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient-accent);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Settings Content */
+.settings-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.setting-section h4 {
+    color: var(--text-accent);
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-accent);
+    padding-bottom: 8px;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.setting-item label {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+/* Player List */
+.player-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.player-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.player-item:hover {
+    border-color: var(--border-accent);
+    transform: translateX(5px);
+}
+
+.player-item.dead {
+    opacity: 0.5;
+    background: var(--bg-glass);
+}
+
+.player-item.impostor {
+    border-color: var(--primary-red);
+    background: rgba(255, 56, 56, 0.1);
+}
+
+.player-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+}
+
+.crewmate-mini {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: relative;
+}
+
+.crewmate-mini::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 15px;
+    background: rgba(200, 230, 255, 0.9);
+    border-radius: 50%;
+}
+
+.player-info {
+    flex: 1;
+}
+
+.player-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.player-status {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.player-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.vote-btn {
+    padding: 8px 16px;
+    background: var(--primary-red);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.vote-btn:hover {
+    background: var(--primary-red);
+    transform: scale(1.05);
+}
+
+/* Responsive Adjustments for Game Content */
+@media (max-width: 480px) {
+    .task-item {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .task-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    
+    .player-item {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .player-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .crewmate-mini {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .settings-sections {
+        gap: 20px;
+    }
+    
+    .setting-item {
+        margin-bottom: 12px;
+    }
+}
+
 /* Mobile Modal System */
 .modal-overlay {
     position: fixed;
