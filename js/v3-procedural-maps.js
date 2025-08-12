@@ -13,8 +13,6 @@ class AmongUsV3ProceduralMaps {
 
     async initialize() {
         try {
-            // Initialize the procedural map generator
-            this.initializeMapGenerator();
             this.isInitialized = true;
             console.log('🗺️ Procedural map system initialized');
         } catch (error) {
@@ -22,18 +20,7 @@ class AmongUsV3ProceduralMaps {
         }
     }
 
-    initializeMapGenerator() {
-        // Import the procedural map generator functions
-        this.mapGenerator = {
-            generateLevel: this.generateProceduralLevel.bind(this),
-            toPhaserTilemap: this.convertToPhaserTilemap.bind(this),
-            toPixiContainers: this.convertToPixiContainers.bind(this),
-            drawMiniMap: this.drawProceduralMiniMap.bind(this)
-        };
-    }
-
     generateProceduralLevel(seed = 'default-seed') {
-        // Configuration for procedural map generation
         const config = {
             seed: seed,
             width: 96,
@@ -68,17 +55,11 @@ class AmongUsV3ProceduralMaps {
             ensureLoop: true
         };
 
-        // Generate the procedural map
         const levelData = this.generateLevel(config);
-        
-        // Convert to Among Us V3 map format
         return this.convertToAmongUsFormat(levelData);
     }
 
     generateLevel(config) {
-        // Implementation of the procedural map generator
-        // This is a simplified version based on the TypeScript code
-        
         // RNG functions
         const mulberry32 = (seed) => {
             return () => {
@@ -317,8 +298,7 @@ class AmongUsV3ProceduralMaps {
             spawns,
             entities: {
                 props: [],
-                tasks: [],
-                vents: []
+                tasks: []
             },
             meta: { mstEdges: mst }
         };
@@ -357,7 +337,6 @@ class AmongUsV3ProceduralMaps {
 
         // Convert vents
         const vents = [];
-        const ventEntities = [];
         
         for (let y = 0; y < levelData.config.height; y++) {
             for (let x = 0; x < levelData.config.width; x++) {
@@ -369,7 +348,7 @@ class AmongUsV3ProceduralMaps {
                             x: (x + 0.5) * tileSize,
                             y: (y + 0.5) * tileSize
                         },
-                        connections: [] // Will be populated based on proximity
+                        connections: []
                     });
                 }
             }
@@ -383,7 +362,7 @@ class AmongUsV3ProceduralMaps {
                     Math.pow(vents[i].position.y - vents[j].position.y, 2)
                 );
                 
-                if (dist < 200) { // Connect vents within reasonable distance
+                if (dist < 200) {
                     vents[i].connections.push(vents[j].id);
                     vents[j].connections.push(vents[i].id);
                 }
@@ -405,7 +384,7 @@ class AmongUsV3ProceduralMaps {
             },
             background: '#1a1a2e',
             rooms,
-            corridors: [], // Generated implicitly by room connections
+            corridors: [],
             vents,
             spawnPoints,
             emergencyButton: spawnPoints[0] || { x: 0, y: 0 },
@@ -413,72 +392,15 @@ class AmongUsV3ProceduralMaps {
         };
     }
 
-    convertToPhaserTilemap(scene, levelData, key) {
-        // Implementation for Phaser tilemap conversion
-        const W = levelData.config.width;
-        const H = levelData.config.height;
-        
-        // Create combined grid
-        const grid = makeGrid(W, H, 0);
-        
-        for (let y = 0; y < H; y++) {
-            for (let x = 0; x < W; x++) {
-                const v = levelData.vents[y][x] || 0;
-                const d = levelData.doors[y][x] || 0;
-                const w = levelData.walls[y][x] || 0;
-                const f = levelData.floor[y][x] || 0;
-                
-                grid[y][x] = f;
-                if (v) grid[y][x] = v;
-                if (d) grid[y][x] = d;
-                if (w) grid[y][x] = w;
-            }
-        }
-        
-        const map = scene.make.tilemap({
-            data: grid,
-            tileWidth: levelData.config.tileSize,
-            tileHeight: levelData.config.tileSize
-        });
-        
-        return { map };
+    // Public API methods
+    getProceduralMap(seed = 'default-seed') {
+        return this.generateProceduralLevel(seed);
     }
 
-    convertToPixiContainers(app, levelData, textures) {
-        // Implementation for PixiJS container conversion
-        const container = new PIXI.Container();
-        
-        for (let y = 0; y < levelData.config.height; y++) {
-            for (let x = 0; x < levelData.config.width; x++) {
-                const idx = levelData.walls[y][x] || 
-                           levelData.doors[y][x] || 
-                           levelData.vents[y][x] || 
-                           levelData.floor[y][x];
-                
-                if (idx && textures[idx]) {
-                    const sprite = new PIXI.Sprite(textures[idx]);
-                    sprite.x = x * levelData.config.tileSize;
-                    sprite.y = y * levelData.config.tileSize;
-                    container.addChild(sprite);
-                }
-            }
-        }
-        
-        return container;
+    getRandomSeed() {
+        return 'proc_' + Math.random().toString(36).substr(2, 9);
     }
+}
 
-    drawProceduralMiniMap(canvas, levelData) {
-        const ctx = canvas.getContext('2d');
-        canvas.width = levelData.config.width;
-        canvas.height = levelData.config.height;
-        
-        const colors = {
-            0: '#000000', // void
-            1: '#374151', // floor
-            2: '#9CA3AF', // wall
-            3: '#60A5FA', // door
-            4: '#34D399', // vent
-            5: '#F59E0B'  // deco
-        };
-        
-        for (let y
+// Export for use in other modules
+window.AmongUsV3ProceduralMaps = AmongUsV3ProceduralMaps;
