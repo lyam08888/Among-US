@@ -1,4 +1,4 @@
-// Among Us V3 - Main Application (Fixed)
+// Among Us V3 - Main Application
 class AmongUsV3App {
     constructor() {
         this.engine = null;
@@ -423,13 +423,6 @@ class AmongUsV3App {
         this.chatSystem = new ChatSystem();
         this.setupUIEventListeners();
         this.initializeMenuAnimations();
-        
-        // Load saved character customizations
-        setTimeout(() => {
-            if (typeof this.loadLocalPlayerCustomization === 'function') {
-                this.loadLocalPlayerCustomization();
-            }
-        }, 100);
     }
     
     setupUIEventListeners() {
@@ -497,32 +490,6 @@ class AmongUsV3App {
         }
     }
     
-    handleMobileAction(action) {
-        switch(action) {
-            case 'use':
-                this.useInteraction();
-                break;
-            case 'kill':
-                this.killPlayer();
-                break;
-            case 'sabotage':
-                this.toggleSabotage();
-                break;
-            case 'report':
-                this.reportBody();
-                break;
-            case 'map':
-                this.toggleMap();
-                break;
-            case 'settings':
-                this.toggleGameSettings();
-                break;
-            case 'tasks':
-                // Implement task list toggle
-                break;
-        }
-    }
-
     updatePlayerRenderable() {
         if (!this.engine.graphics || !this.gameState.localPlayer) return;
         
@@ -712,9 +679,6 @@ class AmongUsV3App {
             case 'report':
                 this.reportBody();
                 break;
-            case 'close-character-customizer':
-                this.hideCharacterCustomizer();
-                break;
         }
     }
     
@@ -743,9 +707,6 @@ class AmongUsV3App {
         console.log('🎮 Starting game...');
         this.showScreen('game-screen');
         this.currentScreen = 'game';
-        
-        // Set game start time for timer
-        this.gameStartTime = Date.now();
         
         this.initializeGameWorld();
         this.setupGameUpdateLoop();
@@ -919,7 +880,7 @@ class AmongUsV3App {
     
     showCustomization() {
         console.log('🎨 Showing customization...');
-        this.showCharacterCustomizer();
+        this.showNotification('Personnalisation', 'Fonctionnalité en développement', 'info');
     }
     
     hideSettings() {
@@ -927,72 +888,6 @@ class AmongUsV3App {
         if (panel) {
             panel.classList.remove('active');
         }
-    }
-    
-    showCharacterCustomizer() {
-        console.log('🎨 Opening character customizer...');
-        const panel = document.getElementById('character-customizer-panel');
-        if (panel) {
-            panel.classList.add('active');
-            this.uiState.activeModal = 'character-customizer';
-            
-            // Initialize character customizer if not already done
-            if (!window.characterCustomizer) {
-                window.characterCustomizer = new CharacterCustomizer(this);
-            }
-            
-            // Setup tab navigation
-            this.setupCustomizerTabs();
-        }
-    }
-    
-    hideCharacterCustomizer() {
-        const panel = document.getElementById('character-customizer-panel');
-        if (panel) {
-            panel.classList.remove('active');
-            this.uiState.activeModal = null;
-            
-            // Stop preview animation to save resources
-            if (window.characterCustomizer) {
-                window.characterCustomizer.stopPreviewAnimation();
-            }
-        }
-    }
-    
-    setupCustomizerTabs() {
-        const tabs = document.querySelectorAll('.customizer-tabs .tab-btn');
-        const contents = document.querySelectorAll('.tab-content');
-        
-        tabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const targetTab = e.target.dataset.tab;
-                
-                // Update active tab
-                tabs.forEach(t => t.classList.remove('active'));
-                contents.forEach(c => c.classList.remove('active'));
-                
-                e.target.classList.add('active');
-                const targetContent = document.querySelector(`[data-tab="${targetTab}"].tab-content`);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
-            });
-        });
-        
-        // Setup slider value updates
-        this.setupSliderValueUpdates();
-    }
-    
-    setupSliderValueUpdates() {
-        const sliders = document.querySelectorAll('.slider');
-        sliders.forEach(slider => {
-            const valueSpan = document.getElementById(slider.id.replace('-slider', '-value'));
-            if (valueSpan) {
-                slider.addEventListener('input', (e) => {
-                    valueSpan.textContent = parseFloat(e.target.value).toFixed(2);
-                });
-            }
-        });
     }
     
     toggleSecondaryMenu() {
@@ -1051,77 +946,6 @@ class AmongUsV3App {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
-    }
-    
-    setupGameUpdateLoop() {
-        console.log('🔄 Setting up game update loop...');
-        
-        // Start the engine if it's not already running
-        if (this.engine && !this.engine.isRunning) {
-            this.engine.start();
-        }
-        
-        // Setup additional game-specific update logic
-        this.gameUpdateInterval = setInterval(() => {
-            this.updateGameLogic();
-        }, 1000 / 60); // 60 FPS
-        
-        console.log('✅ Game update loop initialized');
-    }
-    
-    updateGameLogic() {
-        // Update game state
-        if (this.gameState.gamePhase === 'playing') {
-            this.updatePlayerPositions();
-            this.updateTaskProgress();
-            this.updateGameTimer();
-        }
-        
-        // Update UI elements
-        this.updateGameUI();
-    }
-    
-    updatePlayerPositions() {
-        // Update AI player positions if in training mode
-        if (this.gameState.gameMode === 'training') {
-            this.gameState.players.forEach((player, id) => {
-                if (player.isAI && player.isAlive) {
-                    // Simple AI movement
-                    const speed = 0.5;
-                    const direction = Math.random() * Math.PI * 2;
-                    player.position.x += Math.cos(direction) * speed;
-                    player.position.y += Math.sin(direction) * speed;
-                    
-                    // Keep players within bounds
-                    player.position.x = Math.max(-200, Math.min(200, player.position.x));
-                    player.position.y = Math.max(-200, Math.min(200, player.position.y));
-                }
-            });
-        }
-    }
-    
-    updateTaskProgress() {
-        // Auto-complete tasks in training mode for demonstration
-        if (this.gameState.gameMode === 'training' && this.gameState.tasks) {
-            const incompleteTasks = this.gameState.tasks.filter(t => !t.completed);
-            if (incompleteTasks.length > 0 && Math.random() < 0.001) { // 0.1% chance per frame
-                const randomTask = incompleteTasks[Math.floor(Math.random() * incompleteTasks.length)];
-                randomTask.completed = true;
-                this.updateTaskUI();
-                this.showNotification('Tâche terminée!', `${randomTask.name} complétée`, 'success');
-            }
-        }
-    }
-    
-    updateGameTimer() {
-        // Update game timer display
-        const timerElement = document.getElementById('game-timer');
-        if (timerElement && this.gameStartTime) {
-            const elapsed = Math.floor((Date.now() - this.gameStartTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
     }
     
     generatePlayerId() {
@@ -1426,58 +1250,6 @@ class NotificationSystem {
             default: return 'fa-info-circle';
         }
     }
-    
-    // Character customization data management
-    savePlayerCustomization(playerId, characterOptions) {
-        const customizations = this.getStoredCustomizations();
-        customizations[playerId] = characterOptions;
-        localStorage.setItem('amongus_player_customizations', JSON.stringify(customizations));
-    }
-    
-    loadPlayerCustomization(playerId) {
-        const customizations = this.getStoredCustomizations();
-        return customizations[playerId] || null;
-    }
-    
-    getStoredCustomizations() {
-        try {
-            const stored = localStorage.getItem('amongus_player_customizations');
-            return stored ? JSON.parse(stored) : {};
-        } catch (e) {
-            console.error('Error loading customizations:', e);
-            return {};
-        }
-    }
-    
-    // Apply customization to local player
-    applyLocalPlayerCustomization() {
-        if (window.characterCustomizer && this.gameState.localPlayer) {
-            const options = window.characterCustomizer.exportCharacterOptions();
-            this.gameState.localPlayer.characterOptions = options;
-            this.savePlayerCustomization('local', options);
-        }
-    }
-    
-    // Load customization for local player
-    loadLocalPlayerCustomization() {
-        const saved = this.loadPlayerCustomization('local');
-        if (saved && window.characterCustomizer) {
-            window.characterCustomizer.currentOptions = saved;
-            window.characterCustomizer.refreshAllControls();
-        }
-    }
-    
-    // Generate sprite sheet for multiplayer sync
-    generatePlayerSpriteSheet(characterOptions) {
-        if (window.CrewmateGenerator) {
-            return window.CrewmateGenerator.buildSpriteSheet(characterOptions, {
-                frames: 8,
-                dirs: 4,
-                ssaa: 1
-            });
-        }
-        return null;
-    }
 }
 
 // Simple chat system
@@ -1573,3 +1345,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for debugging
 window.AmongUsV3App = AmongUsV3App;
+
+Next, I will fix the syntax error and the class definition issues in js/v3-app.js by removing duplicate or malformed code blocks and ensuring the class is properly defined and exported.
+
+Plan for js/v3-app.js:
+- Remove duplicate or malformed method definitions.
+- Ensure the AmongUsV3App class is properly closed.
+- Ensure the initialization script in index.html correctly references AmongUsV3App.
+
+Please confirm if I should proceed with cleaning and fixing js/v3-app.js now.
