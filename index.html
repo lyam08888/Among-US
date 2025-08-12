@@ -3,30 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Among Us V3 - Premium Game Experience</title>
+    <title>Among Us - Mobile Game</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
     
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles/v3-main.css">
-    <link rel="stylesheet" href="styles/v3-game.css">
-    <link rel="stylesheet" href="styles/v3-ui.css">
-    <link rel="stylesheet" href="styles/v3-animations.css">
-    <link rel="stylesheet" href="styles/v3-particles.css">
-    <link rel="stylesheet" href="styles/mobile-controls.css">
-    <link rel="stylesheet" href="styles/mobile-popups.css">
-    <link rel="stylesheet" href="styles/responsive.css">
-    <link rel="stylesheet" href="styles/mobile-fixes.css">
+    <!-- Unified Styles -->
+    <link rel="stylesheet" href="styles/clean-main.css">
+    <link rel="stylesheet" href="styles/clean-mobile.css">
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Preload critical resources -->
     <link rel="preload" href="assets/sounds/ambient.mp3" as="audio" crossorigin="anonymous">
     <link rel="preload" href="assets/sounds/button-click.mp3" as="audio" crossorigin="anonymous">
-    
-    <meta name="description" content="Among Us V3 - Experience the ultimate premium Among Us game with advanced graphics, physics, and complete gameplay mechanics">
-    <meta name="keywords" content="among us, game, multiplayer, premium, v3">
 </head>
 <body>
     <div id="app" class="app-container">
@@ -34,183 +24,109 @@
         <div id="loading-screen" class="loading-screen active">
             <div class="loading-content">
                 <div class="loading-logo">
-                    <div class="crewmate-loader">
+                    <div class="crewmate-simple">
                         <div class="crewmate-body"></div>
                         <div class="crewmate-visor"></div>
-                        <div class="crewmate-backpack"></div>
                     </div>
                 </div>
-                <h1 class="loading-title">
-                    <span class="title-among">AMONG</span>
-                    <span class="title-us">US</span>
-                    <span class="version-badge-v3">V3</span>
-                </h1>
+                <h1 class="loading-title">AMONG US</h1>
                 <div class="loading-progress">
                     <div class="progress-bar">
                         <div class="progress-fill" id="loading-progress-fill"></div>
                     </div>
-                    <div class="loading-text" id="loading-text">Initialisation du moteur de jeu...</div>
-                    <div class="loading-percentage" id="loading-percentage">0%</div>
-                </div>
-                <div class="loading-tips">
-                    <div class="tip-container">
-                        <i class="fas fa-lightbulb"></i>
-                        <span id="loading-tip">Astuce: Utilisez les évents pour vous déplacer rapidement sur la carte!</span>
-                    </div>
+                    <div class="loading-text" id="loading-text">Chargement...</div>
                 </div>
             </div>
-            <div class="loading-particles"></div>
         </div>
 
-        <!-- Main Menu V3 -->
-        <div id="main-menu-v3" class="screen">
-            <div class="menu-background">
-                <canvas id="menu-background-canvas"></canvas>
-                <div class="space-overlay"></div>
-            </div>
-            
-            <div class="menu-container-v3">
-                <!-- Header Section -->
+        <!-- Main Menu - Épuré -->
+        <div id="main-menu" class="screen">
+            <div class="menu-container">
+                <!-- Header Simple -->
                 <header class="menu-header">
-                    <div class="logo-section-v3">
-                        <div class="logo-container-v3">
-                            <div class="animated-crewmate">
-                                <div class="crewmate-body"></div>
-                                <div class="crewmate-visor"></div>
-                                <div class="crewmate-backpack"></div>
-                                <div class="crewmate-shadow"></div>
-                            </div>
-                            <div class="title-container">
-                                <h1 class="game-title-v3">
-                                    <span class="title-among">AMONG</span>
-                                    <span class="title-us">US</span>
-                                </h1>
-                                <div class="version-info">
-                                    <span class="version-badge-v3">V3</span>
-                                    <span class="version-subtitle">PREMIUM EDITION</span>
-                                </div>
-                            </div>
+                    <div class="logo-simple">
+                        <div class="crewmate-icon">
+                            <div class="crewmate-body"></div>
+                            <div class="crewmate-visor"></div>
                         </div>
+                        <h1 class="game-title">AMONG US</h1>
                     </div>
                     
-                    <!-- User Profile -->
-                    <div class="user-profile">
+                    <!-- User Profile Compact -->
+                    <div class="user-profile-compact">
                         <div class="profile-avatar">
-                            <div class="avatar-crewmate" data-color="red">
-                                <div class="avatar-body"></div>
-                                <div class="avatar-visor"></div>
-                            </div>
-                            <div class="profile-status online"></div>
+                            <div class="avatar-crewmate"></div>
                         </div>
-                        <div class="profile-info">
-                            <div class="profile-name" id="player-name">Joueur</div>
-                            <div class="profile-level">
-                                <i class="fas fa-star"></i>
-                                <span id="player-level">Niveau 15</span>
-                            </div>
-                        </div>
-                        <button class="profile-settings" data-action="profile-settings">
+                        <button class="settings-btn" data-action="settings">
                             <i class="fas fa-cog"></i>
                         </button>
                     </div>
                 </header>
 
-                <!-- Main Actions Grid -->
-                <div class="main-actions-v3">
-                    <div class="action-card-v3 primary-card" data-action="quick-play-v3">
-                        <div class="card-background"></div>
-                        <div class="card-icon">
-                            <i class="fas fa-rocket"></i>
+                <!-- Actions Principales - Seulement 3 -->
+                <div class="main-actions">
+                    <button class="action-btn primary" data-action="quick-play">
+                        <div class="btn-icon">
+                            <i class="fas fa-play"></i>
                         </div>
-                        <div class="card-content">
-                            <h3>Partie Rapide</h3>
-                            <p>Rejoindre une partie immédiatement</p>
-                            <div class="card-stats">
-                                <span><i class="fas fa-users"></i> ~30s d'attente</span>
-                            </div>
+                        <div class="btn-content">
+                            <h3>Jouer</h3>
+                            <p>Partie rapide</p>
                         </div>
-                        <div class="card-glow"></div>
-                        <div class="card-particles"></div>
-                    </div>
+                    </button>
 
-                    <div class="action-card-v3 secondary-card" data-action="create-room-v3">
-                        <div class="card-background"></div>
-                        <div class="card-icon">
-                            <i class="fas fa-plus-circle"></i>
+                    <button class="action-btn secondary" data-action="create-room">
+                        <div class="btn-icon">
+                            <i class="fas fa-plus"></i>
                         </div>
-                        <div class="card-content">
-                            <h3>Créer une Partie</h3>
-                            <p>Personnaliser toutes les règles</p>
-                            <div class="card-stats">
-                                <span><i class="fas fa-sliders-h"></i> Configuration avancée</span>
-                            </div>
+                        <div class="btn-content">
+                            <h3>Créer</h3>
+                            <p>Nouvelle partie</p>
                         </div>
-                        <div class="card-glow"></div>
-                    </div>
+                    </button>
 
-                    <div class="action-card-v3 secondary-card" data-action="join-room-v3">
-                        <div class="card-background"></div>
-                        <div class="card-icon">
-                            <i class="fas fa-sign-in-alt"></i>
+                    <button class="action-btn secondary" data-action="join-room">
+                        <div class="btn-icon">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <div class="card-content">
+                        <div class="btn-content">
                             <h3>Rejoindre</h3>
-                            <p>Entrer un code de partie</p>
-                            <div class="card-stats">
-                                <span><i class="fas fa-keyboard"></i> Code à 6 lettres</span>
-                            </div>
+                            <p>Code de partie</p>
                         </div>
-                        <div class="card-glow"></div>
-                    </div>
-
-                    <div class="action-card-v3 tertiary-card" data-action="training-mode">
-                        <div class="card-background"></div>
-                        <div class="card-icon">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
-                        <div class="card-content">
-                            <h3>Mode Entraînement</h3>
-                            <p>Apprendre les mécaniques</p>
-                            <div class="card-stats">
-                                <span><i class="fas fa-brain"></i> Tutoriel interactif</span>
-                            </div>
-                        </div>
-                        <div class="card-glow"></div>
-                    </div>
+                    </button>
                 </div>
 
+                <!-- Menu Secondaire - Caché par défaut -->
+                <div class="secondary-menu" id="secondary-menu">
+                    <button class="secondary-btn" data-action="training">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Entraînement</span>
+                    </button>
+                    <button class="secondary-btn" data-action="cosmetics">
+                        <i class="fas fa-palette"></i>
+                        <span>Cosmétiques</span>
+                    </button>
+                    <button class="secondary-btn" data-action="stats">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Statistiques</span>
+                    </button>
+                </div>
 
-                <!-- Status Bar -->
-                <div class="status-bar-v3">
-                    <div class="status-section">
-                        <div class="server-status">
-                            <div class="status-indicator online"></div>
-                            <span>Serveurs en ligne</span>
-                            <div class="ping-display">
-                                <i class="fas fa-wifi"></i>
-                                <span id="ping-value">23ms</span>
-                            </div>
-                        </div>
+                <!-- Toggle pour menu secondaire -->
+                <button class="menu-toggle" id="menu-toggle" data-action="toggle-secondary">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <span>Plus d'options</span>
+                </button>
+
+                <!-- Status Bar Simplifié -->
+                <div class="status-bar">
+                    <div class="status-item">
+                        <div class="status-indicator online"></div>
+                        <span id="online-players">12,543 joueurs</span>
                     </div>
-                    
-                    <div class="status-section">
-                        <div class="player-count">
-                            <i class="fas fa-users"></i>
-                            <span id="online-players-v3">24,891</span>
-                            <span class="players-label">joueurs en ligne</span>
-                        </div>
-                    </div>
-                    
-                    <div class="status-section">
-                        <div class="region-selector">
-                            <i class="fas fa-globe"></i>
-                            <select id="region-select-v3">
-                                <option value="auto">Auto (23ms)</option>
-                                <option value="eu">Europe (23ms)</option>
-                                <option value="na">Amérique du Nord (89ms)</option>
-                                <option value="as">Asie (156ms)</option>
-                            </select>
-                        </div>
+                    <div class="status-item">
+                        <i class="fas fa-wifi"></i>
+                        <span id="ping-value">23ms</span>
                     </div>
                 </div>
             </div>
@@ -222,15 +138,14 @@
                 <!-- Game Canvas -->
                 <canvas id="game-canvas" width="1920" height="1080"></canvas>
                 
-                <!-- Game UI Overlay -->
+                <!-- Game UI Overlay - Épuré -->
                 <div class="game-ui-overlay">
-                    <!-- Top HUD -->
+                    <!-- Top HUD Compact -->
                     <div class="top-hud">
                         <div class="game-info">
                             <div class="room-code">
-                                <i class="fas fa-key"></i>
                                 <span id="current-room-code">ABCDEF</span>
-                                <button class="copy-code-btn" data-action="copy-room-code">
+                                <button class="copy-btn" data-action="copy-room-code">
                                     <i class="fas fa-copy"></i>
                                 </button>
                             </div>
@@ -240,15 +155,9 @@
                             </div>
                         </div>
                         
-                        <div class="player-count-hud">
-                            <div class="alive-count">
-                                <i class="fas fa-heart"></i>
-                                <span id="alive-players">8</span>
-                            </div>
-                            <div class="total-count">
-                                <i class="fas fa-users"></i>
-                                <span id="total-players">10</span>
-                            </div>
+                        <div class="player-count">
+                            <i class="fas fa-users"></i>
+                            <span id="alive-players">8</span>/<span id="total-players">10</span>
                         </div>
                         
                         <div class="game-controls">
@@ -264,250 +173,136 @@
                         </div>
                     </div>
                     
-                    <!-- Task List -->
-                    <div class="task-list" id="task-list">
+                    <!-- Task List Compact -->
+                    <div class="task-list-compact" id="task-list">
                         <div class="task-header">
-                            <h3>Tâches</h3>
+                            <h4>Tâches</h4>
                             <div class="task-progress">
+                                <span id="task-progress-text">3/7</span>
                                 <div class="progress-bar">
                                     <div class="progress-fill" id="task-progress-fill"></div>
                                 </div>
-                                <span id="task-progress-text">3/7</span>
                             </div>
                         </div>
                         <div class="task-items" id="task-items">
-                            <!-- Tasks will be populated by JavaScript -->
+                            <!-- Tasks populated by JavaScript -->
                         </div>
                     </div>
                     
-                    <!-- Use Button -->
-                    <div class="use-button" id="use-button">
-                        <button class="use-btn" data-action="use-interact">
-                            <span class="use-text">Utiliser</span>
-                            <div class="use-key">E</div>
-                        </button>
+                    <!-- Mobile Controls -->
+                    <div class="mobile-controls" id="mobile-controls">
+                        <!-- Joystick -->
+                        <div class="joystick-container">
+                            <div class="joystick" id="joystick">
+                                <div class="joystick-knob" id="joystick-knob"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button class="action-btn-mobile primary" id="use-btn" data-action="use">
+                                <i class="fas fa-hand-paper"></i>
+                            </button>
+                            <button class="action-btn-mobile secondary" id="kill-btn" data-action="kill" style="display: none;">
+                                <i class="fas fa-skull"></i>
+                            </button>
+                            <button class="action-btn-mobile secondary" id="sabotage-btn" data-action="sabotage" style="display: none;">
+                                <i class="fas fa-wrench"></i>
+                            </button>
+                            <button class="action-btn-mobile tertiary" id="report-btn" data-action="report">
+                                <i class="fas fa-exclamation"></i>
+                            </button>
+                        </div>
                     </div>
                     
-                    <!-- Kill Button (for impostors) -->
-                    <div class="kill-button" id="kill-button">
-                        <button class="kill-btn" data-action="kill-player">
-                            <i class="fas fa-skull"></i>
-                            <span class="kill-text">Éliminer</span>
-                        </button>
-                    </div>
-                    
-                    <!-- Sabotage Panel (for impostors) -->
-                    <div class="sabotage-panel" id="sabotage-panel">
-                        <div class="sabotage-header">
-                            <h3>Sabotages</h3>
-                            <button class="close-sabotage" data-action="close-sabotage">
-                                <i class="fas fa-times"></i>
-                            </button>
+                    <!-- Chat Compact -->
+                    <div class="chat-compact" id="chat-container">
+                        <div class="chat-toggle" id="chat-toggle">
+                            <i class="fas fa-comments"></i>
+                            <span class="chat-badge" id="chat-badge" style="display: none;">1</span>
                         </div>
-                        <div class="sabotage-options">
-                            <button class="sabotage-btn" data-sabotage="lights">
-                                <i class="fas fa-lightbulb"></i>
-                                <span>Lumières</span>
-                            </button>
-                            <button class="sabotage-btn" data-sabotage="oxygen">
-                                <i class="fas fa-wind"></i>
-                                <span>Oxygène</span>
-                            </button>
-                            <button class="sabotage-btn" data-sabotage="reactor">
-                                <i class="fas fa-radiation"></i>
-                                <span>Réacteur</span>
-                            </button>
-                            <button class="sabotage-btn" data-sabotage="comms">
-                                <i class="fas fa-satellite-dish"></i>
-                                <span>Communications</span>
-                            </button>
-                            <button class="sabotage-btn" data-sabotage="doors">
-                                <i class="fas fa-door-closed"></i>
-                                <span>Portes</span>
-                            </button>
+                        <div class="chat-panel" id="chat-panel">
+                            <div class="chat-messages" id="chat-messages"></div>
+                            <div class="chat-input-container">
+                                <input type="text" id="chat-input" placeholder="Tapez votre message..." maxlength="100">
+                                <button id="chat-send" class="chat-send-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Voting Screen -->
-        <div id="voting-screen" class="screen">
-            <div class="voting-container">
-                <div class="voting-header">
-                    <h2>Qui est l'imposteur ?</h2>
-                    <div class="voting-timer">
-                        <div class="timer-circle">
-                            <svg class="timer-svg">
-                                <circle class="timer-bg" cx="25" cy="25" r="20"></circle>
-                                <circle class="timer-progress" cx="25" cy="25" r="20" id="voting-timer-progress"></circle>
-                            </svg>
-                            <span class="timer-text" id="voting-time">120</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="voting-grid" id="voting-grid">
-                    <!-- Voting options will be populated by JavaScript -->
-                </div>
-                
-                <div class="voting-actions">
-                    <button class="vote-skip-btn" data-action="vote-skip">
-                        <i class="fas fa-forward"></i>
-                        Passer le vote
-                    </button>
-                </div>
-                
-                <div class="voting-results" id="voting-results">
-                    <!-- Results will be shown here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Task Interface -->
-        <div id="task-interface" class="modal-overlay">
-            <div class="task-modal">
-                <div class="task-header">
-                    <h3 id="task-title">Tâche</h3>
-                    <button class="close-task-btn" data-action="close-task">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="task-content" id="task-content">
-                    <!-- Task-specific content will be loaded here -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Modal -->
-        <div id="settings-modal" class="modal-overlay">
-            <div class="settings-modal">
-                <div class="modal-header">
-                    <h3>Paramètres</h3>
-                    <button class="close-modal-btn" data-action="close-settings">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-content">
-                    <div class="settings-tabs">
-                        <button class="tab-btn active" data-tab="graphics">Graphismes</button>
-                        <button class="tab-btn" data-tab="audio">Audio</button>
-                        <button class="tab-btn" data-tab="controls">Contrôles</button>
-                        <button class="tab-btn" data-tab="gameplay">Gameplay</button>
-                    </div>
-                    <div class="settings-content" id="settings-content">
-                        <!-- Settings content will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notification System -->
-        <div id="notification-container" class="notification-container">
-            <!-- Notifications will be added here dynamically -->
-        </div>
-
-        <!-- Chat System -->
-        <div id="chat-container" class="chat-container collapsed">
-            <div class="chat-header">
-                <h4>Chat</h4>
-                <button class="toggle-chat-btn" data-action="toggle-chat">
-                    <i class="fas fa-chevron-down"></i>
+        <!-- Settings Panel -->
+        <div id="settings-panel" class="panel">
+            <div class="panel-header">
+                <h3>Paramètres</h3>
+                <button class="panel-close" data-action="close-settings">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="chat-messages" id="chat-messages">
-                <!-- Chat messages will be added here -->
+            <div class="panel-content">
+                <div class="setting-group">
+                    <label>Volume Principal</label>
+                    <input type="range" id="master-volume" min="0" max="100" value="70">
+                </div>
+                <div class="setting-group">
+                    <label>Effets Sonores</label>
+                    <input type="range" id="sfx-volume" min="0" max="100" value="80">
+                </div>
+                <div class="setting-group">
+                    <label>Qualité Graphique</label>
+                    <select id="graphics-quality">
+                        <option value="low">Faible</option>
+                        <option value="medium" selected>Moyenne</option>
+                        <option value="high">Élevée</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>Contrôles Mobiles</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="mobile-controls-toggle" checked>
+                        <label for="mobile-controls-toggle"></label>
+                    </div>
+                </div>
             </div>
-            <div class="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Tapez votre message..." maxlength="100">
-                <button class="send-chat-btn" data-action="send-chat">
-                    <i class="fas fa-paper-plane"></i>
+        </div>
+
+        <!-- Join Room Panel -->
+        <div id="join-room-panel" class="panel">
+            <div class="panel-header">
+                <h3>Rejoindre une Partie</h3>
+                <button class="panel-close" data-action="close-join-room">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="panel-content">
+                <div class="input-group">
+                    <label>Code de la Partie</label>
+                    <input type="text" id="room-code-input" placeholder="ABCDEF" maxlength="6" autocomplete="off">
+                </div>
+                <button class="btn-primary" data-action="join-with-code">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Rejoindre
                 </button>
             </div>
         </div>
 
-        <!-- Audio Elements -->
-        <audio id="ambient-audio" loop>
-            <source src="assets/sounds/ambient.mp3" type="audio/mpeg">
-        </audio>
-        <audio id="button-click-audio">
-            <source src="assets/sounds/button-click.mp3" type="audio/mpeg">
-        </audio>
-        <audio id="task-complete-audio">
-            <source src="assets/sounds/task-complete.mp3" type="audio/mpeg">
-        </audio>
-        <audio id="emergency-audio">
-            <source src="assets/sounds/emergency.mp3" type="audio/mpeg">
-        </audio>
-        <audio id="kill-audio">
-            <source src="assets/sounds/kill.mp3" type="audio/mpeg">
-        </audio>
+        <!-- Notifications -->
+        <div id="notifications" class="notifications-container"></div>
     </div>
 
     <!-- Scripts -->
-    <script src="js/error-handler.js"></script>
     <script src="js/v3-config.js"></script>
-    <script src="js/v3-performance.js"></script>
-    <script src="js/v3-engine.js"></script>
-    <script src="js/v3-physics.js"></script>
-    <script src="js/v3-graphics.js"></script>
     <script src="js/v3-audio.js"></script>
-    <script src="js/v3-networking.js"></script>
-    <script src="js/v3-game-logic.js"></script>
-    <script src="js/v3-ui.js"></script>
-    <script src="js/v3-animations.js"></script>
-    <script src="js/v3-particles.js"></script>
-    <script src="js/v3-tasks.js"></script>
+    <script src="js/v3-graphics.js"></script>
+    <script src="js/v3-physics.js"></script>
+    <script src="js/v3-engine.js"></script>
     <script src="js/v3-maps.js"></script>
+    <script src="js/v3-game-logic.js"></script>
     <script src="js/mobile-controls.js"></script>
-    <script src="js/mobile-popups.js"></script>
-    <script src="js/v3-app.js"></script>
-    
-    <!-- Initialize Application -->
-    <script>
-        // Initialize the application when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Starting Among Us V3...');
-            try {
-                window.amongUsApp = new AmongUsV3App();
-            } catch (error) {
-                console.error('❌ Failed to start application:', error);
-                
-                // Show error message to user
-                const loadingText = document.getElementById('loading-text');
-                if (loadingText) {
-                    loadingText.textContent = `Erreur de démarrage: ${error.message}`;
-                    loadingText.style.color = '#ff3838';
-                }
-            }
-        });
-        
-        // Handle page visibility changes
-        document.addEventListener('visibilitychange', function() {
-            if (window.amongUsApp && window.amongUsApp.engine) {
-                if (document.hidden) {
-                    window.amongUsApp.engine.pause();
-                } else {
-                    window.amongUsApp.engine.resume();
-                }
-            }
-        });
-        
-        // Handle window resize for mobile
-        window.addEventListener('resize', function() {
-            if (window.amongUsApp && window.amongUsApp.engine) {
-                window.amongUsApp.engine.resizeCanvas();
-            }
-        });
-        
-        // Handle orientation change on mobile
-        window.addEventListener('orientationchange', function() {
-            setTimeout(function() {
-                if (window.amongUsApp && window.amongUsApp.engine) {
-                    window.amongUsApp.engine.resizeCanvas();
-                }
-            }, 100);
-        });
-    </script>
+    <script src="js/clean-app.js"></script>
 </body>
 </html>
