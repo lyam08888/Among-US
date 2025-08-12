@@ -104,11 +104,16 @@ class AmongUsV3App {
         const tipElement = document.getElementById('loading-tip');
         if (!tipElement) return;
         
+        // Clear any existing tip timer
+        if (this.tipTimer) {
+            clearTimeout(this.tipTimer);
+        }
+        
         const updateTip = () => {
             if (this.currentScreen === 'loading') {
                 tipElement.textContent = this.loadingProgress.tips[this.loadingProgress.currentTip];
                 this.loadingProgress.currentTip = (this.loadingProgress.currentTip + 1) % this.loadingProgress.tips.length;
-                setTimeout(updateTip, 3000);
+                this.tipTimer = setTimeout(updateTip, 3000);
             }
         };
         
@@ -182,16 +187,8 @@ class AmongUsV3App {
             console.log('🔧 Creating game engine...');
             this.engine = new AmongUsV3Engine();
             
-            // Wait for engine to be ready with timeout
-            await Promise.race([
-                new Promise(resolve => {
-                    this.engine.on('start', resolve);
-                    this.engine.start();
-                }),
-                new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('Engine initialization timeout')), 10000);
-                })
-            ]);
+            // Engine is initialized in constructor, no need to wait for start event
+            console.log('✅ Game engine created successfully');
             
             console.log('✅ Game engine initialized successfully');
             this.updateLoadingProgress(25, 'Moteur de jeu initialisé');
@@ -860,6 +857,12 @@ class AmongUsV3App {
             loadingScreen.classList.remove('active');
             loadingScreen.classList.add('animate-fade-out');
         }
+        
+        // Stop loading tips timer
+        if (this.tipTimer) {
+            clearTimeout(this.tipTimer);
+            this.tipTimer = null;
+        }
     }
     
     showMainMenu() {
@@ -894,8 +897,15 @@ class AmongUsV3App {
             playerCountElement.textContent = count.toLocaleString();
         }
         
-        // Update every 30 seconds
-        setTimeout(() => this.updateOnlinePlayerCount(), 30000);
+        // Clear any existing timer
+        if (this.playerCountTimer) {
+            clearTimeout(this.playerCountTimer);
+        }
+        
+        // Update every 30 seconds only if still on main menu
+        if (this.currentScreen === 'main-menu-v3') {
+            this.playerCountTimer = setTimeout(() => this.updateOnlinePlayerCount(), 30000);
+        }
     }
     
     showScreen(screenId) {

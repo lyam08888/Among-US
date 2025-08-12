@@ -44,21 +44,28 @@ class AmongUsV3Engine {
     }
     
     init() {
-        console.log('🚀 Initializing Among Us V3 Engine...');
-        
-        // Initialize canvas
-        this.initCanvas();
-        
-        // Initialize input system
-        this.initInput();
-        
-        // Initialize engine systems
-        this.initSystems();
-        
-        // Setup event listeners
-        this.setupEventListeners();
-        
-        console.log('✅ Engine initialized successfully');
+        try {
+            console.log('🚀 Initializing Among Us V3 Engine...');
+            
+            // Initialize canvas
+            this.initCanvas();
+            
+            // Initialize input system
+            this.initInput();
+            
+            // Initialize engine systems
+            this.initSystems();
+            
+            // Setup event listeners
+            this.setupEventListeners();
+            
+            console.log('✅ Engine initialized successfully');
+            this.emit('initialized');
+        } catch (error) {
+            console.error('❌ Engine initialization failed:', error);
+            this.emit('error', { error });
+            throw error;
+        }
     }
     
     initCanvas() {
@@ -84,19 +91,28 @@ class AmongUsV3Engine {
     }
     
     initSystems() {
-        // Initialize physics engine
-        this.physics = new AmongUsV3Physics(this);
-        
-        // Initialize graphics renderer
-        this.graphics = new AmongUsV3Graphics(this);
-        
-        // Initialize audio system
-        this.audio = new AmongUsV3Audio(this);
-        
-        // Initialize networking
-        this.networking = new AmongUsV3Networking(this);
-        
-        console.log('🔧 Engine systems initialized');
+        try {
+            // Initialize physics engine
+            console.log('🔧 Initializing physics system...');
+            this.physics = new AmongUsV3Physics(this);
+            
+            // Initialize graphics renderer
+            console.log('🔧 Initializing graphics system...');
+            this.graphics = new AmongUsV3Graphics(this);
+            
+            // Initialize audio system
+            console.log('🔧 Initializing audio system...');
+            this.audio = new AmongUsV3Audio(this);
+            
+            // Initialize networking
+            console.log('🔧 Initializing networking system...');
+            this.networking = new AmongUsV3Networking(this);
+            
+            console.log('✅ Engine systems initialized successfully');
+        } catch (error) {
+            console.error('❌ Failed to initialize engine systems:', error);
+            throw error;
+        }
     }
     
     initInput() {
@@ -114,6 +130,10 @@ class AmongUsV3Engine {
             }
         };
         
+        // Cache canvas rect to avoid repeated getBoundingClientRect calls
+        this.canvasRect = null;
+        this.updateCanvasRect();
+        
         // Keyboard events
         document.addEventListener('keydown', (e) => {
             this.input.keys.add(e.code);
@@ -127,9 +147,9 @@ class AmongUsV3Engine {
         
         // Mouse events
         this.canvas.addEventListener('mousemove', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.input.mouse.x = (e.clientX - rect.left) * (this.canvas.width / rect.width);
-            this.input.mouse.y = (e.clientY - rect.top) * (this.canvas.height / rect.height);
+            if (!this.canvasRect) this.updateCanvasRect();
+            this.input.mouse.x = (e.clientX - this.canvasRect.left) * (this.canvas.width / this.canvasRect.width);
+            this.input.mouse.y = (e.clientY - this.canvasRect.top) * (this.canvas.height / this.canvasRect.height);
             this.emit('mousemove', this.input.mouse);
         });
         
@@ -152,11 +172,11 @@ class AmongUsV3Engine {
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             this.input.touch.isActive = true;
+            if (!this.canvasRect) this.updateCanvasRect();
             for (let touch of e.changedTouches) {
-                const rect = this.canvas.getBoundingClientRect();
                 this.input.touch.touches.set(touch.identifier, {
-                    x: (touch.clientX - rect.left) * (this.canvas.width / rect.width),
-                    y: (touch.clientY - rect.top) * (this.canvas.height / rect.height)
+                    x: (touch.clientX - this.canvasRect.left) * (this.canvas.width / this.canvasRect.width),
+                    y: (touch.clientY - this.canvasRect.top) * (this.canvas.height / this.canvasRect.height)
                 });
             }
             this.emit('touchstart', { touches: Array.from(this.input.touch.touches.values()) });
@@ -164,11 +184,11 @@ class AmongUsV3Engine {
         
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
+            if (!this.canvasRect) this.updateCanvasRect();
             for (let touch of e.changedTouches) {
-                const rect = this.canvas.getBoundingClientRect();
                 this.input.touch.touches.set(touch.identifier, {
-                    x: (touch.clientX - rect.left) * (this.canvas.width / rect.width),
-                    y: (touch.clientY - rect.top) * (this.canvas.height / rect.height)
+                    x: (touch.clientX - this.canvasRect.left) * (this.canvas.width / this.canvasRect.width),
+                    y: (touch.clientY - this.canvasRect.top) * (this.canvas.height / this.canvasRect.height)
                 });
             }
             this.emit('touchmove', { touches: Array.from(this.input.touch.touches.values()) });
@@ -188,10 +208,17 @@ class AmongUsV3Engine {
         console.log('🎮 Input system initialized');
     }
     
+    updateCanvasRect() {
+        if (this.canvas) {
+            this.canvasRect = this.canvas.getBoundingClientRect();
+        }
+    }
+    
     setupEventListeners() {
         // Window resize
         window.addEventListener('resize', () => {
             this.resizeCanvas();
+            this.updateCanvasRect();
         });
         
         // Visibility change
