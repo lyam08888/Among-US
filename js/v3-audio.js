@@ -58,6 +58,14 @@ class AmongUsV3Audio {
                     this.audioContext.resume().then(() => {
                         console.log('🔊 Audio context resumed after user interaction');
                         this.userInteractionHandled = true;
+                        
+                        // Retry loading sounds if they weren't loaded due to suspended context
+                        if (this.sounds.size === 0 && this.music.size === 0) {
+                            console.log('🔊 Retrying sound loading after audio context resume');
+                            this.loadDefaultSounds().catch(error => {
+                                console.error('Failed to load sounds after resume:', error);
+                            });
+                        }
                     }).catch(error => {
                         console.warn('Failed to resume audio context:', error);
                     });
@@ -253,6 +261,12 @@ class AmongUsV3Audio {
             return;
         }
         
+        // Ensure audio context is ready
+        if (this.audioContext.state === 'suspended') {
+            console.log('Audio context suspended, will load sounds after user interaction');
+            return;
+        }
+        
         const soundList = [
             { name: 'buttonClick', url: 'assets/sounds/button-click.mp3', fallbackUrl: 'assets/sounds/default-click.mp3', type: 'sfx' },
             { name: 'taskComplete', url: 'assets/sounds/task-complete.mp3', fallbackUrl: 'assets/sounds/default-complete.mp3', type: 'sfx' },
@@ -266,20 +280,28 @@ class AmongUsV3Audio {
             { name: 'discussion', url: 'assets/sounds/discussion.mp3', fallbackUrl: 'assets/sounds/default-discussion.mp3', type: 'music' }
         ];
         
-        // Create fallback sounds if files don't exist
-        for (let sound of soundList) {
+        console.log(`🔊 Loading ${soundList.length} audio files...`);
+        
+        // Load sounds with better error handling
+        const loadPromises = soundList.map(async (sound) => {
             try {
                 await this.loadSound(sound.name, sound.url, sound.type);
+                console.log(`✅ Loaded ${sound.name}`);
             } catch (error) {
-                console.warn(`Failed to load ${sound.name}, trying fallback`);
+                console.warn(`⚠️ Failed to load ${sound.name}, trying fallback:`, error.message);
                 try {
                     await this.loadSound(sound.name, sound.fallbackUrl, sound.type);
+                    console.log(`✅ Loaded ${sound.name} (fallback)`);
                 } catch (fallbackError) {
-                    console.warn(`Failed to load fallback for ${sound.name}, creating synthetic sound`);
+                    console.warn(`❌ Failed to load fallback for ${sound.name}, creating synthetic sound:`, fallbackError.message);
                     this.createSyntheticSound(sound.name, sound.type);
                 }
             }
-        }
+        });
+        
+        // Wait for all sounds to load (or fail)
+        await Promise.allSettled(loadPromises);
+        console.log(`🔊 Audio loading complete. Loaded ${this.sounds.size} sounds and ${this.music.size} music tracks.`);
     }
     
     createSyntheticSound(name, type) {
@@ -392,24 +414,37 @@ class AmongUsV3Audio {
     }
     
     async fetchAndDecodeAudio(url) {
+        if (!this.audioContext) {
+            throw new Error('Audio context not initialized');
+        }
+        
         try {
             // First try to use preloaded resource
             const preloadedData = await this.tryPreloadedResource(url);
             if (preloadedData) {
-                return this.audioContext.decodeAudioData(preloadedData);
+                return await this.audioContext.decodeAudioData(preloadedData);
             }
         } catch (error) {
             console.warn('Failed to use preloaded resource, falling back to fetch:', error);
         }
         
         // Fallback to regular fetch
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch audio: ${response.status}`);
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch audio: ${response.status} ${response.statusText}`);
+            }
+            
+            const arrayBuffer = await response.arrayBuffer();
+            if (arrayBuffer.byteLength === 0) {
+                throw new Error('Empty audio file');
+            }
+            
+            return await this.audioContext.decodeAudioData(arrayBuffer);
+        } catch (error) {
+            console.error(`Failed to load audio from ${url}:`, error);
+            throw error;
         }
-        
-        const arrayBuffer = await response.arrayBuffer();
-        return this.audioContext.decodeAudioData(arrayBuffer);
     }
     
     async tryPreloadedResource(url) {
