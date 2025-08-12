@@ -16,8 +16,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="assets/sounds/ambient.mp3" as="audio" crossorigin="anonymous">
-    <link rel="preload" href="assets/sounds/button-click.mp3" as="audio" crossorigin="anonymous">
 </head>
 <body>
     <div id="app" class="app-container">
@@ -439,11 +437,5 @@
     <script src="js/crewmate-generator.js"></script>
     <script src="js/character-customizer.js"></script>
     <script src="js/v3-app.js"></script>
-    <script>
-        // Initialize the game when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            window.amongUsApp = new AmongUsV3App();
-        });
-    </script>
 </body>
 </html>

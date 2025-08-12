@@ -549,6 +549,10 @@ class AmongUsV3App {
         }
     }
     
+    handleMobileAction(action) {
+        console.log('Mobile action:', action);
+    }
+
     updatePlayerRenderable() {
         if (!this.engine.graphics || !this.gameState.localPlayer) return;
         
