@@ -36,7 +36,7 @@ def main():
     sounds_dir = "assets/sounds"
     os.makedirs(sounds_dir, exist_ok=True)
     
-    # List of audio files needed
+    # List of basic audio files (use create_all_audio_files.py for complete set)
     audio_files = [
         "ambient.mp3",
         "button-click.mp3", 
