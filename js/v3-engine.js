@@ -141,7 +141,7 @@ class AmongUsV3Engine {
     
     render() {
         if (this.graphics) {
-            this.graphics.render();
+            this.graphics.render(this.ctx);
         }
     }
     
