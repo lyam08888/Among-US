@@ -1,4 +1,11 @@
-// Amon        // Game settings
+// Among Us V3 - Game Logic System
+class AmongUsV3GameLogic {
+    constructor(engine) {
+        this.engine = engine;
+        this.isInitialized = false;
+        
+        // Game state
+        this.gamePhase = 'lobby'; // lobby, playing, meeting, voting, ended
         this.gameSettings = {
             maxPlayers: 15,
             numImpostors: 2,
@@ -45,7 +52,12 @@
                 killPenaltyWeight: 1.5,
                 votingAccuracyBonus: 0.5,
                 sabotageImpact: 1.0
-            } System
+            }
+        };
+    }
+}
+
+// Among Us V3 - Game Logic System
 class AmongUsV3GameLogic {
     constructor(engine) {
         this.engine = engine;

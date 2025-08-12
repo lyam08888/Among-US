@@ -136,6 +136,41 @@ class AmongUsV3App {
         }
     }
     
+    async waitForDOM() {
+        return new Promise(resolve => {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', resolve);
+            } else {
+                resolve();
+            }
+        });
+    }
+    
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    showError(title, message) {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            const loadingText = document.getElementById('loading-text');
+            const loadingPercentage = document.getElementById('loading-percentage');
+            
+            if (loadingText) {
+                loadingText.textContent = `❌ ${title}: ${message}`;
+                loadingText.style.color = '#ff3838';
+            }
+            
+            if (loadingPercentage) {
+                loadingPercentage.textContent = 'Erreur';
+                loadingPercentage.style.color = '#ff3838';
+            }
+        }
+        
+        // Also show in console for debugging
+        console.error(`${title}: ${message}`);
+    }
+    
     async initializeEngine() {
         this.updateLoadingProgress(10, 'Initialisation du moteur de jeu...');
         
