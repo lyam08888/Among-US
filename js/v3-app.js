@@ -893,6 +893,72 @@ class AmongUsV3App {
         }
     }
     
+    showCharacterCustomizer() {
+        console.log('🎨 Opening character customizer...');
+        const panel = document.getElementById('character-customizer-panel');
+        if (panel) {
+            panel.classList.add('active');
+            this.uiState.activeModal = 'character-customizer';
+            
+            // Initialize character customizer if not already done
+            if (!window.characterCustomizer) {
+                window.characterCustomizer = new CharacterCustomizer(this);
+            }
+            
+            // Setup tab navigation
+            this.setupCustomizerTabs();
+        }
+    }
+    
+    hideCharacterCustomizer() {
+        const panel = document.getElementById('character-customizer-panel');
+        if (panel) {
+            panel.classList.remove('active');
+            this.uiState.activeModal = null;
+            
+            // Stop preview animation to save resources
+            if (window.characterCustomizer) {
+                window.characterCustomizer.stopPreviewAnimation();
+            }
+        }
+    }
+    
+    setupCustomizerTabs() {
+        const tabs = document.querySelectorAll('.customizer-tabs .tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const targetTab = e.target.dataset.tab;
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                e.target.classList.add('active');
+                const targetContent = document.querySelector(`[data-tab="${targetTab}"].tab-content`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+        
+        // Setup slider value updates
+        this.setupSliderValueUpdates();
+    }
+    
+    setupSliderValueUpdates() {
+        const sliders = document.querySelectorAll('.slider');
+        sliders.forEach(slider => {
+            const valueSpan = document.getElementById(slider.id.replace('-slider', '-value'));
+            if (valueSpan) {
+                slider.addEventListener('input', (e) => {
+                    valueSpan.textContent = parseFloat(e.target.value).toFixed(2);
+                });
+            }
+        });
+    }
+    
     toggleSecondaryMenu() {
         const menu = document.getElementById('secondary-menu');
         if (menu) {
@@ -1348,12 +1414,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for debugging
 window.AmongUsV3App = AmongUsV3App;
-
-Next, I will fix the syntax error and the class definition issues in js/v3-app.js by removing duplicate or malformed code blocks and ensuring the class is properly defined and exported.
-
-Plan for js/v3-app.js:
-- Remove duplicate or malformed method definitions.
-- Ensure the AmongUsV3App class is properly closed.
-- Ensure the initialization script in index.html correctly references AmongUsV3App.
-
-Please confirm if I should proceed with cleaning and fixing js/v3-app.js now.

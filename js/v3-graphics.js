@@ -729,6 +729,68 @@ class AmongUsV3Graphics {
     }
     
     renderPlayer(ctx, player) {
+        // Use the new crewmate generator if available
+        if (window.CrewmateGenerator) {
+            this.renderPlayerWithGenerator(ctx, player);
+        } else {
+            // Fallback to old system
+            this.renderPlayerLegacy(ctx, player);
+        }
+        
+        // Player name
+        if (player.name && this.camera.zoom > 0.3) {
+            ctx.fillStyle = '#ffffff';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.font = `${12 * this.camera.zoom}px 'Inter', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.strokeText(player.name, 0, 55);
+            ctx.fillText(player.name, 0, 55);
+        }
+        
+        // Player status indicators
+        if (player.isDead) {
+            this.renderDeadPlayer(ctx, player);
+        }
+        
+        if (player.isImpostor && player.showImpostorIndicator) {
+            this.renderImpostorIndicator(ctx);
+        }
+    }
+    
+    renderPlayerWithGenerator(ctx, player) {
+        // Player shadow
+        if (this.settings.shadows) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(2, 35, 30, 15, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Get player's character options
+        let characterOptions = this.getPlayerCharacterOptions(player);
+        
+        // Create temporary canvas for the character
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 200;
+        tempCanvas.height = 200;
+        
+        // Determine animation state
+        const state = {
+            anim: player.isMoving ? 'walk' : 'idle',
+            frame: Math.floor(Date.now() / 100) % 8,
+            dir: this.getPlayerDirection(player)
+        };
+        
+        // Render character to temp canvas
+        window.CrewmateGenerator.renderFrameToCanvas(tempCanvas, characterOptions, state);
+        
+        // Draw the character
+        ctx.drawImage(tempCanvas, -50, -50, 100, 100);
+    }
+    
+    renderPlayerLegacy(ctx, player) {
         // Player shadow
         if (this.settings.shadows) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
@@ -754,27 +816,38 @@ class AmongUsV3Graphics {
             // Fallback rendering
             this.renderCrewmateFallback(ctx, player);
         }
-        
-        // Player name
-        if (player.name && this.camera.zoom > 0.3) {
-            ctx.fillStyle = '#ffffff';
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 2;
-            ctx.font = `${12 * this.camera.zoom}px 'Inter', sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'top';
-            ctx.strokeText(player.name, 0, 55);
-            ctx.fillText(player.name, 0, 55);
+    }
+    
+    getPlayerCharacterOptions(player) {
+        // If player has custom character options, use them
+        if (player.characterOptions) {
+            return player.characterOptions;
         }
         
-        // Player status indicators
-        if (player.isDead) {
-            this.renderDeadPlayer(ctx, player);
+        // If it's the local player, try to get saved customization
+        if (player.isLocal && window.characterCustomizer) {
+            return window.characterCustomizer.exportCharacterOptions();
         }
         
-        if (player.isImpostor && player.showImpostorIndicator) {
-            this.renderImpostorIndicator(ctx);
+        // Default character based on player color
+        const preset = window.CrewmateGenerator.CrewmatePresets.Classic();
+        if (player.color) {
+            preset.body = player.color;
         }
+        
+        return preset;
+    }
+    
+    getPlayerDirection(player) {
+        // Determine direction based on movement
+        if (player.velocity) {
+            if (Math.abs(player.velocity.x) > Math.abs(player.velocity.y)) {
+                return player.velocity.x > 0 ? 3 : 1; // Right : Left
+            } else {
+                return player.velocity.y > 0 ? 0 : 2; // Down : Up
+            }
+        }
+        return 3; // Default to right
     }
     
     renderCrewmateFallback(ctx, player) {
