@@ -426,7 +426,9 @@ class AmongUsV3App {
         
         // Load saved character customizations
         setTimeout(() => {
-            this.loadLocalPlayerCustomization();
+            if (typeof this.loadLocalPlayerCustomization === 'function') {
+                this.loadLocalPlayerCustomization();
+            }
         }, 100);
     }
     
