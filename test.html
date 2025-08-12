@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Among Us V3 - Test Mobile</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #0f3460;
+        }
+        .test-button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.2s ease;
+        }
+        .test-button:hover {
+            background: #d63447;
+            transform: translateY(-2px);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: rgba(17, 127, 45, 0.3);
+            border: 1px solid #117f2d;
+        }
+        .status.error {
+            background: rgba(255, 56, 56, 0.3);
+            border: 1px solid #ff3838;
+        }
+        .status.info {
+            background: rgba(0, 212, 255, 0.3);
+            border: 1px solid #00d4ff;
+        }
+        #test-canvas {
+            border: 2px solid #0f3460;
+            border-radius: 10px;
+            background: #0a0a0f;
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 Among Us V3 - Test Mobile</h1>
+        
+        <div class="test-section">
+            <h3>📱 Test de Compatibilité Mobile</h3>
+            <div id="mobile-status" class="status info">
+                Vérification en cours...
+            </div>
+            <button class="test-button" onclick="testMobileFeatures()">
+                Tester les Fonctionnalités Mobile
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎮 Test du Moteur de Jeu</h3>
+            <div id="engine-status" class="status info">
+                Moteur non initialisé
+            </div>
+            <button class="test-button" onclick="testGameEngine()">
+                Tester le Moteur
+            </button>
+            <button class="test-button" onclick="startDemo()">
+                Démo Graphique
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🖼️ Test de Rendu</h3>
+            <canvas id="test-canvas"></canvas>
+            <br>
+            <button class="test-button" onclick="testRendering()">
+                Test de Rendu
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📋 Test des Popups</h3>
+            <div id="popup-status" class="status info">
+                Système de popups non testé
+            </div>
+            <button class="test-button" onclick="testPopups()">
+                Tester les Popups
+            </button>
+            <button class="test-button" onclick="testMobileControls()">
+                Tester les Contrôles
+            </button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔗 Lancer le Jeu Complet</h3>
+            <p>Une fois tous les tests réussis, vous pouvez lancer le jeu complet :</p>
+            <button class="test-button" onclick="window.location.href='index.html'">
+                🎮 Lancer Among Us V3
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Test mobile features
+        function testMobileFeatures() {
+            const status = document.getElementById('mobile-status');
+            const features = {
+                'Touch Support': 'ontouchstart' in window,
+                'Device Orientation': 'DeviceOrientationEvent' in window,
+                'Vibration API': 'vibrate' in navigator,
+                'Fullscreen API': 'requestFullscreen' in document.documentElement,
+                'Local Storage': 'localStorage' in window,
+                'Canvas Support': !!document.createElement('canvas').getContext
+            };
+            
+            const results = Object.entries(features)
+                .map(([name, supported]) => `${name}: ${supported ? '✅' : '❌'}`)
+                .join('<br>');
+            
+            const allSupported = Object.values(features).every(Boolean);
+            status.className = `status ${allSupported ? 'success' : 'error'}`;
+            status.innerHTML = `<strong>Résultats des tests :</strong><br>${results}`;
+        }
+        
+        // Test game engine
+        function testGameEngine() {
+            const status = document.getElementById('engine-status');
+            
+            try {
+                // Test if classes are available
+                const tests = {
+                    'AmongUsV3Engine': typeof AmongUsV3Engine !== 'undefined',
+                    'MobileControls': typeof MobileControls !== 'undefined',
+                    'MobilePopupSystem': typeof MobilePopupSystem !== 'undefined'
+                };
+                
+                const results = Object.entries(tests)
+                    .map(([name, available]) => `${name}: ${available ? '✅' : '❌'}`)
+                    .join('<br>');
+                
+                const allAvailable = Object.values(tests).every(Boolean);
+                status.className = `status ${allAvailable ? 'success' : 'error'}`;
+                status.innerHTML = `<strong>Classes disponibles :</strong><br>${results}`;
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.innerHTML = `<strong>Erreur :</strong> ${error.message}`;
+            }
+        }
+        
+        // Test rendering
+        function testRendering() {
+            const canvas = document.getElementById('test-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = 400;
+            canvas.height = 300;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#1a1a2e');
+            gradient.addColorStop(1, '#16213e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw a simple crewmate
+            ctx.save();
+            ctx.translate(200, 150);
+            
+            // Body
+            ctx.fillStyle = '#ff3838';
+            ctx.beginPath();
+            ctx.ellipse(0, 10, 35, 28, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Visor
+            ctx.fillStyle = 'rgba(200, 230, 255, 0.9)';
+            ctx.beginPath();
+            ctx.ellipse(0, -5, 25, 20, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Visor reflection
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.beginPath();
+            ctx.ellipse(-8, -12, 8, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Backpack
+            ctx.fillStyle = '#cc2e2e';
+            ctx.fillRect(20, -5, 15, 25);
+            ctx.beginPath();
+            ctx.arc(27.5, -5, 7.5, Math.PI, 0);
+            ctx.fill();
+            
+            ctx.restore();
+            
+            // Add text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Test de Rendu Réussi!', 200, 50);
+            
+            console.log('✅ Test de rendu terminé');
+        }
+        
+        // Test popups
+        function testPopups() {
+            const status = document.getElementById('popup-status');
+            
+            if (typeof MobilePopupSystem === 'undefined') {
+                status.className = 'status error';
+                status.innerHTML = 'Système de popups non disponible';
+                return;
+            }
+            
+            try {
+                const popupSystem = new MobilePopupSystem();
+                
+                // Test minimizable popup
+                popupSystem.showPopup('test-popup', 'minimizable', {
+                    title: 'Test Popup',
+                    content: '<p>Ceci est un test de popup minimisable!</p><button onclick="alert(\'Popup fonctionne!\')">Test Button</button>'
+                });
+                
+                status.className = 'status success';
+                status.innerHTML = 'Popup de test créé avec succès!';
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.innerHTML = `Erreur: ${error.message}`;
+            }
+        }
+        
+        // Test mobile controls
+        function testMobileControls() {
+            if (typeof MobileControls === 'undefined') {
+                alert('Système de contrôles mobiles non disponible');
+                return;
+            }
+            
+            try {
+                // Create a mock engine for testing
+                const mockEngine = {
+                    emit: (event, data) => console.log('Mock engine event:', event, data)
+                };
+                
+                const controls = new MobileControls(mockEngine);
+                alert('Contrôles mobiles initialisés avec succès!\nVérifiez la console pour les événements.');
+                
+            } catch (error) {
+                alert(`Erreur lors du test des contrôles: ${error.message}`);
+            }
+        }
+        
+        // Start demo
+        function startDemo() {
+            const canvas = document.getElementById('test-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 400;
+            canvas.height = 300;
+            
+            let time = 0;
+            
+            function animate() {
+                time += 0.02;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Animated background
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, `hsl(${time * 50}, 50%, 20%)`);
+                gradient.addColorStop(1, `hsl(${time * 30}, 40%, 10%)`);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Animated crewmate
+                ctx.save();
+                ctx.translate(200 + Math.sin(time) * 50, 150 + Math.cos(time * 0.5) * 20);
+                ctx.rotate(Math.sin(time * 2) * 0.1);
+                
+                // Body
+                ctx.fillStyle = `hsl(${time * 100}, 70%, 50%)`;
+                ctx.beginPath();
+                ctx.ellipse(0, 10, 35, 28, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Visor
+                ctx.fillStyle = 'rgba(200, 230, 255, 0.9)';
+                ctx.beginPath();
+                ctx.ellipse(0, -5, 25, 20, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // Auto-run mobile test on load
+        window.addEventListener('load', () => {
+            setTimeout(testMobileFeatures, 500);
+        });
+    </script>
+    
+    <!-- Load game scripts for testing -->
+    <script src="js/mobile-controls.js"></script>
+    <script src="js/mobile-popups.js"></script>
+    <script src="js/v3-engine.js"></script>
+</body>
+</html>

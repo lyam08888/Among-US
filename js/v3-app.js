@@ -1550,6 +1550,110 @@ class AmongUsV3App {
         console.error(`${title}: ${message}`);
         alert(`${title}\n\n${message}`);
     }
+    
+    showGameScreen() {
+        // Hide menu screen
+        const menuScreen = document.getElementById('main-menu-v3');
+        if (menuScreen) {
+            menuScreen.classList.remove('active');
+        }
+        
+        // Show game screen
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen) {
+            gameScreen.classList.add('active');
+        }
+        
+        // Update mobile controls for game state
+        if (this.mobileControls) {
+            this.mobileControls.updateForGameState({
+                isImpostor: this.gameState.localPlayer?.isImpostor || false,
+                nearbyInteractable: false
+            });
+        }
+    }
+    
+    initializeGameSession() {
+        // Initialize local player
+        this.gameState.localPlayer = {
+            id: 'local-player',
+            name: 'Joueur',
+            color: '#ff3838',
+            position: { x: 0, y: 0 },
+            velocity: { x: 0, y: 0 },
+            animation: 'idle',
+            direction: 'right',
+            isAlive: true,
+            isImpostor: Math.random() < 0.3, // 30% chance to be impostor
+            tasks: [
+                { id: 1, name: 'Réparer les câbles', location: 'Cafétéria', icon: 'fas fa-bolt', completed: false },
+                { id: 2, name: 'Vider les déchets', location: 'Stockage', icon: 'fas fa-trash', completed: false },
+                { id: 3, name: 'Faire le plein', location: 'Moteurs', icon: 'fas fa-gas-pump', completed: false }
+            ]
+        };
+        
+        // Add some other players for demo
+        this.gameState.players.set('player-2', {
+            id: 'player-2',
+            name: 'Rouge',
+            color: '#ff3838',
+            position: { x: 100, y: 50 },
+            isAlive: true,
+            isImpostor: false
+        });
+        
+        this.gameState.players.set('player-3', {
+            id: 'player-3',
+            name: 'Bleu',
+            color: '#132ed1',
+            position: { x: -80, y: 30 },
+            isAlive: true,
+            isImpostor: false
+        });
+        
+        // Update game state
+        this.gameState.gamePhase = 'playing';
+        this.gameState.tasks = this.gameState.localPlayer.tasks;
+        
+        // Load map and create renderables
+        this.loadMap('skeld');
+        
+        // Update task tracker
+        this.updateTaskTracker();
+        
+        console.log('🎮 Game session initialized');
+    }
+    
+    initializeTrainingSession() {
+        this.initializeGameSession();
+        
+        // Add training-specific elements
+        this.gameState.isTraining = true;
+        
+        // Show tutorial popup
+        if (this.popupSystem) {
+            this.popupSystem.showPopup('tutorial', 'slide-up', {
+                title: 'Mode Entraînement',
+                content: `
+                    <div class="tutorial-content">
+                        <h4>Bienvenue dans le mode entraînement !</h4>
+                        <p>Utilisez le joystick virtuel pour vous déplacer et explorez la carte.</p>
+                        <ul>
+                            <li>🕹️ Joystick : Déplacement</li>
+                            <li>🤚 Bouton Utiliser : Interagir avec les objets</li>
+                            <li>🚨 Bouton Urgence : Appeler une réunion</li>
+                            <li>📋 Menu flottant : Accéder aux options</li>
+                        </ul>
+                        <button class="quick-action-btn primary" onclick="document.querySelector('#popup-tutorial').remove()">
+                            Commencer l'entraînement
+                        </button>
+                    </div>
+                `
+            });
+        }
+        
+        console.log('🎓 Training session initialized');
+    }
 }
 
 // Simple notification system

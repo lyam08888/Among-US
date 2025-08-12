@@ -581,6 +581,114 @@ class AmongUsV3Engine {
         console.log('🐛 Debug mode enabled');
     }
     
+    // Game loop control
+    start() {
+        if (this.isRunning) {
+            console.warn('⚠️ Engine is already running');
+            return;
+        }
+        
+        this.isRunning = true;
+        this.lastTime = performance.now();
+        this.gameLoop();
+        
+        console.log('▶️ Engine started');
+    }
+    
+    stop() {
+        this.isRunning = false;
+        console.log('⏹️ Engine stopped');
+    }
+    
+    pause() {
+        this.gameState.isPaused = true;
+        console.log('⏸️ Engine paused');
+    }
+    
+    resume() {
+        this.gameState.isPaused = false;
+        console.log('▶️ Engine resumed');
+    }
+    
+    gameLoop() {
+        if (!this.isRunning) return;
+        
+        const currentTime = performance.now();
+        this.deltaTime = currentTime - this.lastTime;
+        this.lastTime = currentTime;
+        
+        // Update performance metrics
+        this.updatePerformanceMetrics();
+        
+        // Skip frame if paused
+        if (!this.gameState.isPaused) {
+            // Update game systems
+            this.update();
+            
+            // Render frame
+            this.render();
+        }
+        
+        // Schedule next frame
+        requestAnimationFrame(() => this.gameLoop());
+    }
+    
+    update() {
+        // Update physics
+        if (this.physics) {
+            this.physics.update(this.deltaTime);
+        }
+        
+        // Update game objects
+        for (let [id, gameObject] of this.gameState.gameObjects) {
+            if (gameObject.update) {
+                gameObject.update(this.deltaTime);
+            }
+        }
+        
+        // Update players
+        for (let [id, player] of this.gameState.players) {
+            if (player.update) {
+                player.update(this.deltaTime);
+            }
+        }
+        
+        // Emit update event
+        this.emit('update', { deltaTime: this.deltaTime });
+    }
+    
+    render() {
+        if (this.graphics && this.ctx) {
+            this.graphics.render(this.ctx);
+        }
+        
+        // Emit render event
+        this.emit('render', { ctx: this.ctx });
+    }
+    
+    updatePerformanceMetrics() {
+        this.performance.frameCount++;
+        
+        // Calculate FPS
+        const now = performance.now();
+        if (now - this.performance.lastFpsUpdate >= 1000) {
+            this.performance.currentFps = this.performance.frameCount;
+            this.performance.frameCount = 0;
+            this.performance.lastFpsUpdate = now;
+        }
+        
+        // Track frame time
+        this.performance.frameTimeHistory.push(this.deltaTime);
+        if (this.performance.frameTimeHistory.length > 60) {
+            this.performance.frameTimeHistory.shift();
+        }
+        
+        // Calculate average frame time
+        this.performance.averageFrameTime = 
+            this.performance.frameTimeHistory.reduce((a, b) => a + b, 0) / 
+            this.performance.frameTimeHistory.length;
+    }
+    
     // Cleanup
     destroy() {
         this.stop();

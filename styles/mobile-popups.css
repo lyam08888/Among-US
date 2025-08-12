@@ -755,6 +755,239 @@
     }
 }
 
+/* Tutorial Content */
+.tutorial-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.tutorial-content h4 {
+    color: var(--text-accent);
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.tutorial-content p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.tutorial-content ul {
+    text-align: left;
+    margin: 20px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.tutorial-content li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.tutorial-content li:last-child {
+    margin-bottom: 0;
+}
+
+/* Mobile Interface Improvements */
+.mobile-interface-compact {
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 20px;
+    --font-size-xs: 10px;
+    --font-size-sm: 12px;
+    --font-size-md: 14px;
+    --font-size-lg: 16px;
+}
+
+/* Compact Mode for Small Screens */
+@media (max-width: 480px) {
+    :root {
+        --spacing-xs: 3px;
+        --spacing-sm: 6px;
+        --spacing-md: 10px;
+        --spacing-lg: 14px;
+        --spacing-xl: 18px;
+        --font-size-xs: 9px;
+        --font-size-sm: 11px;
+        --font-size-md: 13px;
+        --font-size-lg: 15px;
+    }
+    
+    .mobile-popup.minimizable {
+        min-width: 200px;
+        min-height: 120px;
+    }
+    
+    .popup-header {
+        padding: 12px 15px;
+    }
+    
+    .popup-title {
+        font-size: 16px;
+    }
+    
+    .popup-content {
+        padding: 15px;
+        font-size: 13px;
+    }
+    
+    .tutorial-content h4 {
+        font-size: 18px;
+    }
+    
+    .tutorial-content li {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+/* Ultra Compact Mode for Very Small Screens */
+@media (max-width: 360px) {
+    .mobile-popup.minimizable {
+        min-width: 180px;
+        min-height: 100px;
+    }
+    
+    .popup-header {
+        padding: 10px 12px;
+    }
+    
+    .popup-title {
+        font-size: 14px;
+    }
+    
+    .popup-content {
+        padding: 12px;
+        font-size: 12px;
+    }
+    
+    .floating-trigger {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .floating-menu {
+        min-width: 160px;
+    }
+    
+    .floating-item {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+}
+
+/* Dynamic Sizing Based on Content */
+.popup-auto-size {
+    width: auto !important;
+    height: auto !important;
+    max-width: min(90vw, 400px);
+    max-height: min(80vh, 600px);
+}
+
+.popup-content.scrollable {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Improved Touch Targets */
+.touch-optimized {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+}
+
+/* Better Visual Hierarchy */
+.popup-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.popup-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.popup-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-accent);
+    margin-bottom: 12px;
+}
+
+.popup-section-content {
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Enhanced Animations for Mobile */
+@keyframes mobileSlideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes mobileSlideDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.mobile-slide-up {
+    animation: mobileSlideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.mobile-slide-down {
+    animation: mobileSlideDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    .mobile-slide-up,
+    .mobile-slide-down {
+        animation: none;
+    }
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+    .popup-content {
+        border: 2px solid var(--text-primary);
+    }
+    
+    .tutorial-content li {
+        border: 1px solid var(--border-accent);
+    }
+}
+
+/* Dark Mode Optimizations */
+@media (prefers-color-scheme: dark) {
+    .tutorial-content li {
+        background: rgba(255, 255, 255, 0.05);
+    }
+}
+
 /* Mobile Modal System */
 .modal-overlay {
     position: fixed;
