@@ -876,6 +876,59 @@ class AmongUsV3Audio {
         return this.activeSounds.size;
     }
     
+    // Update method for engine integration
+    update(deltaTime) {
+        // Update spatial audio positions
+        this.updateSpatialAudio();
+        
+        // Clean up finished sounds
+        this.cleanupFinishedSounds();
+        
+        // Update audio effects based on game state
+        this.updateAudioEffects(deltaTime);
+    }
+    
+    updateSpatialAudio() {
+        if (!this.settings.spatialAudio || !this.listener) return;
+        
+        // Update listener position based on camera/player position
+        // This would be updated by the game engine with actual player position
+        for (let [id, source] of this.spatialSources) {
+            if (source.position && source.panner) {
+                source.panner.positionX.value = source.position.x;
+                source.panner.positionY.value = source.position.y;
+                source.panner.positionZ.value = source.position.z || 0;
+            }
+        }
+    }
+    
+    cleanupFinishedSounds() {
+        // Remove finished sounds from active sounds map
+        for (let [id, sound] of this.activeSounds) {
+            if (sound.source.playbackState === 'finished') {
+                this.activeSounds.delete(id);
+            }
+        }
+    }
+    
+    updateAudioEffects(deltaTime) {
+        // Update dynamic audio effects based on game state
+        // This could include things like:
+        // - Distance-based filtering
+        // - Environmental reverb
+        // - Dynamic range compression
+        
+        // Example: Update low-pass filter based on distance or game state
+        if (this.effects.lowpass && this.engine) {
+            // This would be updated based on actual game state
+            const gameState = this.engine.gameState;
+            if (gameState && gameState.currentScreen === 'game') {
+                // Normal gameplay - full frequency range
+                this.effects.lowpass.frequency.value = 20000;
+            }
+        }
+    }
+    
     // Debug methods
     getDebugInfo() {
         return {

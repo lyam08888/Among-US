@@ -718,6 +718,9 @@ class AmongUsV3App {
         this.showScreen('game-screen');
         this.currentScreen = 'game';
         
+        // Set game start time for timer
+        this.gameStartTime = Date.now();
+        
         this.initializeGameWorld();
         this.setupGameUpdateLoop();
         
@@ -1022,6 +1025,77 @@ class AmongUsV3App {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
+    }
+    
+    setupGameUpdateLoop() {
+        console.log('🔄 Setting up game update loop...');
+        
+        // Start the engine if it's not already running
+        if (this.engine && !this.engine.isRunning) {
+            this.engine.start();
+        }
+        
+        // Setup additional game-specific update logic
+        this.gameUpdateInterval = setInterval(() => {
+            this.updateGameLogic();
+        }, 1000 / 60); // 60 FPS
+        
+        console.log('✅ Game update loop initialized');
+    }
+    
+    updateGameLogic() {
+        // Update game state
+        if (this.gameState.gamePhase === 'playing') {
+            this.updatePlayerPositions();
+            this.updateTaskProgress();
+            this.updateGameTimer();
+        }
+        
+        // Update UI elements
+        this.updateGameUI();
+    }
+    
+    updatePlayerPositions() {
+        // Update AI player positions if in training mode
+        if (this.gameState.gameMode === 'training') {
+            this.gameState.players.forEach((player, id) => {
+                if (player.isAI && player.isAlive) {
+                    // Simple AI movement
+                    const speed = 0.5;
+                    const direction = Math.random() * Math.PI * 2;
+                    player.position.x += Math.cos(direction) * speed;
+                    player.position.y += Math.sin(direction) * speed;
+                    
+                    // Keep players within bounds
+                    player.position.x = Math.max(-200, Math.min(200, player.position.x));
+                    player.position.y = Math.max(-200, Math.min(200, player.position.y));
+                }
+            });
+        }
+    }
+    
+    updateTaskProgress() {
+        // Auto-complete tasks in training mode for demonstration
+        if (this.gameState.gameMode === 'training' && this.gameState.tasks) {
+            const incompleteTasks = this.gameState.tasks.filter(t => !t.completed);
+            if (incompleteTasks.length > 0 && Math.random() < 0.001) { // 0.1% chance per frame
+                const randomTask = incompleteTasks[Math.floor(Math.random() * incompleteTasks.length)];
+                randomTask.completed = true;
+                this.updateTaskUI();
+                this.showNotification('Tâche terminée!', `${randomTask.name} complétée`, 'success');
+            }
+        }
+    }
+    
+    updateGameTimer() {
+        // Update game timer display
+        const timerElement = document.getElementById('game-timer');
+        if (timerElement && this.gameStartTime) {
+            const elapsed = Math.floor((Date.now() - this.gameStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
     }
     
     generatePlayerId() {
