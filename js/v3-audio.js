@@ -152,6 +152,7 @@ class AmongUsV3Audio {
         this.stopSound = () => {};
         this.stopMusic = () => {};
         this.setVolume = () => {};
+        this.update = () => {};
     }
     
     // Test method to verify audio system is working
