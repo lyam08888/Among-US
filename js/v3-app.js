@@ -85,6 +85,9 @@ class AmongUsV3App {
             // Complete initialization
             this.completeInitialization();
             
+            // Setup game update loop
+            this.setupGameUpdateLoop();
+
         } catch (error) {
             console.error('❌ Failed to initialize application:', error);
             this.showError('Erreur d\'initialisation', error.message);
@@ -118,40 +121,6 @@ class AmongUsV3App {
         };
         
         updateTip();
-    }
-    
-    async initializeEngine() {
-        console.log('🔧 Initializing engine...');
-        this.updateLoadingProgress(10, 'Initialisation du moteur...');
-        
-        this.engine = new AmongUsV3Engine();
-        
-        console.log('✅ Engine initialized');
-    }
-    
-    async loadAssets() {
-        console.log('📦 Loading assets...');
-        this.updateLoadingProgress(30, 'Chargement des ressources...');
-        
-        // Initialize audio system
-        if (this.engine && this.engine.audio) {
-            await this.engine.audio.initialize();
-        }
-        
-        this.updateLoadingProgress(50, 'Ressources chargées');
-        console.log('✅ Assets loaded');
-    }
-    
-    async initializeGameSystems() {
-        console.log('⚙️ Initializing game systems...');
-        this.updateLoadingProgress(70, 'Initialisation des systèmes...');
-        
-        this.initializeTaskSystem();
-        this.initializeMapSystem();
-        this.initializePlayerSystem();
-        
-        this.updateLoadingProgress(80, 'Systèmes initialisés');
-        console.log('✅ Game systems initialized');
     }
     
     updateLoadingProgress(progress, stage) {
@@ -196,31 +165,6 @@ class AmongUsV3App {
         
         // Also show in console for debugging
         console.error(`${title}: ${message}`);
-    }
-    
-    completeInitialization() {
-        console.log('🎉 Initialization complete!');
-        this.updateLoadingProgress(100, 'Prêt à jouer!');
-        this.isInitialized = true;
-        
-        // Hide loading screen after a short delay
-        setTimeout(() => {
-            this.hideLoadingScreen();
-            this.showScreen('main-menu');
-        }, 1000);
-    }
-    
-    hideLoadingScreen() {
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) {
-            loadingScreen.classList.remove('active');
-        }
-        
-        // Clear tip timer
-        if (this.tipTimer) {
-            clearTimeout(this.tipTimer);
-            this.tipTimer = null;
-        }
     }
     
     async initializeEngine() {
@@ -546,68 +490,6 @@ class AmongUsV3App {
         }
     }
     
-    handleMobileAction(action) {
-        console.log('Mobile action:', action);
-    }
-
-    setupGameUpdateLoop() {
-        if (this.engine) {
-            this.engine.on('update', this.update.bind(this));
-            console.log('Game update loop setup.');
-        }
-    }
-
-    update(event) {
-        const { deltaTime } = event;
-        if (this.currentScreen !== 'game') return;
-
-        // Game logic update here
-        if (this.gameState.gameMode === 'training') {
-            this.updateAIPlayers(deltaTime);
-        }
-
-        // Update player physics from velocity
-        if (this.gameState.localPlayer && this.engine.physics) {
-            const body = this.engine.physics.collisionBodies.get('localPlayer');
-            if (body) {
-                this.gameState.localPlayer.position.x = body.position.x;
-                this.gameState.localPlayer.position.y = body.position.y;
-                this.updatePlayerRenderable();
-            }
-        }
-    }
-
-    updateAIPlayers(deltaTime) {
-        this.gameState.players.forEach(player => {
-            if (player.isAI) {
-                // Simple random walk for AI
-                if (!player.aiState || player.aiState.timer <= 0) {
-                    player.aiState = {
-                        timer: Math.random() * 3000 + 1000, // change direction every 1-4 seconds
-                        velocity: {
-                            x: (Math.random() * 2 - 1) * 100,
-                            y: (Math.random() * 2 - 1) * 100
-                        }
-                    };
-                }
-
-                player.aiState.timer -= deltaTime;
-                player.position.x += player.aiState.velocity.x * (deltaTime / 1000);
-                player.position.y += player.aiState.velocity.y * (deltaTime / 1000);
-
-                const aiRenderable = this.engine.graphics.layers.players.find(p => p.id === player.id);
-                if (aiRenderable) {
-                    aiRenderable.x = player.position.x;
-                    aiRenderable.y = player.position.y;
-                    aiRenderable.animation = (player.aiState.velocity.x !== 0 || player.aiState.velocity.y !== 0) ? 'walking' : 'idle';
-                    if (Math.abs(player.aiState.velocity.x) > Math.abs(player.aiState.velocity.y)) {
-                        aiRenderable.direction = player.aiState.velocity.x > 0 ? 'right' : 'left';
-                    }
-                }
-            }
-        });
-    }
-
     updatePlayerRenderable() {
         if (!this.engine.graphics || !this.gameState.localPlayer) return;
         
@@ -825,9 +707,6 @@ class AmongUsV3App {
         console.log('🎮 Starting game...');
         this.showScreen('game-screen');
         this.currentScreen = 'game';
-        
-        // Set game start time for timer
-        this.gameStartTime = Date.now();
         
         this.initializeGameWorld();
         this.setupGameUpdateLoop();
@@ -1067,77 +946,6 @@ class AmongUsV3App {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
-    }
-    
-    setupGameUpdateLoop() {
-        console.log('🔄 Setting up game update loop...');
-        
-        // Start the engine if it's not already running
-        if (this.engine && !this.engine.isRunning) {
-            this.engine.start();
-        }
-        
-        // Setup additional game-specific update logic
-        this.gameUpdateInterval = setInterval(() => {
-            this.updateGameLogic();
-        }, 1000 / 60); // 60 FPS
-        
-        console.log('✅ Game update loop initialized');
-    }
-    
-    updateGameLogic() {
-        // Update game state
-        if (this.gameState.gamePhase === 'playing') {
-            this.updatePlayerPositions();
-            this.updateTaskProgress();
-            this.updateGameTimer();
-        }
-        
-        // Update UI elements
-        this.updateGameUI();
-    }
-    
-    updatePlayerPositions() {
-        // Update AI player positions if in training mode
-        if (this.gameState.gameMode === 'training') {
-            this.gameState.players.forEach((player, id) => {
-                if (player.isAI && player.isAlive) {
-                    // Simple AI movement
-                    const speed = 0.5;
-                    const direction = Math.random() * Math.PI * 2;
-                    player.position.x += Math.cos(direction) * speed;
-                    player.position.y += Math.sin(direction) * speed;
-                    
-                    // Keep players within bounds
-                    player.position.x = Math.max(-200, Math.min(200, player.position.x));
-                    player.position.y = Math.max(-200, Math.min(200, player.position.y));
-                }
-            });
-        }
-    }
-    
-    updateTaskProgress() {
-        // Auto-complete tasks in training mode for demonstration
-        if (this.gameState.gameMode === 'training' && this.gameState.tasks) {
-            const incompleteTasks = this.gameState.tasks.filter(t => !t.completed);
-            if (incompleteTasks.length > 0 && Math.random() < 0.001) { // 0.1% chance per frame
-                const randomTask = incompleteTasks[Math.floor(Math.random() * incompleteTasks.length)];
-                randomTask.completed = true;
-                this.updateTaskUI();
-                this.showNotification('Tâche terminée!', `${randomTask.name} complétée`, 'success');
-            }
-        }
-    }
-    
-    updateGameTimer() {
-        // Update game timer display
-        const timerElement = document.getElementById('game-timer');
-        if (timerElement && this.gameStartTime) {
-            const elapsed = Math.floor((Date.now() - this.gameStartTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
     }
     
     generatePlayerId() {
@@ -1537,3 +1345,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for debugging
 window.AmongUsV3App = AmongUsV3App;
+
+Next, I will fix the syntax error and the class definition issues in js/v3-app.js by removing duplicate or malformed code blocks and ensuring the class is properly defined and exported.
+
+Plan for js/v3-app.js:
+- Remove duplicate or malformed method definitions.
+- Ensure the AmongUsV3App class is properly closed.
+- Ensure the initialization script in index.html correctly references AmongUsV3App.
+
+Please confirm if I should proceed with cleaning and fixing js/v3-app.js now.

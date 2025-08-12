@@ -134,6 +134,11 @@ class AmongUsV3Graphics {
         
         console.log('🎨 Graphics system initialized');
     }
+
+    update(deltaTime) {
+        // This method is called by the engine's game loop.
+        // We can add graphics-related update logic here in the future.
+    }
     
     initOffscreenCanvases() {
         // Shadow map canvas
