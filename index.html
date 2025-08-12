@@ -461,5 +461,52 @@
     <script src="js/mobile-controls.js"></script>
     <script src="js/mobile-popups.js"></script>
     <script src="js/v3-app.js"></script>
+    
+    <!-- Initialize Application -->
+    <script>
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Starting Among Us V3...');
+            try {
+                window.amongUsApp = new AmongUsV3App();
+            } catch (error) {
+                console.error('❌ Failed to start application:', error);
+                
+                // Show error message to user
+                const loadingText = document.getElementById('loading-text');
+                if (loadingText) {
+                    loadingText.textContent = `Erreur de démarrage: ${error.message}`;
+                    loadingText.style.color = '#ff3838';
+                }
+            }
+        });
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (window.amongUsApp && window.amongUsApp.engine) {
+                if (document.hidden) {
+                    window.amongUsApp.engine.pause();
+                } else {
+                    window.amongUsApp.engine.resume();
+                }
+            }
+        });
+        
+        // Handle window resize for mobile
+        window.addEventListener('resize', function() {
+            if (window.amongUsApp && window.amongUsApp.engine) {
+                window.amongUsApp.engine.resizeCanvas();
+            }
+        });
+        
+        // Handle orientation change on mobile
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                if (window.amongUsApp && window.amongUsApp.engine) {
+                    window.amongUsApp.engine.resizeCanvas();
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>

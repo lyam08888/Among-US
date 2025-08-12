@@ -174,19 +174,32 @@ class AmongUsV3App {
     async initializeEngine() {
         this.updateLoadingProgress(10, 'Initialisation du moteur de jeu...');
         
-        // Wait for DOM to be ready
-        await this.waitForDOM();
-        
-        // Initialize game engine
-        this.engine = new AmongUsV3Engine();
-        
-        // Wait for engine to be ready
-        await new Promise(resolve => {
-            this.engine.on('start', resolve);
-            this.engine.start();
-        });
-        
-        this.updateLoadingProgress(25, 'Moteur de jeu initialisé');
+        try {
+            // Wait for DOM to be ready
+            await this.waitForDOM();
+            
+            // Initialize game engine
+            console.log('🔧 Creating game engine...');
+            this.engine = new AmongUsV3Engine();
+            
+            // Wait for engine to be ready with timeout
+            await Promise.race([
+                new Promise(resolve => {
+                    this.engine.on('start', resolve);
+                    this.engine.start();
+                }),
+                new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Engine initialization timeout')), 10000);
+                })
+            ]);
+            
+            console.log('✅ Game engine initialized successfully');
+            this.updateLoadingProgress(25, 'Moteur de jeu initialisé');
+            
+        } catch (error) {
+            console.error('❌ Engine initialization failed:', error);
+            throw new Error(`Échec d'initialisation du moteur: ${error.message}`);
+        }
     }
     
     async loadAssets() {

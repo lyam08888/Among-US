@@ -214,25 +214,38 @@ class AmongUsV3Engine {
     }
     
     resizeCanvas() {
+        if (!this.canvas) return;
+        
         const container = this.canvas.parentElement;
-        const rect = container.getBoundingClientRect();
+        if (!container) return;
         
-        // Set canvas size to match container
-        this.canvas.width = rect.width * window.devicePixelRatio;
-        this.canvas.height = rect.height * window.devicePixelRatio;
+        // Get viewport dimensions for mobile
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
         
-        // Scale context to match device pixel ratio
-        this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        // Use viewport dimensions on mobile, container on desktop
+        const isMobile = window.innerWidth <= 768;
+        const width = isMobile ? viewportWidth : container.clientWidth;
+        const height = isMobile ? viewportHeight : container.clientHeight;
+        
+        // Set canvas size to match viewport/container
+        const pixelRatio = window.devicePixelRatio || 1;
+        this.canvas.width = width * pixelRatio;
+        this.canvas.height = height * pixelRatio;
         
         // Set CSS size
-        this.canvas.style.width = rect.width + 'px';
-        this.canvas.style.height = rect.height + 'px';
+        this.canvas.style.width = width + 'px';
+        this.canvas.style.height = height + 'px';
+        
+        // Scale context to match device pixel ratio
+        this.ctx.scale(pixelRatio, pixelRatio);
         
         // Update graphics system
         if (this.graphics) {
             this.graphics.onResize(this.canvas.width, this.canvas.height);
         }
         
+        console.log(`📱 Canvas resized: ${width}x${height} (${this.canvas.width}x${this.canvas.height})`);
         this.emit('resize', { width: this.canvas.width, height: this.canvas.height });
     }
     
