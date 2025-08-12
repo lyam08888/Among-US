@@ -1,4 +1,4 @@
-// Among Us V3 - Main Application
+// Among Us V3 - Main Application (Fixed)
 class AmongUsV3App {
     constructor() {
         this.engine = null;
@@ -497,6 +497,32 @@ class AmongUsV3App {
         }
     }
     
+    handleMobileAction(action) {
+        switch(action) {
+            case 'use':
+                this.useInteraction();
+                break;
+            case 'kill':
+                this.killPlayer();
+                break;
+            case 'sabotage':
+                this.toggleSabotage();
+                break;
+            case 'report':
+                this.reportBody();
+                break;
+            case 'map':
+                this.toggleMap();
+                break;
+            case 'settings':
+                this.toggleGameSettings();
+                break;
+            case 'tasks':
+                // Implement task list toggle
+                break;
+        }
+    }
+
     updatePlayerRenderable() {
         if (!this.engine.graphics || !this.gameState.localPlayer) return;
         
