@@ -640,6 +640,9 @@ class AmongUsV3Graphics {
         
         // Render based on object type
         switch (obj.type) {
+            case 'background':
+                this.renderBackground(ctx, obj);
+                break;
             case 'room':
                 this.renderRoom(ctx, obj);
                 break;
@@ -664,6 +667,26 @@ class AmongUsV3Graphics {
         
         ctx.restore();
         this.performance.drawCalls++;
+    }
+    
+    renderBackground(ctx, bg) {
+        // Fill background
+        ctx.fillStyle = bg.color || '#1a1a2e';
+        ctx.fillRect(-bg.width/2, -bg.height/2, bg.width, bg.height);
+        
+        // Add space pattern
+        if (bg.pattern !== false) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+            for (let x = -bg.width/2; x < bg.width/2; x += 50) {
+                for (let y = -bg.height/2; y < bg.height/2; y += 50) {
+                    if (Math.random() > 0.95) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, 1, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+        }
     }
     
     renderRoom(ctx, room) {

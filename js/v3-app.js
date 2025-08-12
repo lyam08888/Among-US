@@ -27,6 +27,9 @@ class AmongUsV3App {
             selectedPlayer: null
         };
         
+        // Mobile controls
+        this.mobileControls = null;
+        
         // Loading progress
         this.loadingProgress = {
             current: 0,
@@ -69,6 +72,9 @@ class AmongUsV3App {
             
             // Initialize UI
             this.initializeUI();
+            
+            // Initialize mobile controls
+            this.initializeMobileControls();
             
             // Complete initialization
             this.completeInitialization();
@@ -266,7 +272,7 @@ class AmongUsV3App {
         // This would load actual map data
         console.log(`🗺️ Loading map: ${mapName}`);
         
-        // For now, create a simple map structure
+        // Create a simple map structure with renderable objects
         this.mapSystem.rooms.set('cafeteria', {
             name: 'Cafeteria',
             bounds: { x: 0, y: 0, width: 200, height: 150 },
@@ -281,8 +287,110 @@ class AmongUsV3App {
             vents: ['vent1']
         });
         
+        // Add renderable objects to graphics engine
+        this.createMapRenderables();
+        
         // Set spawn point
         this.gameState.localPlayer.position = { x: 0, y: 0 };
+        
+        // Set camera target to local player
+        if (this.engine.graphics) {
+            this.engine.graphics.camera.target = this.gameState.localPlayer.position;
+        }
+    }
+    
+    createMapRenderables() {
+        if (!this.engine.graphics) return;
+        
+        // Clear existing renderables
+        this.engine.graphics.layers.background = [];
+        this.engine.graphics.layers.environment = [];
+        this.engine.graphics.layers.objects = [];
+        this.engine.graphics.layers.players = [];
+        
+        // Add background
+        this.engine.graphics.layers.background.push({
+            type: 'background',
+            x: 0,
+            y: 0,
+            width: 1000,
+            height: 1000,
+            color: '#1a1a2e'
+        });
+        
+        // Add rooms
+        this.mapSystem.rooms.forEach((room, roomName) => {
+            this.engine.graphics.layers.environment.push({
+                type: 'room',
+                x: room.bounds.x,
+                y: room.bounds.y,
+                width: room.bounds.width,
+                height: room.bounds.height,
+                name: roomName,
+                color: '#4a5568'
+            });
+        });
+        
+        // Add walls around rooms
+        this.engine.graphics.layers.environment.push({
+            type: 'wall',
+            x: -100,
+            y: -75,
+            width: 200,
+            height: 10
+        });
+        
+        this.engine.graphics.layers.environment.push({
+            type: 'wall',
+            x: -100,
+            y: 75,
+            width: 200,
+            height: 10
+        });
+        
+        // Add some tasks
+        this.engine.graphics.layers.objects.push({
+            type: 'task',
+            x: 50,
+            y: 0,
+            width: 40,
+            height: 30,
+            taskType: 'wires'
+        });
+        
+        this.engine.graphics.layers.objects.push({
+            type: 'task',
+            x: -100,
+            y: 120,
+            width: 40,
+            height: 30,
+            taskType: 'fuel'
+        });
+        
+        // Add a vent
+        this.engine.graphics.layers.objects.push({
+            type: 'vent',
+            x: -120,
+            y: 140,
+            radius: 25
+        });
+        
+        // Add local player to render
+        if (this.gameState.localPlayer) {
+            this.engine.graphics.layers.players.push({
+                type: 'player',
+                x: this.gameState.localPlayer.position.x,
+                y: this.gameState.localPlayer.position.y,
+                color: this.gameState.localPlayer.color,
+                name: this.gameState.localPlayer.name,
+                animation: this.gameState.localPlayer.animation,
+                direction: this.gameState.localPlayer.direction,
+                isDead: !this.gameState.localPlayer.isAlive,
+                isImpostor: this.gameState.localPlayer.isImpostor
+            });
+        }
+        
+        console.log('🎨 Map renderables created');
     }
     
     setupEventListeners() {
@@ -360,6 +468,106 @@ class AmongUsV3App {
             item.style.animationDelay = `${(index * 0.05) + 0.5}s`;
             item.classList.add('animate-fade-in');
         });
+    }
+    
+    initializeMobileControls() {
+        // Initialize mobile controls if available
+        if (typeof MobileControls !== 'undefined' && this.engine) {
+            this.mobileControls = new MobileControls(this.engine);
+            
+            // Setup mobile control event listeners
+            this.engine.on('mobileMovement', this.handleMobileMovement.bind(this));
+            this.engine.on('mobileAction', this.handleMobileAction.bind(this));
+            
+            console.log('📱 Mobile controls integrated');
+        }
+    }
+    
+    handleMobileMovement(data) {
+        // Handle mobile joystick movement
+        if (this.gameState.localPlayer) {
+            const speed = 200; // pixels per second
+            const deltaTime = this.engine.deltaTime / 1000; // Convert to seconds
+            
+            // Update position
+            this.gameState.localPlayer.position.x += data.x * speed * deltaTime;
+            this.gameState.localPlayer.position.y += data.y * speed * deltaTime;
+            
+            // Update velocity for physics
+            this.gameState.localPlayer.velocity.x = data.x * speed;
+            this.gameState.localPlayer.velocity.y = data.y * speed;
+            
+            // Update animation state
+            if (data.isMoving) {
+                this.gameState.localPlayer.animation = 'walking';
+                // Set direction based on movement
+                if (Math.abs(data.x) > Math.abs(data.y)) {
+                    this.gameState.localPlayer.direction = data.x > 0 ? 'right' : 'left';
+                }
+            } else {
+                this.gameState.localPlayer.animation = 'idle';
+            }
+            
+            // Update player renderable
+            this.updatePlayerRenderable();
+        }
+    }
+    
+    updatePlayerRenderable() {
+        if (!this.engine.graphics || !this.gameState.localPlayer) return;
+        
+        // Find and update player in render layers
+        const playerLayer = this.engine.graphics.layers.players;
+        const playerRenderable = playerLayer.find(obj => obj.type === 'player');
+        
+        if (playerRenderable) {
+            playerRenderable.x = this.gameState.localPlayer.position.x;
+            playerRenderable.y = this.gameState.localPlayer.position.y;
+            playerRenderable.animation = this.gameState.localPlayer.animation;
+            playerRenderable.direction = this.gameState.localPlayer.direction;
+        }
+        
+        // Update camera target
+        if (this.engine.graphics.camera) {
+            this.engine.graphics.camera.target = this.gameState.localPlayer.position;
+        }
+    }
+    
+    handleMobileAction(data) {
+        // Handle mobile action buttons
+        switch (data.action) {
+            case 'use':
+                this.handleUIAction('use-interact');
+                break;
+            case 'report':
+                this.handleUIAction('emergency-meeting');
+                break;
+            case 'kill':
+                if (this.gameState.localPlayer?.isImpostor) {
+                    this.handleUIAction('kill-player');
+                }
+                break;
+            case 'sabotage':
+                if (this.gameState.localPlayer?.isImpostor) {
+                    this.handleUIAction('toggle-sabotage');
+                }
+                break;
+            case 'emergency':
+                this.handleUIAction('emergency-meeting');
+                break;
+            case 'map':
+                this.handleUIAction('toggle-map');
+                break;
+            case 'toggle-menu':
+                this.handleUIAction('toggle-settings');
+                break;
+            case 'toggle-chat':
+                this.toggleChat();
+                break;
+            case 'toggle-tasks':
+                this.toggleTaskList();
+                break;
+        }
     }
     
     completeInitialization() {
