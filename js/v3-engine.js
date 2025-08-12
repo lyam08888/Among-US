@@ -1,335 +1,100 @@
 // Among Us V3 - Game Engine
 class AmongUsV3Engine {
     constructor() {
-        this.canvas = null;
-        this.ctx = null;
+        this.isInitialized = false;
         this.isRunning = false;
-        this.lastTime = 0;
+        this.lastFrameTime = 0;
         this.deltaTime = 0;
-        this.fps = 60;
-        this.targetFrameTime = 1000 / this.fps;
         
-        // Engine systems
-        this.physics = null;
-        this.graphics = null;
+        // Subsystems
         this.audio = null;
-        this.input = null;
+        this.graphics = null;
+        this.physics = null;
         this.networking = null;
+        
+        // Event system
+        this.events = new Map();
         
         // Game state
         this.gameState = {
-            currentScene: 'menu',
-            isLoading: false,
             isPaused: false,
-            players: new Map(),
-            gameObjects: new Map(),
-            currentMap: null,
-            gameMode: 'classic',
-            settings: this.getDefaultSettings()
+            currentScreen: 'loading',
+            settings: {}
         };
-        
-        // Performance monitoring
-        this.performance = {
-            frameCount: 0,
-            lastFpsUpdate: 0,
-            currentFps: 0,
-            averageFrameTime: 0,
-            frameTimeHistory: []
-        };
-        
-        // Event system
-        this.eventListeners = new Map();
         
         this.init();
     }
     
     init() {
-        try {
-            console.log('🚀 Initializing Among Us V3 Engine...');
-            
-            // Initialize canvas
-            this.initCanvas();
-            
-            // Initialize input system
-            this.initInput();
-            
-            // Initialize engine systems
-            this.initSystems();
-            
-            // Setup event listeners
-            this.setupEventListeners();
-            
-            console.log('✅ Engine initialized successfully');
-            this.emit('initialized');
-        } catch (error) {
-            console.error('❌ Engine initialization failed:', error);
-            this.emit('error', { error });
-            throw error;
+        console.log('🔧 Initializing AmongUsV3Engine...');
+        
+        // Initialize subsystems
+        this.audio = new AmongUsV3Audio(this);
+        this.graphics = new AmongUsV3Graphics(this);
+        this.physics = new AmongUsV3Physics(this);
+        this.networking = new AmongUsV3Networking(this);
+        
+        this.isInitialized = true;
+        console.log('✅ AmongUsV3Engine initialized');
+    }
+    
+    // Event system
+    on(eventName, callback) {
+        if (!this.events.has(eventName)) {
+            this.events.set(eventName, []);
+        }
+        this.events.get(eventName).push(callback);
+    }
+    
+    off(eventName, callback) {
+        if (this.events.has(eventName)) {
+            const callbacks = this.events.get(eventName);
+            const index = callbacks.indexOf(callback);
+            if (index > -1) {
+                callbacks.splice(index, 1);
+            }
         }
     }
     
-    initCanvas() {
-        this.canvas = document.getElementById('game-canvas');
-        if (!this.canvas) {
-            throw new Error('Game canvas not found');
-        }
-        
-        this.ctx = this.canvas.getContext('2d', {
-            alpha: false,
-            desynchronized: true,
-            powerPreference: 'high-performance'
-        });
-        
-        // Set canvas size
-        this.resizeCanvas();
-        
-        // Enable image smoothing
-        this.ctx.imageSmoothingEnabled = true;
-        this.ctx.imageSmoothingQuality = 'high';
-        
-        console.log('🎨 Canvas initialized:', this.canvas.width, 'x', this.canvas.height);
-    }
-    
-    initSystems() {
-        try {
-            // Initialize physics engine
-            console.log('🔧 Initializing physics system...');
-            this.physics = new AmongUsV3Physics(this);
-            
-            // Initialize graphics renderer
-            console.log('🔧 Initializing graphics system...');
-            this.graphics = new AmongUsV3Graphics(this);
-            
-            // Initialize audio system
-            console.log('🔧 Initializing audio system...');
-            this.audio = new AmongUsV3Audio(this);
-            
-            // Initialize networking
-            console.log('🔧 Initializing networking system...');
-            this.networking = new AmongUsV3Networking(this);
-            
-            console.log('✅ Engine systems initialized successfully');
-        } catch (error) {
-            console.error('❌ Failed to initialize engine systems:', error);
-            throw error;
+    emit(eventName, data) {
+        if (this.events.has(eventName)) {
+            this.events.get(eventName).forEach(callback => {
+                try {
+                    callback(data);
+                } catch (error) {
+                    console.error(`Error in event handler for ${eventName}:`, error);
+                }
+            });
         }
     }
     
-    initInput() {
-        this.input = {
-            keys: new Set(),
-            mouse: {
-                x: 0,
-                y: 0,
-                buttons: new Set(),
-                wheel: 0
-            },
-            touch: {
-                touches: new Map(),
-                isActive: false
-            }
-        };
-        
-        // Cache canvas rect to avoid repeated getBoundingClientRect calls
-        this.canvasRect = null;
-        this.updateCanvasRect();
-        
-        // Keyboard events
-        document.addEventListener('keydown', (e) => {
-            this.input.keys.add(e.code);
-            this.emit('keydown', { code: e.code, key: e.key });
-        });
-        
-        document.addEventListener('keyup', (e) => {
-            this.input.keys.delete(e.code);
-            this.emit('keyup', { code: e.code, key: e.key });
-        });
-        
-        // Mouse events
-        this.canvas.addEventListener('mousemove', (e) => {
-            if (!this.canvasRect) this.updateCanvasRect();
-            this.input.mouse.x = (e.clientX - this.canvasRect.left) * (this.canvas.width / this.canvasRect.width);
-            this.input.mouse.y = (e.clientY - this.canvasRect.top) * (this.canvas.height / this.canvasRect.height);
-            this.emit('mousemove', this.input.mouse);
-        });
-        
-        this.canvas.addEventListener('mousedown', (e) => {
-            this.input.mouse.buttons.add(e.button);
-            this.emit('mousedown', { button: e.button, ...this.input.mouse });
-        });
-        
-        this.canvas.addEventListener('mouseup', (e) => {
-            this.input.mouse.buttons.delete(e.button);
-            this.emit('mouseup', { button: e.button, ...this.input.mouse });
-        });
-        
-        this.canvas.addEventListener('wheel', (e) => {
-            this.input.mouse.wheel = e.deltaY;
-            this.emit('wheel', { delta: e.deltaY, ...this.input.mouse });
-        });
-        
-        // Touch events
-        this.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            this.input.touch.isActive = true;
-            if (!this.canvasRect) this.updateCanvasRect();
-            for (let touch of e.changedTouches) {
-                this.input.touch.touches.set(touch.identifier, {
-                    x: (touch.clientX - this.canvasRect.left) * (this.canvas.width / this.canvasRect.width),
-                    y: (touch.clientY - this.canvasRect.top) * (this.canvas.height / this.canvasRect.height)
-                });
-            }
-            this.emit('touchstart', { touches: Array.from(this.input.touch.touches.values()) });
-        });
-        
-        this.canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!this.canvasRect) this.updateCanvasRect();
-            for (let touch of e.changedTouches) {
-                this.input.touch.touches.set(touch.identifier, {
-                    x: (touch.clientX - this.canvasRect.left) * (this.canvas.width / this.canvasRect.width),
-                    y: (touch.clientY - this.canvasRect.top) * (this.canvas.height / this.canvasRect.height)
-                });
-            }
-            this.emit('touchmove', { touches: Array.from(this.input.touch.touches.values()) });
-        });
-        
-        this.canvas.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            for (let touch of e.changedTouches) {
-                this.input.touch.touches.delete(touch.identifier);
-            }
-            if (this.input.touch.touches.size === 0) {
-                this.input.touch.isActive = false;
-            }
-            this.emit('touchend', { touches: Array.from(this.input.touch.touches.values()) });
-        });
-        
-        console.log('🎮 Input system initialized');
-    }
-    
-    updateCanvasRect() {
-        if (this.canvas) {
-            this.canvasRect = this.canvas.getBoundingClientRect();
-        }
-    }
-    
-    setupEventListeners() {
-        // Window resize
-        window.addEventListener('resize', () => {
-            this.resizeCanvas();
-            this.updateCanvasRect();
-        });
-        
-        // Visibility change
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                this.pause();
-            } else {
-                this.resume();
-            }
-        });
-        
-        // Focus events
-        window.addEventListener('blur', () => {
-            this.pause();
-        });
-        
-        window.addEventListener('focus', () => {
-            this.resume();
-        });
-    }
-    
-    resizeCanvas() {
-        if (!this.canvas) return;
-        
-        const container = this.canvas.parentElement;
-        if (!container) return;
-        
-        // Get viewport dimensions for mobile
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Use viewport dimensions on mobile, container on desktop
-        const isMobile = window.innerWidth <= 768;
-        const width = isMobile ? viewportWidth : container.clientWidth;
-        const height = isMobile ? viewportHeight : container.clientHeight;
-        
-        // Set canvas size to match viewport/container
-        const pixelRatio = window.devicePixelRatio || 1;
-        this.canvas.width = width * pixelRatio;
-        this.canvas.height = height * pixelRatio;
-        
-        // Set CSS size
-        this.canvas.style.width = width + 'px';
-        this.canvas.style.height = height + 'px';
-        
-        // Scale context to match device pixel ratio
-        this.ctx.scale(pixelRatio, pixelRatio);
-        
-        // Update graphics system
-        if (this.graphics) {
-            this.graphics.onResize(this.canvas.width, this.canvas.height);
-        }
-        
-        console.log(`📱 Canvas resized: ${width}x${height} (${this.canvas.width}x${this.canvas.height})`);
-        this.emit('resize', { width: this.canvas.width, height: this.canvas.height });
-    }
-    
+    // Game loop
     start() {
         if (this.isRunning) return;
         
         this.isRunning = true;
-        this.lastTime = performance.now();
+        this.lastFrameTime = performance.now();
         this.gameLoop();
-        
         console.log('🎮 Game engine started');
-        this.emit('start');
     }
     
     stop() {
         this.isRunning = false;
         console.log('⏹️ Game engine stopped');
-        this.emit('stop');
-    }
-    
-    pause() {
-        if (!this.isRunning) return;
-        
-        this.gameState.isPaused = true;
-        console.log('⏸️ Game engine paused');
-        this.emit('pause');
-    }
-    
-    resume() {
-        if (!this.isRunning || !this.gameState.isPaused) return;
-        
-        this.gameState.isPaused = false;
-        this.lastTime = performance.now();
-        console.log('▶️ Game engine resumed');
-        this.emit('resume');
     }
     
     gameLoop() {
         if (!this.isRunning) return;
         
         const currentTime = performance.now();
-        this.deltaTime = currentTime - this.lastTime;
-        this.lastTime = currentTime;
+        this.deltaTime = currentTime - this.lastFrameTime;
+        this.lastFrameTime = currentTime;
         
-        // Update performance metrics
-        this.updatePerformanceMetrics(currentTime);
-        
-        // Skip frame if paused
         if (!this.gameState.isPaused) {
-            // Update game systems
             this.update(this.deltaTime);
-            
-            // Render frame
             this.render();
         }
         
-        // Schedule next frame
         requestAnimationFrame(() => this.gameLoop());
     }
     
@@ -339,414 +104,247 @@ class AmongUsV3Engine {
             this.physics.update(deltaTime);
         }
         
-        // Update game objects
-        for (let [id, gameObject] of this.gameState.gameObjects) {
-            if (gameObject.update) {
-                gameObject.update(deltaTime);
-            }
+        // Update audio
+        if (this.audio) {
+            this.audio.update(deltaTime);
         }
         
-        // Update players
-        for (let [id, player] of this.gameState.players) {
-            if (player.update) {
-                player.update(deltaTime);
-            }
+        // Update graphics
+        if (this.graphics) {
+            this.graphics.update(deltaTime);
         }
         
-        // Update networking
-        if (this.networking) {
-            this.networking.update(deltaTime);
-        }
-        
+        // Emit update event
         this.emit('update', { deltaTime });
     }
     
     render() {
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Render with graphics system
         if (this.graphics) {
-            this.graphics.render(this.ctx);
+            this.graphics.render();
         }
-        
-        this.emit('render', { ctx: this.ctx });
-    }
-    
-    updatePerformanceMetrics(currentTime) {
-        this.performance.frameCount++;
-        this.performance.frameTimeHistory.push(this.deltaTime);
-        
-        // Keep only last 60 frame times
-        if (this.performance.frameTimeHistory.length > 60) {
-            this.performance.frameTimeHistory.shift();
-        }
-        
-        // Update FPS every second
-        if (currentTime - this.performance.lastFpsUpdate >= 1000) {
-            this.performance.currentFps = this.performance.frameCount;
-            this.performance.frameCount = 0;
-            this.performance.lastFpsUpdate = currentTime;
-            
-            // Calculate average frame time
-            const sum = this.performance.frameTimeHistory.reduce((a, b) => a + b, 0);
-            this.performance.averageFrameTime = sum / this.performance.frameTimeHistory.length;
-            
-            this.emit('performance', this.performance);
-        }
-    }
-    
-    // Event system
-    on(event, callback) {
-        if (!this.eventListeners.has(event)) {
-            this.eventListeners.set(event, []);
-        }
-        this.eventListeners.get(event).push(callback);
-    }
-    
-    off(event, callback) {
-        if (!this.eventListeners.has(event)) return;
-        
-        const listeners = this.eventListeners.get(event);
-        const index = listeners.indexOf(callback);
-        if (index > -1) {
-            listeners.splice(index, 1);
-        }
-    }
-    
-    emit(event, data = {}) {
-        if (!this.eventListeners.has(event)) return;
-        
-        const listeners = this.eventListeners.get(event);
-        for (let callback of listeners) {
-            try {
-                callback(data);
-            } catch (error) {
-                console.error(`Error in event listener for '${event}':`, error);
-            }
-        }
-    }
-    
-    // Game object management
-    addGameObject(id, gameObject) {
-        this.gameState.gameObjects.set(id, gameObject);
-        gameObject.engine = this;
-        
-        if (gameObject.init) {
-            gameObject.init();
-        }
-        
-        this.emit('gameObjectAdded', { id, gameObject });
-    }
-    
-    removeGameObject(id) {
-        const gameObject = this.gameState.gameObjects.get(id);
-        if (gameObject) {
-            if (gameObject.destroy) {
-                gameObject.destroy();
-            }
-            this.gameState.gameObjects.delete(id);
-            this.emit('gameObjectRemoved', { id, gameObject });
-        }
-    }
-    
-    getGameObject(id) {
-        return this.gameState.gameObjects.get(id);
-    }
-    
-    // Player management
-    addPlayer(id, player) {
-        this.gameState.players.set(id, player);
-        player.engine = this;
-        
-        if (player.init) {
-            player.init();
-        }
-        
-        this.emit('playerAdded', { id, player });
-    }
-    
-    removePlayer(id) {
-        const player = this.gameState.players.get(id);
-        if (player) {
-            if (player.destroy) {
-                player.destroy();
-            }
-            this.gameState.players.delete(id);
-            this.emit('playerRemoved', { id, player });
-        }
-    }
-    
-    getPlayer(id) {
-        return this.gameState.players.get(id);
-    }
-    
-    // Scene management
-    changeScene(sceneName) {
-        const oldScene = this.gameState.currentScene;
-        this.gameState.currentScene = sceneName;
-        
-        this.emit('sceneChanged', { oldScene, newScene: sceneName });
-        console.log(`🎬 Scene changed: ${oldScene} → ${sceneName}`);
     }
     
     // Settings management
-    getDefaultSettings() {
-        return {
-            graphics: {
-                quality: 'high',
-                vsync: true,
-                antialiasing: true,
-                particleEffects: true,
-                shadows: true,
-                lighting: true
-            },
-            audio: {
-                masterVolume: 0.8,
-                musicVolume: 0.6,
-                sfxVolume: 0.8,
-                voiceVolume: 0.9
-            },
-            controls: {
-                moveUp: 'KeyW',
-                moveDown: 'KeyS',
-                moveLeft: 'KeyA',
-                moveRight: 'KeyD',
-                interact: 'KeyE',
-                map: 'Tab',
-                report: 'KeyR',
-                kill: 'KeyQ',
-                sabotage: 'KeyF'
-            },
-            gameplay: {
-                colorBlindSupport: false,
-                chatFilter: true,
-                quickChat: true,
-                streamerMode: false
-            }
-        };
-    }
-    
     updateSetting(category, key, value) {
-        if (this.gameState.settings[category]) {
-            this.gameState.settings[category][key] = value;
-            this.emit('settingChanged', { category, key, value });
-            
-            // Apply setting immediately
-            this.applySetting(category, key, value);
+        if (!this.gameState.settings[category]) {
+            this.gameState.settings[category] = {};
+        }
+        this.gameState.settings[category][key] = value;
+        
+        // Notify subsystems
+        if (this.audio) {
+            this.audio.applySetting(key, value);
+        }
+        if (this.graphics) {
+            this.graphics.applySetting(key, value);
         }
     }
     
-    applySetting(category, key, value) {
-        switch (category) {
-            case 'graphics':
-                if (this.graphics) {
-                    this.graphics.applySetting(key, value);
-                }
-                break;
-            case 'audio':
-                if (this.audio) {
-                    this.audio.applySetting(key, value);
-                }
-                break;
-            case 'controls':
-                // Update input mappings
-                break;
-        }
+    getSetting(category, key) {
+        return this.gameState.settings[category]?.[key];
     }
     
     // Utility methods
-    getCanvasSize() {
-        return {
-            width: this.canvas.width,
-            height: this.canvas.height
-        };
-    }
-    
-    getMousePosition() {
-        return {
-            x: this.input.mouse.x,
-            y: this.input.mouse.y
-        };
-    }
-    
-    isKeyPressed(keyCode) {
-        return this.input.keys.has(keyCode);
-    }
-    
-    isMouseButtonPressed(button) {
-        return this.input.mouse.buttons.has(button);
-    }
-    
-    // Debug methods
-    getDebugInfo() {
-        return {
-            fps: this.performance.currentFps,
-            frameTime: this.performance.averageFrameTime.toFixed(2) + 'ms',
-            gameObjects: this.gameState.gameObjects.size,
-            players: this.gameState.players.size,
-            scene: this.gameState.currentScene,
-            isRunning: this.isRunning,
-            isPaused: this.gameState.isPaused
-        };
-    }
-    
-    enableDebugMode() {
-        // Add debug overlay
-        const debugOverlay = document.createElement('div');
-        debugOverlay.id = 'debug-overlay';
-        debugOverlay.style.cssText = `
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 9999;
-            border-radius: 5px;
-        `;
-        document.body.appendChild(debugOverlay);
-        
-        // Update debug info
-        const updateDebugInfo = () => {
-            const info = this.getDebugInfo();
-            debugOverlay.innerHTML = Object.entries(info)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join('<br>');
-        };
-        
-        setInterval(updateDebugInfo, 100);
-        console.log('🐛 Debug mode enabled');
-    }
-    
-    // Game loop control
-    start() {
-        if (this.isRunning) {
-            console.warn('⚠️ Engine is already running');
-            return;
-        }
-        
-        this.isRunning = true;
-        this.lastTime = performance.now();
-        this.gameLoop();
-        
-        console.log('▶️ Engine started');
-    }
-    
-    stop() {
-        this.isRunning = false;
-        console.log('⏹️ Engine stopped');
-    }
-    
     pause() {
         this.gameState.isPaused = true;
-        console.log('⏸️ Engine paused');
+        this.emit('paused');
     }
     
     resume() {
         this.gameState.isPaused = false;
-        console.log('▶️ Engine resumed');
+        this.emit('resumed');
     }
     
-    gameLoop() {
-        if (!this.isRunning) return;
-        
-        const currentTime = performance.now();
-        this.deltaTime = currentTime - this.lastTime;
-        this.lastTime = currentTime;
-        
-        // Update performance metrics
-        this.updatePerformanceMetrics();
-        
-        // Skip frame if paused
-        if (!this.gameState.isPaused) {
-            // Update game systems
-            this.update();
-            
-            // Render frame
-            this.render();
-        }
-        
-        // Schedule next frame
-        requestAnimationFrame(() => this.gameLoop());
-    }
-    
-    update() {
-        // Update physics
-        if (this.physics) {
-            this.physics.update(this.deltaTime);
-        }
-        
-        // Update game objects
-        for (let [id, gameObject] of this.gameState.gameObjects) {
-            if (gameObject.update) {
-                gameObject.update(this.deltaTime);
-            }
-        }
-        
-        // Update players
-        for (let [id, player] of this.gameState.players) {
-            if (player.update) {
-                player.update(this.deltaTime);
-            }
-        }
-        
-        // Emit update event
-        this.emit('update', { deltaTime: this.deltaTime });
-    }
-    
-    render() {
-        if (this.graphics && this.ctx) {
-            this.graphics.render(this.ctx);
-        }
-        
-        // Emit render event
-        this.emit('render', { ctx: this.ctx });
-    }
-    
-    updatePerformanceMetrics() {
-        this.performance.frameCount++;
-        
-        // Calculate FPS
-        const now = performance.now();
-        if (now - this.performance.lastFpsUpdate >= 1000) {
-            this.performance.currentFps = this.performance.frameCount;
-            this.performance.frameCount = 0;
-            this.performance.lastFpsUpdate = now;
-        }
-        
-        // Track frame time
-        this.performance.frameTimeHistory.push(this.deltaTime);
-        if (this.performance.frameTimeHistory.length > 60) {
-            this.performance.frameTimeHistory.shift();
-        }
-        
-        // Calculate average frame time
-        this.performance.averageFrameTime = 
-            this.performance.frameTimeHistory.reduce((a, b) => a + b, 0) / 
-            this.performance.frameTimeHistory.length;
-    }
-    
-    // Cleanup
     destroy() {
         this.stop();
         
-        // Cleanup systems
-        if (this.physics) this.physics.destroy();
-        if (this.graphics) this.graphics.destroy();
-        if (this.audio) this.audio.destroy();
-        if (this.networking) this.networking.destroy();
+        // Cleanup subsystems
+        if (this.audio) {
+            this.audio.destroy();
+        }
+        if (this.graphics) {
+            this.graphics.destroy();
+        }
+        if (this.physics) {
+            this.physics.destroy();
+        }
+        if (this.networking) {
+            this.networking.destroy();
+        }
         
-        // Clear event listeners
-        this.eventListeners.clear();
+        this.events.clear();
+        console.log('🗑️ Game engine destroyed');
+    }
+}
+
+// Placeholder classes for subsystems
+class AmongUsV3Graphics {
+    constructor(engine) {
+        this.engine = engine;
+        this.canvas = null;
+        this.ctx = null;
+        this.layers = {
+            background: [],
+            environment: [],
+            objects: [],
+            players: []
+        };
+        this.camera = {
+            x: 0,
+            y: 0,
+            zoom: 1,
+            target: { x: 0, y: 0 }
+        };
         
-        // Clear game state
-        this.gameState.gameObjects.clear();
-        this.gameState.players.clear();
+        this.init();
+    }
+    
+    init() {
+        this.canvas = document.getElementById('game-canvas');
+        if (this.canvas) {
+            this.ctx = this.canvas.getContext('2d');
+            console.log('🎨 Graphics system initialized');
+        }
+    }
+    
+    update(deltaTime) {
+        // Update camera position
+        if (this.camera.target) {
+            this.camera.x = this.camera.target.x;
+            this.camera.y = this.camera.target.y;
+        }
+    }
+    
+    render() {
+        if (!this.ctx || !this.canvas) return;
         
-        console.log('🧹 Engine destroyed');
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Render layers
+        this.renderLayer(this.layers.background);
+        this.renderLayer(this.layers.environment);
+        this.renderLayer(this.layers.objects);
+        this.renderLayer(this.layers.players);
+    }
+    
+    renderLayer(layer) {
+        if (!layer || !this.ctx) return;
+        
+        layer.forEach(obj => {
+            this.renderObject(obj);
+        });
+    }
+    
+    renderObject(obj) {
+        // Basic rendering for different object types
+        switch(obj.type) {
+            case 'background':
+                this.ctx.fillStyle = obj.color || '#1a1a2e';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                break;
+                
+            case 'room':
+                this.ctx.fillStyle = obj.color || '#4a5568';
+                this.ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                break;
+                
+            case 'player':
+                this.ctx.fillStyle = obj.color || '#ff3838';
+                this.ctx.beginPath();
+                this.ctx.arc(obj.x, obj.y, 25, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Player name
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.font = '12px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText(obj.name, obj.x, obj.y - 35);
+                break;
+                
+            case 'task':
+                this.ctx.fillStyle = '#fbbf24';
+                this.ctx.fillRect(obj.x, obj.y, obj.width, obj.height);
+                break;
+                
+            case 'vent':
+                this.ctx.fillStyle = '#6b7280';
+                this.ctx.beginPath();
+                this.ctx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
+                this.ctx.fill();
+                break;
+        }
+    }
+    
+    screenToWorld(screenX, screenY) {
+        return {
+            x: screenX + this.camera.x - this.canvas.width / 2,
+            y: screenY + this.camera.y - this.canvas.height / 2
+        };
+    }
+    
+    applySetting(key, value) {
+        // Apply graphics settings
+        console.log(`Graphics setting updated: ${key} = ${value}`);
+    }
+    
+    destroy() {
+        console.log('🎨 Graphics system destroyed');
+    }
+}
+
+class AmongUsV3Physics {
+    constructor(engine) {
+        this.engine = engine;
+        this.collisionBodies = new Map();
+        this.gravity = { x: 0, y: 0 };
+    }
+    
+    update(deltaTime) {
+        // Update physics simulation
+        this.collisionBodies.forEach((body, id) => {
+            if (body.type === 'dynamic') {
+                // Simple physics update
+                body.position.x += body.velocity.x * deltaTime / 1000;
+                body.position.y += body.velocity.y * deltaTime / 1000;
+            }
+        });
+    }
+    
+    createBody(id, config) {
+        this.collisionBodies.set(id, {
+            id,
+            position: { x: config.x || 0, y: config.y || 0 },
+            velocity: { x: 0, y: 0 },
+            width: config.width || 50,
+            height: config.height || 50,
+            type: config.type || 'static',
+            mass: config.mass || 1,
+            friction: config.friction || 0.8,
+            restitution: config.restitution || 0
+        });
+    }
+    
+    destroy() {
+        this.collisionBodies.clear();
+        console.log('⚙️ Physics system destroyed');
+    }
+}
+
+class AmongUsV3Networking {
+    constructor(engine) {
+        this.engine = engine;
+        this.isConnected = false;
+    }
+    
+    async initialize() {
+        console.log('🌐 Networking system initialized');
+        this.isConnected = true;
+    }
+    
+    destroy() {
+        this.isConnected = false;
+        console.log('🌐 Networking system destroyed');
     }
 }
 
