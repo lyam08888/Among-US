@@ -1000,6 +1000,12 @@ class AmongUsV3App {
             case 'report':
                 this.reportBody();
                 break;
+            case 'cosmetics':
+                this.showCharacterCustomizer();
+                break;
+            case 'close-character-customizer':
+                this.hideCharacterCustomizer();
+                break;
         }
     }
     
@@ -1245,7 +1251,7 @@ class AmongUsV3App {
     
     showCustomization() {
         console.log('🎨 Showing customization...');
-        this.showNotification('Personnalisation', 'Fonctionnalité en développement', 'info');
+        this.showCharacterCustomizer();
     }
     
     hideSettings() {
@@ -1253,6 +1259,72 @@ class AmongUsV3App {
         if (panel) {
             panel.classList.remove('active');
         }
+    }
+    
+    showCharacterCustomizer() {
+        console.log('🎨 Opening character customizer...');
+        const panel = document.getElementById('character-customizer-panel');
+        if (panel) {
+            panel.classList.add('active');
+            this.uiState.activeModal = 'character-customizer';
+            
+            // Initialize character customizer if not already done
+            if (!window.characterCustomizer) {
+                window.characterCustomizer = new CharacterCustomizer(this);
+            }
+            
+            // Setup tab navigation
+            this.setupCustomizerTabs();
+        }
+    }
+    
+    hideCharacterCustomizer() {
+        const panel = document.getElementById('character-customizer-panel');
+        if (panel) {
+            panel.classList.remove('active');
+            this.uiState.activeModal = null;
+            
+            // Stop preview animation to save resources
+            if (window.characterCustomizer) {
+                window.characterCustomizer.stopPreviewAnimation();
+            }
+        }
+    }
+    
+    setupCustomizerTabs() {
+        const tabs = document.querySelectorAll('.customizer-tabs .tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const targetTab = e.target.dataset.tab;
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                e.target.classList.add('active');
+                const targetContent = document.querySelector(`[data-tab="${targetTab}"].tab-content`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+        
+        // Setup slider value updates
+        this.setupSliderValueUpdates();
+    }
+    
+    setupSliderValueUpdates() {
+        const sliders = document.querySelectorAll('.slider');
+        sliders.forEach(slider => {
+            const valueSpan = document.getElementById(slider.id.replace('-slider', '-value'));
+            if (valueSpan) {
+                slider.addEventListener('input', (e) => {
+                    valueSpan.textContent = parseFloat(e.target.value).toFixed(2);
+                });
+            }
+        });
     }
     
     toggleSecondaryMenu() {
