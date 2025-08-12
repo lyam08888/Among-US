@@ -85,6 +85,9 @@ class AmongUsV3App {
             // Complete initialization
             this.completeInitialization();
             
+            // Setup game update loop
+            this.setupGameUpdateLoop();
+            
         } catch (error) {
             console.error('❌ Failed to initialize application:', error);
             this.showError('Erreur d\'initialisation', error.message);
@@ -956,6 +959,617 @@ class AmongUsV3App {
                 this.startTrainingMode();
                 break;
             case 'customize-v3':
+                this.showCustomization();
+                break;
+            case 'settings':
+                this.showSettings();
+                break;
+            case 'close-settings':
+                this.hideSettings();
+                break;
+            case 'join-with-code':
+                this.joinWithCode();
+                break;
+            case 'close-join-room':
+                this.hideJoinRoom();
+                break;
+            case 'toggle-secondary':
+                this.toggleSecondaryMenu();
+                break;
+            case 'copy-room-code':
+                this.copyRoomCode();
+                break;
+            case 'toggle-map':
+                this.toggleMap();
+                break;
+            case 'toggle-settings':
+                this.toggleGameSettings();
+                break;
+            case 'emergency-meeting':
+                this.callEmergencyMeeting();
+                break;
+            case 'use':
+                this.useInteraction();
+                break;
+            case 'kill':
+                this.killPlayer();
+                break;
+            case 'sabotage':
+                this.toggleSabotage();
+                break;
+            case 'report':
+                this.reportBody();
+                break;
+        }
+    }
+    
+    startQuickPlay() {
+        console.log('🎮 Starting quick play...');
+        this.showNotification('Recherche d\'une partie...', 'Connexion en cours...', 'info');
+        
+        // Simulate finding a game
+        setTimeout(() => {
+            this.gameState.roomCode = this.generateRoomCode();
+            this.gameState.gamePhase = 'lobby';
+            this.startGame();
+        }, 2000);
+    }
+    
+    startTrainingMode() {
+        console.log('🎓 Starting training mode...');
+        this.gameState.gameMode = 'training';
+        this.gameState.roomCode = 'TRAIN';
+        this.gameState.gamePhase = 'playing';
+        
+        // Add some AI players for training
+        this.addAIPlayers();
+        
+        this.startGame();
+    }
+    
+    startGame() {
+        console.log('🎮 Starting game...');
+        
+        // Switch to game screen
+        this.showScreen('game-screen');
+        this.currentScreen = 'game';
+        
+        // Initialize game world
+        this.initializeGameWorld();
+        
+        // Start game loop if not already running
+        if (this.engine && !this.engine.isRunning) {
+            this.engine.start();
+        }
+        
+        // Update UI
+        this.updateGameUI();
+        
+        // Show game start notification
+        this.showNotification('Partie commencée!', 'Bonne chance!', 'success');
+    }
+    
+    initializeGameWorld() {
+        // Set up the game world with map, players, tasks, etc.
+        this.loadMap('skeld');
+        this.assignTasks();
+        this.spawnPlayers();
+        
+        // Update camera to follow local player
+        if (this.engine.graphics && this.gameState.localPlayer) {
+            this.engine.graphics.camera.target = this.gameState.localPlayer.position;
+        }
+    }
+    
+    assignTasks() {
+        if (!this.gameState.localPlayer) return;
+        
+        // Assign random tasks to local player
+        const availableTasks = this.taskSystem.availableTasks;
+        const numTasks = 5; // Standard number of tasks
+        
+        this.gameState.tasks = [];
+        for (let i = 0; i < numTasks; i++) {
+            const task = availableTasks[Math.floor(Math.random() * availableTasks.length)];
+            this.gameState.tasks.push({
+                ...task,
+                id: `task_${i}`,
+                completed: false,
+                progress: 0
+            });
+        }
+        
+        this.gameState.localPlayer.tasks = this.gameState.tasks;
+        this.updateTaskUI();
+    }
+    
+    spawnPlayers() {
+        // Spawn local player at spawn point
+        if (this.gameState.localPlayer) {
+            this.gameState.localPlayer.position = { x: 0, y: 0 };
+            
+            // Update physics body position
+            if (this.engine.physics) {
+                const body = this.engine.physics.collisionBodies.get('localPlayer');
+                if (body) {
+                    body.position.x = 0;
+                    body.position.y = 0;
+                }
+            }
+        }
+        
+        // Spawn AI players if in training mode
+        if (this.gameState.gameMode === 'training') {
+            this.spawnAIPlayers();
+        }
+    }
+    
+    addAIPlayers() {
+        const aiNames = ['Rouge', 'Bleu', 'Vert', 'Rose', 'Orange', 'Jaune', 'Noir', 'Blanc', 'Violet'];
+        const colors = ['#ff3838', '#1f4e96', '#0f7b0f', '#ee54bb', '#f07613', '#f5f557', '#3f474e', '#d6e0f0', '#6b2fbb'];
+        
+        for (let i = 0; i < 5; i++) {
+            const aiPlayer = {
+                id: `ai_${i}`,
+                name: aiNames[i],
+                color: colors[i],
+                isImpostor: i === 0, // First AI is impostor for training
+                isAlive: true,
+                position: { x: Math.random() * 200 - 100, y: Math.random() * 200 - 100 },
+                tasks: [],
+                completedTasks: 0,
+                animation: 'idle',
+                direction: 'right',
+                velocity: { x: 0, y: 0 },
+                isAI: true
+            };
+            
+            this.gameState.players.set(aiPlayer.id, aiPlayer);
+        }
+    }
+    
+    spawnAIPlayers() {
+        // Add AI players to render layers
+        this.gameState.players.forEach((player, id) => {
+            if (player.isAI) {
+                this.engine.graphics.layers.players.push({
+                    type: 'player',
+                    id: player.id,
+                    x: player.position.x,
+                    y: player.position.y,
+                    color: player.color,
+                    name: player.name,
+                    animation: player.animation,
+                    direction: player.direction,
+                    isDead: !player.isAlive,
+                    isImpostor: player.isImpostor
+                });
+            }
+        });
+    }
+    
+    updateGameUI() {
+        // Update room code
+        const roomCodeElement = document.getElementById('current-room-code');
+        if (roomCodeElement) {
+            roomCodeElement.textContent = this.gameState.roomCode;
+        }
+        
+        // Update player count
+        const alivePlayersElement = document.getElementById('alive-players');
+        const totalPlayersElement = document.getElementById('total-players');
+        
+        if (alivePlayersElement && totalPlayersElement) {
+            const alivePlayers = Array.from(this.gameState.players.values()).filter(p => p.isAlive).length;
+            const totalPlayers = this.gameState.players.size;
+            
+            alivePlayersElement.textContent = alivePlayers;
+            totalPlayersElement.textContent = totalPlayers;
+        }
+        
+        // Update task progress
+        this.updateTaskUI();
+    }
+    
+    updateTaskUI() {
+        const taskItems = document.getElementById('task-items');
+        const taskProgressText = document.getElementById('task-progress-text');
+        const taskProgressFill = document.getElementById('task-progress-fill');
+        
+        if (taskItems && this.gameState.tasks) {
+            taskItems.innerHTML = '';
+            
+            this.gameState.tasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-item ${task.completed ? 'completed' : ''}`;
+                taskElement.innerHTML = `
+                    <div class="task-icon">
+                        <i class="fas fa-wrench"></i>
+                    </div>
+                    <div class="task-info">
+                        <div class="task-name">${task.name}</div>
+                        <div class="task-location">${task.location}</div>
+                    </div>
+                    <div class="task-status">
+                        ${task.completed ? '<i class="fas fa-check"></i>' : '<i class="fas fa-circle"></i>'}
+                    </div>
+                `;
+                taskItems.appendChild(taskElement);
+            });
+            
+            // Update progress
+            const completedTasks = this.gameState.tasks.filter(t => t.completed).length;
+            const totalTasks = this.gameState.tasks.length;
+            const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+            
+            if (taskProgressText) {
+                taskProgressText.textContent = `${completedTasks}/${totalTasks}`;
+            }
+            
+            if (taskProgressFill) {
+                taskProgressFill.style.width = `${progress}%`;
+            }
+        }
+    }
+    
+    showCreateRoom() {
+        console.log('🏠 Showing create room...');
+        this.showNotification('Création de partie', 'Fonctionnalité en développement', 'info');
+    }
+    
+    showJoinRoom() {
+        const panel = document.getElementById('join-room-panel');
+        if (panel) {
+            panel.classList.add('active');
+        }
+    }
+    
+    hideJoinRoom() {
+        const panel = document.getElementById('join-room-panel');
+        if (panel) {
+            panel.classList.remove('active');
+        }
+    }
+    
+    joinWithCode() {
+        const input = document.getElementById('room-code-input');
+        if (input && input.value.trim()) {
+            const code = input.value.trim().toUpperCase();
+            console.log('🔗 Joining room with code:', code);
+            
+            this.gameState.roomCode = code;
+            this.hideJoinRoom();
+            this.startGame();
+        }
+    }
+    
+    showCustomization() {
+        console.log('🎨 Showing customization...');
+        this.showNotification('Personnalisation', 'Fonctionnalité en développement', 'info');
+    }
+    
+    hideSettings() {
+        const panel = document.getElementById('settings-panel');
+        if (panel) {
+            panel.classList.remove('active');
+        }
+    }
+    
+    toggleSecondaryMenu() {
+        const menu = document.getElementById('secondary-menu');
+        if (menu) {
+            this.secondaryMenuOpen = !this.secondaryMenuOpen;
+            menu.classList.toggle('active', this.secondaryMenuOpen);
+        }
+    }
+    
+    copyRoomCode() {
+        if (this.gameState.roomCode) {
+            navigator.clipboard.writeText(this.gameState.roomCode).then(() => {
+                this.showNotification('Code copié!', `Code ${this.gameState.roomCode} copié dans le presse-papiers`, 'success');
+            });
+        }
+    }
+    
+    toggleMap() {
+        console.log('🗺️ Toggling map...');
+        this.showNotification('Carte', 'Fonctionnalité en développement', 'info');
+    }
+    
+    toggleGameSettings() {
+        const panel = document.getElementById('settings-panel');
+        if (panel) {
+            panel.classList.toggle('active');
+        }
+    }
+    
+    callEmergencyMeeting() {
+        console.log('🚨 Emergency meeting called!');
+        this.showNotification('Réunion d\'urgence!', 'Une réunion d\'urgence a été appelée', 'warning');
+    }
+    
+    useInteraction() {
+        console.log('🤏 Use interaction');
+        // Handle use/interact action
+    }
+    
+    killPlayer() {
+        console.log('💀 Kill action');
+        // Handle kill action (impostor only)
+    }
+    
+    toggleSabotage() {
+        console.log('🔧 Toggle sabotage');
+        // Handle sabotage action (impostor only)
+    }
+    
+    reportBody() {
+        console.log('📢 Report body');
+        // Handle report body action
+    }
+    
+    generateRoomCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let result = '';
+        for (let i = 0; i < 6; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+    
+    generatePlayerId() {
+        return 'player_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    getPlayerName() {
+        return localStorage.getItem('playerName') || 'Joueur';
+    }
+    
+    showNotification(title, message, type = 'info') {
+        console.log(`📢 ${type.toUpperCase()}: ${title} - ${message}`);
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <div class="notification-title">${title}</div>
+                <div class="notification-message">${message}</div>
+            </div>
+            <button class="notification-close">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        // Add to notifications container
+        const container = document.getElementById('notifications');
+        if (container) {
+            container.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+            
+            // Close button
+            notification.querySelector('.notification-close').addEventListener('click', () => {
+                notification.remove();
+            });
+        }
+    }
+    
+    // Handle keyboard input for player movement
+    handleKeyDown(event) {
+        if (this.currentScreen !== 'game') return;
+        
+        const { code } = event;
+        const player = this.gameState.localPlayer;
+        if (!player) return;
+        
+        const moveSpeed = 200; // pixels per second
+        
+        switch (code) {
+            case 'KeyW':
+            case 'ArrowUp':
+                player.velocity.y = -moveSpeed;
+                player.direction = 'up';
+                player.animation = 'walking';
+                break;
+            case 'KeyS':
+            case 'ArrowDown':
+                player.velocity.y = moveSpeed;
+                player.direction = 'down';
+                player.animation = 'walking';
+                break;
+            case 'KeyA':
+            case 'ArrowLeft':
+                player.velocity.x = -moveSpeed;
+                player.direction = 'left';
+                player.animation = 'walking';
+                break;
+            case 'KeyD':
+            case 'ArrowRight':
+                player.velocity.x = moveSpeed;
+                player.direction = 'right';
+                player.animation = 'walking';
+                break;
+            case 'Space':
+                this.useInteraction();
+                break;
+            case 'KeyE':
+                this.useInteraction();
+                break;
+        }
+        
+        // Update physics body velocity
+        if (this.engine.physics) {
+            const body = this.engine.physics.collisionBodies.get('localPlayer');
+            if (body) {
+                body.velocity.x = player.velocity.x;
+                body.velocity.y = player.velocity.y;
+            }
+        }
+    }
+    
+    handleKeyUp(event) {
+        if (this.currentScreen !== 'game') return;
+        
+        const { code } = event;
+        const player = this.gameState.localPlayer;
+        if (!player) return;
+        
+        switch (code) {
+            case 'KeyW':
+            case 'ArrowUp':
+            case 'KeyS':
+            case 'ArrowDown':
+                player.velocity.y = 0;
+                break;
+            case 'KeyA':
+            case 'ArrowLeft':
+            case 'KeyD':
+            case 'ArrowRight':
+                player.velocity.x = 0;
+                break;
+        }
+        
+        // Stop animation if not moving
+        if (player.velocity.x === 0 && player.velocity.y === 0) {
+            player.animation = 'idle';
+        }
+        
+        // Update physics body velocity
+        if (this.engine.physics) {
+            const body = this.engine.physics.collisionBodies.get('localPlayer');
+            if (body) {
+                body.velocity.x = player.velocity.x;
+                body.velocity.y = player.velocity.y;
+            }
+        }
+    }
+    
+    handleMouseDown(event) {
+        // Handle mouse interactions
+    }
+    
+    handleMouseMove(event) {
+        // Handle mouse movement
+    }
+    
+    handleGlobalClick(event) {
+        // Handle global click events
+    }
+    
+    handleBeforeUnload(event) {
+        // Handle page unload
+    }
+    
+    handlePlayerMove(event) {
+        // Handle player movement events
+    }
+    
+    handleTaskComplete(event) {
+        // Handle task completion
+    }
+    
+    handlePlayerKilled(event) {
+        // Handle player death
+    }
+    
+    setupGameUpdateLoop() {
+        // Listen to engine update events to sync game state
+        if (this.engine) {
+            this.engine.on('update', this.updateGameState.bind(this));
+        }
+    }
+    
+    updateGameState(event) {
+        if (this.currentScreen !== 'game') return;
+        
+        const { deltaTime } = event;
+        
+        // Update local player position from physics
+        this.updatePlayerPositions();
+        
+        // Update camera to follow player
+        this.updateCamera();
+        
+        // Update render layers
+        this.updateRenderLayers();
+    }
+    
+    updatePlayerPositions() {
+        if (!this.engine.physics || !this.gameState.localPlayer) return;
+        
+        // Get physics body for local player
+        const body = this.engine.physics.collisionBodies.get('localPlayer');
+        if (body) {
+            // Update game state position from physics
+            this.gameState.localPlayer.position.x = body.position.x;
+            this.gameState.localPlayer.position.y = body.position.y;
+        }
+    }
+    
+    updateCamera() {
+        if (!this.engine.graphics || !this.gameState.localPlayer) return;
+        
+        // Update camera target to follow local player
+        this.engine.graphics.camera.target = this.gameState.localPlayer.position;
+    }
+    
+    updateRenderLayers() {
+        if (!this.engine.graphics) return;
+        
+        // Update local player in render layer
+        const playerLayer = this.engine.graphics.layers.players;
+        const localPlayerIndex = playerLayer.findIndex(p => p.id === 'localPlayer' || p.type === 'player');
+        
+        if (localPlayerIndex >= 0 && this.gameState.localPlayer) {
+            playerLayer[localPlayerIndex] = {
+                type: 'player',
+                id: 'localPlayer',
+                x: this.gameState.localPlayer.position.x,
+                y: this.gameState.localPlayer.position.y,
+                color: this.gameState.localPlayer.color,
+                name: this.gameState.localPlayer.name,
+                animation: this.gameState.localPlayer.animation,
+                direction: this.gameState.localPlayer.direction,
+                isDead: !this.gameState.localPlayer.isAlive,
+                isImpostor: this.gameState.localPlayer.isImpostor
+            };
+        }
+        
+        // Update AI players
+        this.gameState.players.forEach((player, id) => {
+            if (player.isAI) {
+                const aiPlayerIndex = playerLayer.findIndex(p => p.id === id);
+                if (aiPlayerIndex >= 0) {
+                    playerLayer[aiPlayerIndex].x = player.position.x;
+                    playerLayer[aiPlayerIndex].y = player.position.y;
+                    playerLayer[aiPlayerIndex].animation = player.animation;
+                    playerLayer[aiPlayerIndex].direction = player.direction;
+                }
+            }
+        });
+    }
+    
+    getDefaultGameSettings() {
+        return {
+            maxPlayers: 10,
+            numImpostors: 2,
+            discussionTime: 120,
+            votingTime: 120,
+            playerSpeed: 1.0,
+            crewmateVision: 1.0,
+            impostorVision: 1.5,
+            killCooldown: 45,
+            emergencyMeetings: 1,
+            anonymousVotes: false,
+            visualTasks: true
+        };
+    }
                 this.showCustomization();
                 break;
             case 'achievements':

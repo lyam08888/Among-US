@@ -303,6 +303,12 @@
     <script src="js/v3-maps.js"></script>
     <script src="js/v3-game-logic.js"></script>
     <script src="js/mobile-controls.js"></script>
-    <script src="js/clean-app.js"></script>
+    <script src="js/v3-app.js"></script>
+    <script>
+        // Initialize the game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.amongUsApp = new AmongUsV3App();
+        });
+    </script>
 </body>
 </html>
