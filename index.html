@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="assets/sounds/ambient.mp3" as="audio" type="audio/mpeg" crossorigin="anonymous">
-    <link rel="preload" href="assets/sounds/button-click.mp3" as="audio" type="audio/mpeg" crossorigin="anonymous">
+    <link rel="preload" href="assets/sounds/ambient.mp3" as="fetch" type="audio/mpeg" crossorigin="anonymous">
+    <link rel="preload" href="assets/sounds/button-click.mp3" as="fetch" type="audio/mpeg" crossorigin="anonymous">
 </head>
 <body>
     <div id="app" class="app-container">
@@ -426,6 +426,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="js/error-handler.js"></script>
     <script src="js/v3-config.js"></script>
     <script src="js/v3-audio.js"></script>
     <script src="js/v3-graphics.js"></script>
