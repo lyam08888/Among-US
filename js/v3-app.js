@@ -602,7 +602,7 @@ class AmongUsV3App {
                 this.handleUIAction('emergency-meeting');
                 break;
             case 'kill':
-                if (this.gameState.localPlayer?.isImpostor) {
+                if (this.gameState.localPlayer && this.gameState.localPlayer.isImpostor) {
                     this.handleUIAction('kill-player');
                 }
                 break;
