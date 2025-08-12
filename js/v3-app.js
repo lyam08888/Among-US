@@ -883,7 +883,7 @@ class AmongUsV3App {
     
     showCustomization() {
         console.log('🎨 Showing customization...');
-        this.showNotification('Personnalisation', 'Fonctionnalité en développement', 'info');
+        this.showCharacterCustomizer();
     }
     
     hideSettings() {
