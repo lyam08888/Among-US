@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fixes</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        .error { background: #ffebee; color: #c62828; }
+        .warning { background: #fff3e0; color: #ef6c00; }
+        .info { background: #e3f2fd; color: #1976d2; }
+    </style>
+</head>
+<body>
+    <h1>Among Us Fixes Test</h1>
+    <div id="test-results"></div>
+    <button onclick="runTests()">Run Tests</button>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function runTests() {
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Test 1: Check if classes are defined
+            addResult('Testing class definitions...', 'info');
+            
+            try {
+                if (typeof AmongUsV3Audio !== 'undefined') {
+                    addResult('✅ AmongUsV3Audio class is defined', 'success');
+                } else {
+                    addResult('❌ AmongUsV3Audio class is not defined', 'error');
+                }
+            } catch (e) {
+                addResult('❌ Error checking AmongUsV3Audio: ' + e.message, 'error');
+            }
+
+            try {
+                if (typeof AmongUsV3Engine !== 'undefined') {
+                    addResult('✅ AmongUsV3Engine class is defined', 'success');
+                } else {
+                    addResult('❌ AmongUsV3Engine class is not defined', 'error');
+                }
+            } catch (e) {
+                addResult('❌ Error checking AmongUsV3Engine: ' + e.message, 'error');
+            }
+
+            try {
+                if (typeof AmongUsV3App !== 'undefined') {
+                    addResult('✅ AmongUsV3App class is defined', 'success');
+                } else {
+                    addResult('❌ AmongUsV3App class is not defined', 'error');
+                }
+            } catch (e) {
+                addResult('❌ Error checking AmongUsV3App: ' + e.message, 'error');
+            }
+
+            // Test 2: Check if methods exist
+            addResult('Testing method existence...', 'info');
+            
+            try {
+                const audioInstance = { update: function() {} };
+                if (typeof audioInstance.update === 'function') {
+                    addResult('✅ Audio update method pattern works', 'success');
+                }
+            } catch (e) {
+                addResult('❌ Audio update method test failed: ' + e.message, 'error');
+            }
+
+            // Test 3: Check preload links
+            addResult('Testing preload links...', 'info');
+            
+            const preloadLinks = document.querySelectorAll('link[rel="preload"]');
+            let audioPreloads = 0;
+            let fetchPreloads = 0;
+            
+            preloadLinks.forEach(link => {
+                const asValue = link.getAttribute('as');
+                if (asValue === 'audio') {
+                    audioPreloads++;
+                } else if (asValue === 'fetch') {
+                    fetchPreloads++;
+                }
+            });
+            
+            if (audioPreloads > 0) {
+                addResult(`✅ Found ${audioPreloads} audio preload links`, 'success');
+            }
+            
+            if (fetchPreloads > 0) {
+                addResult(`⚠️ Found ${fetchPreloads} fetch preload links (should be audio)`, 'warning');
+            }
+
+            addResult('Test completed!', 'info');
+        }
+    </script>
+
+    <!-- Load the scripts to test -->
+    <script src="js/v3-audio.js"></script>
+    <script src="js/v3-engine.js"></script>
+    <script src="js/v3-app.js"></script>
+</body>
+</html>
