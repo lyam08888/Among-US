@@ -308,6 +308,16 @@ class CharacterCustomizer {
         };
         
         window.CrewmateGenerator.renderFrameToCanvas(this.previewCanvas, this.currentOptions, state);
+        
+        // Auto-save changes
+        this.autoSave();
+    }
+    
+    autoSave() {
+        // Save to localStorage automatically
+        if (this.app && this.app.savePlayerCustomization) {
+            this.app.savePlayerCustomization('local', this.currentOptions);
+        }
     }
     
     startPreviewAnimation() {

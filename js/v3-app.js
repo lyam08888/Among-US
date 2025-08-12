@@ -423,6 +423,11 @@ class AmongUsV3App {
         this.chatSystem = new ChatSystem();
         this.setupUIEventListeners();
         this.initializeMenuAnimations();
+        
+        // Load saved character customizations
+        setTimeout(() => {
+            this.loadLocalPlayerCustomization();
+        }, 100);
     }
     
     setupUIEventListeners() {
@@ -1318,6 +1323,58 @@ class NotificationSystem {
             case 'warning': return 'fa-exclamation-triangle';
             default: return 'fa-info-circle';
         }
+    }
+    
+    // Character customization data management
+    savePlayerCustomization(playerId, characterOptions) {
+        const customizations = this.getStoredCustomizations();
+        customizations[playerId] = characterOptions;
+        localStorage.setItem('amongus_player_customizations', JSON.stringify(customizations));
+    }
+    
+    loadPlayerCustomization(playerId) {
+        const customizations = this.getStoredCustomizations();
+        return customizations[playerId] || null;
+    }
+    
+    getStoredCustomizations() {
+        try {
+            const stored = localStorage.getItem('amongus_player_customizations');
+            return stored ? JSON.parse(stored) : {};
+        } catch (e) {
+            console.error('Error loading customizations:', e);
+            return {};
+        }
+    }
+    
+    // Apply customization to local player
+    applyLocalPlayerCustomization() {
+        if (window.characterCustomizer && this.gameState.localPlayer) {
+            const options = window.characterCustomizer.exportCharacterOptions();
+            this.gameState.localPlayer.characterOptions = options;
+            this.savePlayerCustomization('local', options);
+        }
+    }
+    
+    // Load customization for local player
+    loadLocalPlayerCustomization() {
+        const saved = this.loadPlayerCustomization('local');
+        if (saved && window.characterCustomizer) {
+            window.characterCustomizer.currentOptions = saved;
+            window.characterCustomizer.refreshAllControls();
+        }
+    }
+    
+    // Generate sprite sheet for multiplayer sync
+    generatePlayerSpriteSheet(characterOptions) {
+        if (window.CrewmateGenerator) {
+            return window.CrewmateGenerator.buildSpriteSheet(characterOptions, {
+                frames: 8,
+                dirs: 4,
+                ssaa: 1
+            });
+        }
+        return null;
     }
 }
 
