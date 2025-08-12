@@ -246,15 +246,15 @@ class AmongUsV3App {
     async loadAssets() {
         this.updateLoadingProgress(30, 'Chargement des ressources...');
         
-        // Simulate asset loading with progress updates
-        const assets = [
-            { name: 'Textures des personnages', weight: 20 },
-            { name: 'Cartes du jeu', weight: 25 },
-            { name: 'Effets sonores', weight: 15 },
-            { name: 'Musiques', weight: 10 },
-            { name: 'Interface utilisateur', weight: 15 },
-            { name: 'Animations', weight: 15 }
-        ];
+            // Simulate asset loading with progress updates
+            const assets = [
+                { name: 'Textures des personnages', weight: 20 },
+                { name: 'Cartes du jeu', weight: 25 },
+                { name: 'Effets sonores', weight: 15 },
+                { name: 'Musiques', weight: 10 },
+                { name: 'Interface utilisateur', weight: 15 },
+                { name: 'Animations', weight: 15 }
+            ];
         
         let currentProgress = 30;
         
