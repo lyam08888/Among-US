@@ -85,9 +85,6 @@ class AmongUsV3App {
             // Complete initialization
             this.completeInitialization();
             
-            // Setup game update loop
-            this.setupGameUpdateLoop();
-            
         } catch (error) {
             console.error('❌ Failed to initialize application:', error);
             this.showError('Erreur d\'initialisation', error.message);
@@ -551,6 +548,64 @@ class AmongUsV3App {
     
     handleMobileAction(action) {
         console.log('Mobile action:', action);
+    }
+
+    setupGameUpdateLoop() {
+        if (this.engine) {
+            this.engine.on('update', this.update.bind(this));
+            console.log('Game update loop setup.');
+        }
+    }
+
+    update(event) {
+        const { deltaTime } = event;
+        if (this.currentScreen !== 'game') return;
+
+        // Game logic update here
+        if (this.gameState.gameMode === 'training') {
+            this.updateAIPlayers(deltaTime);
+        }
+
+        // Update player physics from velocity
+        if (this.gameState.localPlayer && this.engine.physics) {
+            const body = this.engine.physics.collisionBodies.get('localPlayer');
+            if (body) {
+                this.gameState.localPlayer.position.x = body.position.x;
+                this.gameState.localPlayer.position.y = body.position.y;
+                this.updatePlayerRenderable();
+            }
+        }
+    }
+
+    updateAIPlayers(deltaTime) {
+        this.gameState.players.forEach(player => {
+            if (player.isAI) {
+                // Simple random walk for AI
+                if (!player.aiState || player.aiState.timer <= 0) {
+                    player.aiState = {
+                        timer: Math.random() * 3000 + 1000, // change direction every 1-4 seconds
+                        velocity: {
+                            x: (Math.random() * 2 - 1) * 100,
+                            y: (Math.random() * 2 - 1) * 100
+                        }
+                    };
+                }
+
+                player.aiState.timer -= deltaTime;
+                player.position.x += player.aiState.velocity.x * (deltaTime / 1000);
+                player.position.y += player.aiState.velocity.y * (deltaTime / 1000);
+
+                const aiRenderable = this.engine.graphics.layers.players.find(p => p.id === player.id);
+                if (aiRenderable) {
+                    aiRenderable.x = player.position.x;
+                    aiRenderable.y = player.position.y;
+                    aiRenderable.animation = (player.aiState.velocity.x !== 0 || player.aiState.velocity.y !== 0) ? 'walking' : 'idle';
+                    if (Math.abs(player.aiState.velocity.x) > Math.abs(player.aiState.velocity.y)) {
+                        aiRenderable.direction = player.aiState.velocity.x > 0 ? 'right' : 'left';
+                    }
+                }
+            }
+        });
     }
 
     updatePlayerRenderable() {
