@@ -8,6 +8,9 @@ class AmongUsV3Maps {
         this.currentMap = null;
         this.maps = new Map();
         this.mapAssets = new Map();
+
+        // Procedural map system
+        this.proceduralMaps = null;
         
         // Map rendering
         this.mapCanvas = null;
@@ -33,6 +36,10 @@ class AmongUsV3Maps {
         try {
             // Initialize map definitions
             this.initializeMapDefinitions();
+
+            // Initialize procedural maps
+            this.proceduralMaps = new window.AmongUsV3ProceduralMaps(this.engine);
+            await this.proceduralMaps.initialize();
             
             // Setup rendering canvases
             this.setupCanvases();
@@ -589,7 +596,18 @@ class AmongUsV3Maps {
     }
     
     async loadMap(mapId) {
-        const mapData = this.maps.get(mapId);
+        let mapData = null;
+        if (mapId === 'procedural') {
+            if (!this.proceduralMaps) {
+                console.error('Procedural map system not initialized');
+                return false;
+            }
+            mapData = this.proceduralMaps.getProceduralMap(this.proceduralMaps.getRandomSeed());
+            this.maps.set('procedural', mapData);
+        } else {
+            mapData = this.maps.get(mapId);
+        }
+
         if (!mapData) {
             console.error(`Map not found: ${mapId}`);
             return false;
