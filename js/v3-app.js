@@ -229,6 +229,11 @@ class AmongUsV3App {
         // Initialize audio system
         if (this.engine.audio) {
             await this.engine.audio.initialize();
+            
+            // Test audio system
+            if (this.engine.audio.testAudioSystem) {
+                this.engine.audio.testAudioSystem();
+            }
         }
         
         this.updateLoadingProgress(80, 'Système audio initialisé');

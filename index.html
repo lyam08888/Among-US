@@ -22,8 +22,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="assets/sounds/ambient.mp3" as="fetch" crossorigin="anonymous">
-    <link rel="preload" href="assets/sounds/button-click.mp3" as="fetch" crossorigin="anonymous">
+    <link rel="preload" href="assets/sounds/ambient.mp3" as="audio" crossorigin="anonymous">
+    <link rel="preload" href="assets/sounds/button-click.mp3" as="audio" crossorigin="anonymous">
     
     <meta name="description" content="Among Us V3 - Experience the ultimate premium Among Us game with advanced graphics, physics, and complete gameplay mechanics">
     <meta name="keywords" content="among us, game, multiplayer, premium, v3">
@@ -445,6 +445,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="js/error-handler.js"></script>
     <script src="js/v3-config.js"></script>
     <script src="js/v3-performance.js"></script>
     <script src="js/v3-engine.js"></script>
