@@ -9,14 +9,15 @@
     <!-- Unified Styles -->
     <link rel="stylesheet" href="styles/clean-main.css">
     <link rel="stylesheet" href="styles/clean-mobile.css">
+    <link rel="stylesheet" href="styles/character-customizer.css">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Preload critical resources -->
-    <link rel="preload" href="assets/sounds/ambient.mp3" as="audio" type="audio/mpeg">
-    <link rel="preload" href="assets/sounds/button-click.mp3" as="audio" type="audio/mpeg">
+    <link rel="preload" href="assets/sounds/ambient.mp3" as="media" type="audio/mpeg">
+    <link rel="preload" href="assets/sounds/button-click.mp3" as="media" type="audio/mpeg">
 </head>
 <body>
     <div id="app" class="app-container">
@@ -290,6 +291,136 @@
             </div>
         </div>
 
+        <!-- Character Customizer Panel -->
+        <div id="character-customizer-panel" class="panel large-panel">
+            <div class="panel-header">
+                <h3>Personnalisation du Personnage</h3>
+                <div class="panel-actions">
+                    <button class="btn-secondary" onclick="characterCustomizer.saveCharacter()">
+                        <i class="fas fa-save"></i> Sauvegarder
+                    </button>
+                    <button class="panel-close" data-action="close-character-customizer">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="customizer-layout">
+                    <!-- Preview Section -->
+                    <div class="customizer-preview">
+                        <div class="preview-container">
+                            <canvas id="character-preview-canvas" width="300" height="300"></canvas>
+                        </div>
+                        <div class="preview-controls">
+                            <button class="btn-secondary" onclick="characterCustomizer.loadCharacter()">
+                                <i class="fas fa-upload"></i> Charger
+                            </button>
+                            <button class="btn-primary" onclick="characterCustomizer.saveCharacter()">
+                                <i class="fas fa-save"></i> Sauvegarder
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Customization Controls -->
+                    <div class="customizer-controls">
+                        <!-- Tabs -->
+                        <div class="customizer-tabs">
+                            <button class="tab-btn active" data-tab="colors">Couleurs</button>
+                            <button class="tab-btn" data-tab="anatomy">Anatomie</button>
+                            <button class="tab-btn" data-tab="accessories">Accessoires</button>
+                            <button class="tab-btn" data-tab="presets">Presets</button>
+                        </div>
+
+                        <!-- Colors Tab -->
+                        <div class="tab-content active" data-tab="colors">
+                            <div class="control-group">
+                                <label>Couleur du Corps</label>
+                                <div id="body-color-options" class="color-grid">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>Couleur de la Visière</label>
+                                <div id="visor-color-options" class="color-grid">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Anatomy Tab -->
+                        <div class="tab-content" data-tab="anatomy">
+                            <div class="control-group">
+                                <label>Taille</label>
+                                <input type="range" id="height-slider" class="slider">
+                                <span class="slider-value" id="height-value">1.00</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Largeur</label>
+                                <input type="range" id="width-slider" class="slider">
+                                <span class="slider-value" id="width-value">1.00</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Ventre</label>
+                                <input type="range" id="belly-slider" class="slider">
+                                <span class="slider-value" id="belly-value">0.15</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Épaules</label>
+                                <input type="range" id="shoulder-slider" class="slider">
+                                <span class="slider-value" id="shoulder-value">0.10</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Inclinaison</label>
+                                <input type="range" id="tilt-slider" class="slider">
+                                <span class="slider-value" id="tilt-value">-0.04</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Largeur Visière</label>
+                                <input type="range" id="visor-width-slider" class="slider">
+                                <span class="slider-value" id="visor-width-value">0.24</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Hauteur Visière</label>
+                                <input type="range" id="visor-height-slider" class="slider">
+                                <span class="slider-value" id="visor-height-value">0.17</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Inclinaison Visière</label>
+                                <input type="range" id="visor-tilt-slider" class="slider">
+                                <span class="slider-value" id="visor-tilt-value">-0.15</span>
+                            </div>
+                        </div>
+
+                        <!-- Accessories Tab -->
+                        <div class="tab-content" data-tab="accessories">
+                            <div class="control-group">
+                                <label>Accessoire</label>
+                                <div id="accessory-options" class="accessory-grid">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>Décoration</label>
+                                <div id="decal-options" class="decal-grid">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Presets Tab -->
+                        <div class="tab-content" data-tab="presets">
+                            <div class="control-group">
+                                <label>Presets Prédéfinis</label>
+                                <div id="preset-options" class="preset-grid">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Notifications -->
         <div id="notifications" class="notifications-container"></div>
     </div>
@@ -303,6 +434,8 @@
     <script src="js/v3-maps.js"></script>
     <script src="js/v3-game-logic.js"></script>
     <script src="js/mobile-controls.js"></script>
+    <script src="js/crewmate-generator.js"></script>
+    <script src="js/character-customizer.js"></script>
     <script src="js/v3-app.js"></script>
     <script>
         // Initialize the game when DOM is loaded
