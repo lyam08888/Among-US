@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Loading Test</title>
+</head>
+<body>
+    <h1>Class Loading Test</h1>
+    <div id="results"></div>
+
+    <!-- Scripts in the same order as index.html -->
+    <script src="js/error-handler.js"></script>
+    <script src="js/v3-config.js"></script>
+    <script src="js/v3-audio.js"></script>
+    <script src="js/v3-graphics.js"></script>
+    <script src="js/v3-physics.js"></script>
+    <script src="js/v3-networking.js"></script>
+    <script src="js/v3-engine.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const results = document.getElementById('results');
+            const tests = [
+                { name: 'AmongUsV3Engine', class: window.AmongUsV3Engine },
+                { name: 'AmongUsV3Graphics', class: window.AmongUsV3Graphics },
+                { name: 'AmongUsV3Physics', class: window.AmongUsV3Physics },
+                { name: 'AmongUsV3Networking', class: window.AmongUsV3Networking },
+                { name: 'AmongUsV3Audio', class: window.AmongUsV3Audio },
+                { name: 'AmongUsV3Config', class: window.AmongUsV3Config },
+                { name: 'wr (error handler)', class: window.wr }
+            ];
+
+            let html = '<h2>Class Availability Test Results:</h2><ul>';
+            
+            tests.forEach(test => {
+                const available = typeof test.class !== 'undefined';
+                const status = available ? '✅ Available' : '❌ Missing';
+                const color = available ? 'green' : 'red';
+                html += `<li style="color: ${color}"><strong>${test.name}:</strong> ${status}</li>`;
+            });
+
+            html += '</ul>';
+
+            // Test engine creation
+            html += '<h2>Engine Creation Test:</h2>';
+            try {
+                // Create a temporary canvas for testing
+                const canvas = document.createElement('canvas');
+                canvas.id = 'game-canvas';
+                canvas.width = 800;
+                canvas.height = 600;
+                document.body.appendChild(canvas);
+
+                const engine = new AmongUsV3Engine();
+                html += '<p style="color: green">✅ Engine created successfully!</p>';
+                html += `<p>Engine initialized: ${engine.isInitialized}</p>`;
+                
+                // Clean up
+                engine.destroy();
+                document.body.removeChild(canvas);
+            } catch (error) {
+                html += `<p style="color: red">❌ Engine creation failed: ${error.message}</p>`;
+                console.error('Engine creation error:', error);
+            }
+
+            results.innerHTML = html;
+        });
+    </script>
+</body>
+</html>

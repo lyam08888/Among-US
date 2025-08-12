@@ -6,6 +6,10 @@ class AmongUsV3Engine {
         this.lastFrameTime = 0;
         this.deltaTime = 0;
         
+        // Canvas setup
+        this.canvas = null;
+        this.ctx = null;
+        
         // Subsystems
         this.audio = null;
         this.graphics = null;
@@ -28,6 +32,9 @@ class AmongUsV3Engine {
     init() {
         console.log('🔧 Initializing AmongUsV3Engine...');
         
+        // Initialize canvas
+        this.initCanvas();
+        
         // Initialize subsystems
         this.audio = new AmongUsV3Audio(this);
         this.graphics = new AmongUsV3Graphics(this);
@@ -36,6 +43,20 @@ class AmongUsV3Engine {
         
         this.isInitialized = true;
         console.log('✅ AmongUsV3Engine initialized');
+    }
+    
+    initCanvas() {
+        this.canvas = document.getElementById('game-canvas');
+        if (this.canvas) {
+            this.ctx = this.canvas.getContext('2d');
+            console.log('🖼️ Canvas initialized');
+        } else {
+            console.warn('⚠️ Game canvas not found, creating temporary canvas');
+            this.canvas = document.createElement('canvas');
+            this.canvas.width = 1920;
+            this.canvas.height = 1080;
+            this.ctx = this.canvas.getContext('2d');
+        }
     }
     
     // Event system
@@ -179,60 +200,8 @@ class AmongUsV3Engine {
 
 // Note: AmongUsV3Graphics class is defined in v3-graphics.js
 
-class AmongUsV3Physics {
-    constructor(engine) {
-        this.engine = engine;
-        this.collisionBodies = new Map();
-        this.gravity = { x: 0, y: 0 };
-    }
-    
-    update(deltaTime) {
-        // Update physics simulation
-        this.collisionBodies.forEach((body, id) => {
-            if (body.type === 'dynamic') {
-                // Simple physics update
-                body.position.x += body.velocity.x * deltaTime / 1000;
-                body.position.y += body.velocity.y * deltaTime / 1000;
-            }
-        });
-    }
-    
-    createBody(id, config) {
-        this.collisionBodies.set(id, {
-            id,
-            position: { x: config.x || 0, y: config.y || 0 },
-            velocity: { x: 0, y: 0 },
-            width: config.width || 50,
-            height: config.height || 50,
-            type: config.type || 'static',
-            mass: config.mass || 1,
-            friction: config.friction || 0.8,
-            restitution: config.restitution || 0
-        });
-    }
-    
-    destroy() {
-        this.collisionBodies.clear();
-        console.log('⚙️ Physics system destroyed');
-    }
-}
-
-class AmongUsV3Networking {
-    constructor(engine) {
-        this.engine = engine;
-        this.isConnected = false;
-    }
-    
-    async initialize() {
-        console.log('🌐 Networking system initialized');
-        this.isConnected = true;
-    }
-    
-    destroy() {
-        this.isConnected = false;
-        console.log('🌐 Networking system destroyed');
-    }
-}
+// Note: AmongUsV3Physics class is defined in v3-physics.js
+// Note: AmongUsV3Networking class is defined in v3-networking.js
 
 // Export for use in other modules
 window.AmongUsV3Engine = AmongUsV3Engine;
