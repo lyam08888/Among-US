@@ -38,7 +38,6 @@ class AdvancedAudioSystem {
         this.ambientGain = null;
         this.voiceGain = null;
         this.isInitialized = false;
-        this.pendingUserInteraction = true;
         
         // Stockage des sons
         this.sounds = new Map();
@@ -125,59 +124,40 @@ class AdvancedAudioSystem {
             'ambient-comms': { file: 'ambient-comms', volume: 0.3, category: 'ambient', loop: true, spatial: true },
             'ambient-storage': { file: 'ambient-storage', volume: 0.2, category: 'ambient', loop: true, spatial: true }
         };
-        
-        this.init();
     }
-    
+
     async init() {
         console.log('🔊 Initializing Advanced Audio System...');
-        
+
         try {
             // Préparer le système audio (sans créer le contexte)
             await this.prepareAudioSystem();
-            
-            // Attendre l'interaction utilisateur pour créer le contexte audio
-            this.setupUserInteractionHandler();
-            
-            console.log('✅ Advanced Audio System prepared (waiting for user interaction)');
+
+            console.log('✅ Advanced Audio System prepared');
         } catch (error) {
             console.error('❌ Failed to initialize audio system:', error);
             throw error;
         }
     }
-    
+
     async prepareAudioSystem() {
         // Charger les ArrayBuffers des sons sans créer le contexte audio
         await this.loadAllSoundBuffers();
     }
-    
-    setupUserInteractionHandler() {
-        const initAudioOnInteraction = async () => {
-            if (this.pendingUserInteraction) {
-                try {
-                    await this.initializeAudioContext();
-                    this.createGainNodes();
-                    this.createAudioEffects();
-                    await this.decodePendingBuffers();
-                    this.applyStoredVolumeSettings();
-                    this.isInitialized = true;
-                    this.pendingUserInteraction = false;
-                    console.log('✅ Audio context initialized after user interaction');
-                    
-                    // Supprimer les écouteurs d'événements
-                    document.removeEventListener('click', initAudioOnInteraction);
-                    document.removeEventListener('touchstart', initAudioOnInteraction);
-                    document.removeEventListener('keydown', initAudioOnInteraction);
-                } catch (error) {
-                    console.error('❌ Failed to initialize audio context:', error);
-                }
-            }
-        };
-        
-        // Écouter les interactions utilisateur
-        document.addEventListener('click', initAudioOnInteraction);
-        document.addEventListener('touchstart', initAudioOnInteraction);
-        document.addEventListener('keydown', initAudioOnInteraction);
+
+    async resume() {
+        if (this.isInitialized) return;
+        try {
+            await this.initializeAudioContext();
+            this.createGainNodes();
+            this.createAudioEffects();
+            await this.decodePendingBuffers();
+            this.applyStoredVolumeSettings();
+            this.isInitialized = true;
+            console.log('✅ Audio context initialized after user interaction');
+        } catch (error) {
+            console.error('❌ Failed to initialize audio context:', error);
+        }
     }
     
     async initializeAudioContext() {
