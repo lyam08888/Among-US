@@ -50,8 +50,10 @@ class V4AudioManager {
             try {
                 const response = await fetch(url, {
                     method: 'HEAD',
-                    cache: 'no-store',
-                    mode: 'same-origin' // Fix credentials mode issue
+                    cache: 'no-store'
+                    // Use a relative URL without forcing credentials mode to
+                    // ensure the preload request can be reused without a
+                    // credentials mismatch warning.
                 });
                 
                 if (response.ok) {
@@ -83,8 +85,9 @@ class V4AudioManager {
 
         try {
             const response = await fetch(url, {
-                cache: 'no-store',
-                mode: 'same-origin' // Fix credentials mode
+                cache: 'no-store'
+                // Rely on the default credentials for relative URLs so the
+                // request matches the preload and stays same-origin.
             });
             
             if (!response.ok) {
