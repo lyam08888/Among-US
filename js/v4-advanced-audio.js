@@ -7,6 +7,8 @@ class AdvancedAudioSystem {
         this.sfxGain = null;
         this.ambientGain = null;
         this.voiceGain = null;
+        this.isInitialized = false;
+        this.pendingUserInteraction = true;
         
         // Stockage des sons
         this.sounds = new Map();
@@ -99,23 +101,50 @@ class AdvancedAudioSystem {
         console.log('🔊 Initializing Advanced Audio System...');
         
         try {
-            // Initialiser le contexte audio
-            await this.initializeAudioContext();
+            // Préparer le système audio (sans créer le contexte)
+            await this.prepareAudioSystem();
             
-            // Créer les nœuds de gain
-            this.createGainNodes();
+            // Attendre l'interaction utilisateur pour créer le contexte audio
+            this.setupUserInteractionHandler();
             
-            // Créer les effets audio
-            this.createAudioEffects();
-            
-            // Charger les sons
-            await this.loadAllSounds();
-            
-            console.log('✅ Advanced Audio System initialized');
+            console.log('✅ Advanced Audio System prepared (waiting for user interaction)');
         } catch (error) {
             console.error('❌ Failed to initialize audio system:', error);
             throw error;
         }
+    }
+    
+    async prepareAudioSystem() {
+        // Charger les sons sans créer le contexte audio
+        await this.loadAllSounds();
+    }
+    
+    setupUserInteractionHandler() {
+        const initAudioOnInteraction = async () => {
+            if (this.pendingUserInteraction) {
+                try {
+                    await this.initializeAudioContext();
+                    this.createGainNodes();
+                    this.createAudioEffects();
+                    this.applyStoredVolumeSettings();
+                    this.isInitialized = true;
+                    this.pendingUserInteraction = false;
+                    console.log('✅ Audio context initialized after user interaction');
+                    
+                    // Supprimer les écouteurs d'événements
+                    document.removeEventListener('click', initAudioOnInteraction);
+                    document.removeEventListener('touchstart', initAudioOnInteraction);
+                    document.removeEventListener('keydown', initAudioOnInteraction);
+                } catch (error) {
+                    console.error('❌ Failed to initialize audio context:', error);
+                }
+            }
+        };
+        
+        // Écouter les interactions utilisateur
+        document.addEventListener('click', initAudioOnInteraction);
+        document.addEventListener('touchstart', initAudioOnInteraction);
+        document.addEventListener('keydown', initAudioOnInteraction);
     }
     
     async initializeAudioContext() {
@@ -220,6 +249,11 @@ class AdvancedAudioSystem {
     }
     
     playSound(soundId, options = {}) {
+        if (!this.isInitialized || !this.audioContext) {
+            console.warn(`⚠️ Audio system not initialized yet, cannot play sound: ${soundId}`);
+            return null;
+        }
+        
         const soundData = this.loadedBuffers.get(soundId);
         if (!soundData) {
             console.warn(`⚠️ Sound not found: ${soundId}`);
@@ -275,6 +309,11 @@ class AdvancedAudioSystem {
     }
     
     playMusic(musicId, options = {}) {
+        if (!this.isInitialized || !this.audioContext) {
+            console.warn(`⚠️ Audio system not initialized yet, cannot play music: ${musicId}`);
+            return null;
+        }
+        
         // Arrêter la musique actuelle
         if (this.playingMusic) {
             this.stopMusic();
@@ -443,27 +482,52 @@ class AdvancedAudioSystem {
     // Contrôles de volume
     setMasterVolume(volume) {
         this.config.masterVolume = Math.max(0, Math.min(1, volume));
-        this.masterGain.gain.value = this.config.masterVolume;
+        if (this.masterGain && this.isInitialized) {
+            this.masterGain.gain.value = this.config.masterVolume;
+        }
     }
     
     setMusicVolume(volume) {
         this.config.musicVolume = Math.max(0, Math.min(1, volume));
-        this.musicGain.gain.value = this.config.musicVolume;
+        if (this.musicGain && this.isInitialized) {
+            this.musicGain.gain.value = this.config.musicVolume;
+        }
     }
     
     setSfxVolume(volume) {
         this.config.sfxVolume = Math.max(0, Math.min(1, volume));
-        this.sfxGain.gain.value = this.config.sfxVolume;
+        if (this.sfxGain && this.isInitialized) {
+            this.sfxGain.gain.value = this.config.sfxVolume;
+        }
     }
     
     setAmbientVolume(volume) {
         this.config.ambientVolume = Math.max(0, Math.min(1, volume));
-        this.ambientGain.gain.value = this.config.ambientVolume;
+        if (this.ambientGain && this.isInitialized) {
+            this.ambientGain.gain.value = this.config.ambientVolume;
+        }
     }
     
     setVoiceVolume(volume) {
         this.config.voiceVolume = Math.max(0, Math.min(1, volume));
-        this.voiceGain.gain.value = this.config.voiceVolume;
+        if (this.voiceGain && this.isInitialized) {
+            this.voiceGain.gain.value = this.config.voiceVolume;
+        }
+    }
+    
+    applyStoredVolumeSettings() {
+        if (this.isInitialized) {
+            if (this.masterGain) this.masterGain.gain.value = this.config.masterVolume;
+            if (this.musicGain) this.musicGain.gain.value = this.config.musicVolume;
+            if (this.sfxGain) this.sfxGain.gain.value = this.config.sfxVolume;
+            if (this.ambientGain) this.ambientGain.gain.value = this.config.ambientVolume;
+            if (this.voiceGain) this.voiceGain.gain.value = this.config.voiceVolume;
+        }
+    }
+    
+    // Méthode utilitaire pour vérifier si le système audio est prêt
+    isReady() {
+        return this.isInitialized && this.audioContext && this.audioContext.state === 'running';
     }
     
     // Effets spéciaux

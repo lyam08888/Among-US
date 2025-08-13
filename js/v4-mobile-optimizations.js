@@ -266,7 +266,7 @@ class MobileOptimizations {
         document.body.classList.add('background-mode');
         
         // Réduire la qualité audio
-        if (window.amongUsApp && window.amongUsApp.audioSystem) {
+        if (window.amongUsApp && window.amongUsApp.audioSystem && window.amongUsApp.audioSystem.isReady && window.amongUsApp.audioSystem.isReady()) {
             window.amongUsApp.audioSystem.setMasterVolume(0.1);
         }
     }
@@ -279,7 +279,7 @@ class MobileOptimizations {
         document.body.classList.remove('background-mode');
         
         // Restaurer la qualité audio
-        if (window.amongUsApp && window.amongUsApp.audioSystem) {
+        if (window.amongUsApp && window.amongUsApp.audioSystem && window.amongUsApp.audioSystem.isReady && window.amongUsApp.audioSystem.isReady()) {
             window.amongUsApp.audioSystem.setMasterVolume(0.7);
         }
     }
@@ -461,7 +461,7 @@ class BatteryOptimizer {
             }
             
             // Réduire la qualité audio
-            if (app.audioSystem) {
+            if (app.audioSystem && app.audioSystem.isReady && app.audioSystem.isReady()) {
                 app.audioSystem.setMasterVolume(0.3);
             }
         }
@@ -483,7 +483,7 @@ class BatteryOptimizer {
             }
             
             // Réduire la qualité audio
-            if (app.audioSystem) {
+            if (app.audioSystem && app.audioSystem.isReady && app.audioSystem.isReady()) {
                 app.audioSystem.setMasterVolume(0.5);
             }
         }
@@ -507,7 +507,7 @@ class BatteryOptimizer {
             }
             
             // Restaurer la qualité audio
-            if (app.audioSystem) {
+            if (app.audioSystem && app.audioSystem.isReady && app.audioSystem.isReady()) {
                 app.audioSystem.setMasterVolume(0.7);
             }
         }
