@@ -687,13 +687,15 @@ class AdvancedAudioSystem {
     }
     
     pauseAll() {
+        if (!this.audioContext) return;                  // garde-fou
         // Suspendre le contexte audio
         if (this.audioContext.state === 'running') {
             this.audioContext.suspend();
         }
     }
-    
+
     resumeAll() {
+        if (!this.audioContext) return;                  // garde-fou
         // Reprendre le contexte audio
         if (this.audioContext.state === 'suspended') {
             this.audioContext.resume();
