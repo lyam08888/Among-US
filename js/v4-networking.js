@@ -27,16 +27,18 @@ class NetworkingSystem {
         // Messages en attente
         this.messageQueue = [];
         this.lastHeartbeat = Date.now();
-        
-        this.init();
     }
-    
+
     init() {
         console.log('🌐 Initializing Networking System...');
-        
+
         // Générer un ID de joueur unique
         this.playerId = this.generatePlayerId();
-        
+    }
+
+    start() {
+        console.log('🚀 Starting Networking System...');
+
         // Simuler la connexion réseau pour la démo
         this.simulateNetworking();
     }

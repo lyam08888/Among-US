@@ -3,6 +3,7 @@ class AmongUsV4App {
     constructor() {
         this.currentScreen = 'loading';
         this.isInitialized = false;
+        this.appReady = false;
         
         // Systèmes avancés
         this.audioSystem = null;
@@ -154,6 +155,7 @@ class AmongUsV4App {
         // Initialiser le réseau
         this.updateLoadingProgress(85, 'Connexion réseau...');
         this.networkingSystem = new NetworkingSystem(this);
+        this.networkingSystem.init();
         
         // Créer le joueur local
         this.updateLoadingProgress(90, 'Création du personnage...');
@@ -304,6 +306,11 @@ class AmongUsV4App {
     
     completeInitialization() {
         this.isInitialized = true;
+        this.appReady = true;
+
+        if (this.networkingSystem) {
+            this.networkingSystem.start();
+        }
         
         // Masquer l'écran de chargement
         setTimeout(() => {
