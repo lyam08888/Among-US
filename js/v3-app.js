@@ -490,6 +490,102 @@ class AmongUsV3App {
         }
     }
     
+    handleMobileAction(data) {
+        if (!data || !data.action) return;
+        
+        console.log(`📱 Handling mobile action: ${data.action}`);
+        
+        switch (data.action) {
+            case 'use':
+                this.handleUseAction();
+                break;
+            case 'report':
+                this.handleReportAction();
+                break;
+            case 'kill':
+                this.handleKillAction();
+                break;
+            case 'sabotage':
+                this.handleSabotageAction();
+                break;
+            case 'emergency':
+                this.handleEmergencyAction();
+                break;
+            case 'map':
+                this.handleMapAction();
+                break;
+            case 'toggle-menu':
+                this.handleToggleMenuAction();
+                break;
+            case 'toggle-chat':
+                this.handleToggleChatAction();
+                break;
+            case 'toggle-tasks':
+                this.handleToggleTasksAction();
+                break;
+            default:
+                console.warn(`Unknown mobile action: ${data.action}`);
+        }
+    }
+    
+    handleUseAction() {
+        // Handle use/interact action
+        console.log('🔧 Use action triggered');
+        // TODO: Implement interaction with nearby objects/tasks
+    }
+    
+    handleReportAction() {
+        // Handle report body action
+        console.log('📢 Report action triggered');
+        // TODO: Implement body reporting
+    }
+    
+    handleKillAction() {
+        // Handle kill action (for impostors)
+        if (this.gameState.localPlayer && this.gameState.localPlayer.isImpostor) {
+            console.log('💀 Kill action triggered');
+            // TODO: Implement kill functionality
+        }
+    }
+    
+    handleSabotageAction() {
+        // Handle sabotage action (for impostors)
+        if (this.gameState.localPlayer && this.gameState.localPlayer.isImpostor) {
+            console.log('⚡ Sabotage action triggered');
+            // TODO: Implement sabotage functionality
+        }
+    }
+    
+    handleEmergencyAction() {
+        // Handle emergency meeting action
+        console.log('🚨 Emergency meeting triggered');
+        // TODO: Implement emergency meeting
+    }
+    
+    handleMapAction() {
+        // Handle map toggle action
+        console.log('🗺️ Map toggle triggered');
+        // TODO: Implement map display toggle
+    }
+    
+    handleToggleMenuAction() {
+        // Handle menu toggle action
+        console.log('📋 Menu toggle triggered');
+        // TODO: Implement menu toggle
+    }
+    
+    handleToggleChatAction() {
+        // Handle chat toggle action
+        console.log('💬 Chat toggle triggered');
+        // TODO: Implement chat toggle
+    }
+    
+    handleToggleTasksAction() {
+        // Handle tasks toggle action
+        console.log('📝 Tasks toggle triggered');
+        // TODO: Implement tasks toggle
+    }
+    
     updatePlayerRenderable() {
         if (!this.engine.graphics || !this.gameState.localPlayer) return;
         
