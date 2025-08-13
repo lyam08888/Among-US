@@ -1,7 +1,7 @@
 // Among Us V4 - Système Audio Avancé
 
 // Extensions audio à essayer (dans l'ordre de priorité)
-const AUDIO_EXTS = ['.wav', '.mp3', '.ogg'];
+const AUDIO_EXTS = ['.wav'];
 
 // Résolution du chemin réel d'un fichier audio
 async function resolveAudioUrl(basePathWithoutExt) {
