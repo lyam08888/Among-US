@@ -926,9 +926,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Gérer les erreurs globales
 window.addEventListener('error', (e) => {
-    console.error('Global error:', e.error);
+    console.error('Global error:', e.error?.stack || e.message || e);
 });
 
 window.addEventListener('unhandledrejection', (e) => {
-    console.error('Unhandled promise rejection:', e.reason);
+    console.error('Global unhandled:', e.reason?.stack || e.reason || e);
 });
