@@ -3,255 +3,635 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Among Us - Mobile Game</title>
+    <title>Among Us V4 - Mobile Game 2025</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
     
-    <!-- Unified Styles -->
-    <link rel="stylesheet" href="styles/clean-main.css">
-    <link rel="stylesheet" href="styles/clean-mobile.css">
-    <link rel="stylesheet" href="styles/character-customizer.css">
+    <!-- Styles V4 -->
+    <link rel="stylesheet" href="styles/v4-mobile-interface.css">
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Preload critical resources -->
+    <link rel="preload" href="assets/characters/crew-red-sheet.png" as="image">
+    <link rel="preload" href="assets/sounds/ambient.mp3" as="audio">
+    
+    <style>
+        /* Styles de base pour le canvas de jeu */
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0a0a0f;
+            touch-action: none;
+            user-select: none;
+        }
+        
+        /* Interface de jeu overlay */
+        .v4-game-interface {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .v4-game-interface > * {
+            pointer-events: auto;
+        }
+        
+        /* HUD de jeu moderne */
+        .v4-game-hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%);
+        }
+        
+        .v4-hud-left, .v4-hud-right {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .v4-hud-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            backdrop-filter: var(--glass-backdrop);
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .v4-room-code {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            font-weight: 700;
+        }
+        
+        .v4-player-count {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .v4-player-count i {
+            color: var(--neon-green);
+        }
+        
+        /* Contrôles mobiles V4 */
+        .v4-mobile-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .v4-joystick-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        
+        .v4-joystick {
+            width: 100%;
+            height: 100%;
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 50%;
+            backdrop-filter: var(--glass-backdrop);
+            position: relative;
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .v4-joystick-knob {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px var(--neon-blue);
+            transition: all 0.1s ease;
+        }
+        
+        .v4-action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .v4-action-btn-mobile {
+            width: 60px;
+            height: 60px;
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            border-radius: 50%;
+            backdrop-filter: var(--glass-backdrop);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            transition: all 0.3s var(--spring-bounce);
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .v4-action-btn-mobile.primary {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+        
+        .v4-action-btn-mobile.danger {
+            background: linear-gradient(135deg, var(--neon-pink), #ff0040);
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px var(--neon-pink);
+        }
+        
+        .v4-action-btn-mobile:active {
+            transform: scale(0.9);
+        }
+        
+        /* Liste des tâches moderne */
+        .v4-task-list {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            width: 200px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            backdrop-filter: var(--glass-backdrop);
+            padding: 1rem;
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .v4-task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .v4-task-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        
+        .v4-task-progress {
+            font-size: 0.8rem;
+            color: var(--neon-blue);
+        }
+        
+        .v4-task-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .v4-task-item.completed {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+        
+        .v4-task-item i {
+            color: var(--neon-green);
+        }
+        
+        /* Chat moderne */
+        .v4-chat-container {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            max-height: 200px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            backdrop-filter: var(--glass-backdrop);
+            box-shadow: var(--glass-shadow);
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            transition: all 0.3s var(--spring-bounce);
+        }
+        
+        .v4-chat-container.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .v4-chat-messages {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .v4-chat-message {
+            margin-bottom: 0.5rem;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .v4-chat-input-container {
+            display: flex;
+            padding: 0.5rem;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .v4-chat-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .v4-chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .v4-chat-send {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+        
+        /* Panneau de paramètres moderne */
+        .v4-settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s var(--smooth-ease);
+        }
+        
+        .v4-settings-panel.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .v4-settings-content {
+            width: 90%;
+            max-width: 400px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            backdrop-filter: var(--glass-backdrop);
+            padding: 2rem;
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .v4-settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+        
+        .v4-settings-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .v4-settings-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .v4-setting-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .v4-setting-group label {
+            display: block;
+            color: white;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .v4-setting-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--glass-border);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .v4-setting-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .v4-mobile-controls {
+                padding: 1rem;
+            }
+            
+            .v4-joystick-container {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .v4-joystick-knob {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .v4-action-btn-mobile {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .v4-task-list {
+                width: 180px;
+            }
+            
+            .v4-chat-container {
+                width: 250px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="app" class="app-container">
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="loading-screen active">
-            <div class="loading-content">
-                <div class="loading-logo">
-                    <div class="crewmate-simple">
-                        <div class="crewmate-body"></div>
-                        <div class="crewmate-visor"></div>
+    <div id="app" class="v4-mobile-interface">
+        <!-- Écran de chargement V4 -->
+        <div id="loading-screen" class="v4-loading-screen active">
+            <div class="v4-loading-logo">
+                <div class="v4-crewmate-hologram">
+                    <div class="v4-crewmate-body">
+                        <div class="v4-crewmate-visor"></div>
                     </div>
                 </div>
-                <h1 class="loading-title">AMONG US</h1>
-                <div class="loading-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="loading-progress-fill"></div>
-                    </div>
-                    <div class="loading-text" id="loading-text">Chargement...</div>
+            </div>
+            <h1 class="v4-loading-title">AMONG US</h1>
+            <div class="v4-loading-progress">
+                <div class="v4-progress-container">
+                    <div class="v4-progress-bar" id="loading-progress-bar"></div>
                 </div>
+                <div class="v4-loading-text" id="loading-text">Initialisation...</div>
             </div>
         </div>
 
-        <!-- Main Menu - Épuré -->
-        <div id="main-menu" class="screen">
-            <div class="menu-container">
-                <!-- Header Simple -->
-                <header class="menu-header">
-                    <div class="logo-simple">
-                        <div class="crewmate-icon">
-                            <div class="crewmate-body"></div>
-                            <div class="crewmate-visor"></div>
-                        </div>
-                        <h1 class="game-title">AMONG US</h1>
+        <!-- Menu principal V4 -->
+        <div id="main-menu" class="v4-main-menu">
+            <div class="v4-menu-header">
+                <div class="v4-logo-section">
+                    <div class="v4-mini-crewmate"></div>
+                    <h1 class="v4-game-title">AMONG US</h1>
+                </div>
+                <div class="v4-user-profile">
+                    <div class="v4-profile-avatar">
+                        <i class="fas fa-user"></i>
                     </div>
-                    
-                    <!-- User Profile Compact -->
-                    <div class="user-profile-compact">
-                        <div class="profile-avatar">
-                            <div class="avatar-crewmate"></div>
-                        </div>
-                        <button class="settings-btn" data-action="settings">
-                            <i class="fas fa-cog"></i>
-                        </button>
-                    </div>
-                </header>
-
-                <!-- Actions Principales - Seulement 3 -->
-                <div class="main-actions">
-                    <button class="action-btn primary" data-action="quick-play">
-                        <div class="btn-icon">
-                            <i class="fas fa-play"></i>
-                        </div>
-                        <div class="btn-content">
-                            <h3>Jouer</h3>
-                            <p>Partie rapide</p>
-                        </div>
-                    </button>
-
-                    <button class="action-btn secondary" data-action="create-room">
-                        <div class="btn-icon">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                        <div class="btn-content">
-                            <h3>Créer</h3>
-                            <p>Nouvelle partie</p>
-                        </div>
-                    </button>
-
-                    <button class="action-btn secondary" data-action="join-room">
-                        <div class="btn-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="btn-content">
-                            <h3>Rejoindre</h3>
-                            <p>Code de partie</p>
-                        </div>
+                    <button class="v4-settings-btn" data-action="settings">
+                        <i class="fas fa-cog"></i>
                     </button>
                 </div>
+            </div>
 
-                <!-- Menu Secondaire - Caché par défaut -->
-                <div class="secondary-menu" id="secondary-menu">
-                    <button class="secondary-btn" data-action="training">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Entraînement</span>
-                    </button>
-                    <button class="secondary-btn" data-action="cosmetics">
-                        <i class="fas fa-palette"></i>
-                        <span>Cosmétiques</span>
-                    </button>
-                    <button class="secondary-btn" data-action="stats">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Statistiques</span>
-                    </button>
-                </div>
-
-                <!-- Toggle pour menu secondaire -->
-                <button class="menu-toggle" id="menu-toggle" data-action="toggle-secondary">
-                    <i class="fas fa-ellipsis-h"></i>
-                    <span>Plus d'options</span>
+            <div class="v4-main-actions">
+                <button class="v4-action-btn primary" data-action="quick-play">
+                    <div class="v4-btn-icon">
+                        <i class="fas fa-play"></i>
+                    </div>
+                    <div class="v4-btn-content">
+                        <h3>Jouer</h3>
+                        <p>Partie rapide</p>
+                    </div>
                 </button>
 
-                <!-- Status Bar Simplifié -->
-                <div class="status-bar">
-                    <div class="status-item">
-                        <div class="status-indicator online"></div>
-                        <span id="online-players">12,543 joueurs</span>
+                <button class="v4-action-btn secondary" data-action="create-room">
+                    <div class="v4-btn-icon">
+                        <i class="fas fa-plus"></i>
                     </div>
-                    <div class="status-item">
-                        <i class="fas fa-wifi"></i>
-                        <span id="ping-value">23ms</span>
+                    <div class="v4-btn-content">
+                        <h3>Créer</h3>
+                        <p>Nouvelle partie</p>
                     </div>
+                </button>
+
+                <button class="v4-action-btn secondary" data-action="join-room">
+                    <div class="v4-btn-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="v4-btn-content">
+                        <h3>Rejoindre</h3>
+                        <p>Code de partie</p>
+                    </div>
+                </button>
+            </div>
+
+            <div class="v4-secondary-menu" id="secondary-menu">
+                <button class="v4-secondary-btn" data-action="training">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Entraînement</span>
+                </button>
+                <button class="v4-secondary-btn" data-action="cosmetics">
+                    <i class="fas fa-palette"></i>
+                    <span>Cosmétiques</span>
+                </button>
+                <button class="v4-secondary-btn" data-action="stats">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistiques</span>
+                </button>
+            </div>
+
+            <button class="v4-menu-toggle" id="menu-toggle" data-action="toggle-secondary">
+                <i class="fas fa-ellipsis-h"></i>
+                <span>Plus d'options</span>
+            </button>
+
+            <div class="v4-status-bar">
+                <div class="v4-status-item">
+                    <div class="v4-status-indicator"></div>
+                    <span id="online-players">15,247 joueurs</span>
+                </div>
+                <div class="v4-status-item">
+                    <i class="fas fa-wifi"></i>
+                    <span id="ping-value">18ms</span>
                 </div>
             </div>
         </div>
 
-        <!-- Game Screen -->
+        <!-- Écran de jeu V4 -->
         <div id="game-screen" class="screen">
-            <div class="game-container">
-                <!-- Game Canvas -->
-                <canvas id="game-canvas" width="1920" height="1080"></canvas>
-                
-                <!-- Game UI Overlay - Épuré -->
-                <div class="game-ui-overlay">
-                    <!-- Top HUD Compact -->
-                    <div class="top-hud">
-                        <div class="game-info">
-                            <div class="room-code">
-                                <span id="current-room-code">ABCDEF</span>
-                                <button class="copy-btn" data-action="copy-room-code">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            </div>
-                            <div class="game-timer">
-                                <i class="fas fa-clock"></i>
-                                <span id="game-timer">05:30</span>
-                            </div>
+            <canvas id="game-canvas"></canvas>
+            
+            <div class="v4-game-interface">
+                <!-- HUD de jeu -->
+                <div class="v4-game-hud">
+                    <div class="v4-hud-left">
+                        <div class="v4-hud-item v4-room-code">
+                            <span id="current-room-code">ABCDEF</span>
                         </div>
-                        
-                        <div class="player-count">
+                        <div class="v4-hud-item">
+                            <i class="fas fa-clock"></i>
+                            <span id="game-timer">05:30</span>
+                        </div>
+                    </div>
+                    <div class="v4-hud-right">
+                        <div class="v4-hud-item v4-player-count">
                             <i class="fas fa-users"></i>
                             <span id="alive-players">8</span>/<span id="total-players">10</span>
                         </div>
-                        
-                        <div class="game-controls">
-                            <button class="control-btn" data-action="toggle-map">
-                                <i class="fas fa-map"></i>
-                            </button>
-                            <button class="control-btn" data-action="toggle-settings">
-                                <i class="fas fa-cog"></i>
-                            </button>
-                            <button class="control-btn emergency" data-action="emergency-meeting">
+                        <div class="v4-hud-item">
+                            <button class="v4-settings-btn" data-action="emergency-meeting">
                                 <i class="fas fa-exclamation-triangle"></i>
                             </button>
                         </div>
                     </div>
-                    
-                    <!-- Task List Compact -->
-                    <div class="task-list-compact" id="task-list">
-                        <div class="task-header">
-                            <h4>Tâches</h4>
-                            <div class="task-progress">
-                                <span id="task-progress-text">3/7</span>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="task-progress-fill"></div>
-                                </div>
-                            </div>
+                </div>
+
+                <!-- Liste des tâches -->
+                <div class="v4-task-list" id="task-list">
+                    <div class="v4-task-header">
+                        <h4>Tâches</h4>
+                        <div class="v4-task-progress">
+                            <span id="task-progress-text">3/7</span>
                         </div>
-                        <div class="task-items" id="task-items">
-                            <!-- Tasks populated by JavaScript -->
+                    </div>
+                    <div class="v4-task-items" id="task-items">
+                        <div class="v4-task-item">
+                            <i class="fas fa-bolt"></i>
+                            <span>Réparer les câbles</span>
+                        </div>
+                        <div class="v4-task-item completed">
+                            <i class="fas fa-check"></i>
+                            <span>Scanner médical</span>
+                        </div>
+                        <div class="v4-task-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Calibrer boucliers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contrôles mobiles -->
+                <div class="v4-mobile-controls" id="mobile-controls">
+                    <div class="v4-joystick-container">
+                        <div class="v4-joystick" id="joystick">
+                            <div class="v4-joystick-knob" id="joystick-knob"></div>
                         </div>
                     </div>
                     
-                    <!-- Mobile Controls -->
-                    <div class="mobile-controls" id="mobile-controls">
-                        <!-- Joystick -->
-                        <div class="joystick-container">
-                            <div class="joystick" id="joystick">
-                                <div class="joystick-knob" id="joystick-knob"></div>
-                            </div>
+                    <div class="v4-action-buttons">
+                        <button class="v4-action-btn-mobile primary" id="use-btn" data-action="use">
+                            <i class="fas fa-hand-paper"></i>
+                        </button>
+                        <button class="v4-action-btn-mobile danger" id="kill-btn" data-action="kill" style="display: none;">
+                            <i class="fas fa-skull"></i>
+                        </button>
+                        <button class="v4-action-btn-mobile" id="report-btn" data-action="report">
+                            <i class="fas fa-exclamation"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat -->
+                <div class="v4-chat-container" id="chat-container">
+                    <div class="v4-chat-messages" id="chat-messages">
+                        <div class="v4-chat-message">
+                            <strong>Rouge:</strong> Où était tout le monde ?
                         </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="action-buttons">
-                            <button class="action-btn-mobile primary" id="use-btn" data-action="use">
-                                <i class="fas fa-hand-paper"></i>
-                            </button>
-                            <button class="action-btn-mobile secondary" id="kill-btn" data-action="kill" style="display: none;">
-                                <i class="fas fa-skull"></i>
-                            </button>
-                            <button class="action-btn-mobile secondary" id="sabotage-btn" data-action="sabotage" style="display: none;">
-                                <i class="fas fa-wrench"></i>
-                            </button>
-                            <button class="action-btn-mobile tertiary" id="report-btn" data-action="report">
-                                <i class="fas fa-exclamation"></i>
-                            </button>
+                        <div class="v4-chat-message">
+                            <strong>Bleu:</strong> J'étais en électricité
                         </div>
                     </div>
-                    
-                    <!-- Chat Compact -->
-                    <div class="chat-compact" id="chat-container">
-                        <div class="chat-toggle" id="chat-toggle">
-                            <i class="fas fa-comments"></i>
-                            <span class="chat-badge" id="chat-badge" style="display: none;">1</span>
-                        </div>
-                        <div class="chat-panel" id="chat-panel">
-                            <div class="chat-messages" id="chat-messages"></div>
-                            <div class="chat-input-container">
-                                <input type="text" id="chat-input" placeholder="Tapez votre message..." maxlength="100">
-                                <button id="chat-send" class="chat-send-btn">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="v4-chat-input-container">
+                        <input type="text" class="v4-chat-input" id="chat-input" placeholder="Tapez votre message...">
+                        <button class="v4-chat-send" id="chat-send">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Settings Panel -->
-        <div id="settings-panel" class="panel">
-            <div class="panel-header">
-                <h3>Paramètres</h3>
-                <button class="panel-close" data-action="close-settings">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="panel-content">
-                <div class="setting-group">
+        <!-- Panneau de paramètres V4 -->
+        <div id="settings-panel" class="v4-settings-panel">
+            <div class="v4-settings-content">
+                <div class="v4-settings-header">
+                    <h3>Paramètres</h3>
+                    <button class="v4-settings-close" data-action="close-settings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="v4-setting-group">
                     <label>Volume Principal</label>
                     <input type="range" id="master-volume" min="0" max="100" value="70">
                 </div>
-                <div class="setting-group">
+                
+                <div class="v4-setting-group">
                     <label>Effets Sonores</label>
                     <input type="range" id="sfx-volume" min="0" max="100" value="80">
                 </div>
-                <div class="setting-group">
+                
+                <div class="v4-setting-group">
+                    <label>Musique</label>
+                    <input type="range" id="music-volume" min="0" max="100" value="50">
+                </div>
+                
+                <div class="v4-setting-group">
+                    <label>Audio Ambiant</label>
+                    <input type="range" id="ambient-volume" min="0" max="100" value="40">
+                </div>
+                
+                <div class="v4-setting-group">
                     <label>Qualité Graphique</label>
                     <select id="graphics-quality">
                         <option value="low">Faible</option>
@@ -259,183 +639,15 @@
                         <option value="high">Élevée</option>
                     </select>
                 </div>
-                <div class="setting-group">
-                    <label>Contrôles Mobiles</label>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="mobile-controls-toggle" checked>
-                        <label for="mobile-controls-toggle"></label>
-                    </div>
-                </div>
             </div>
         </div>
-
-        <!-- Join Room Panel -->
-        <div id="join-room-panel" class="panel">
-            <div class="panel-header">
-                <h3>Rejoindre une Partie</h3>
-                <button class="panel-close" data-action="close-join-room">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="panel-content">
-                <div class="input-group">
-                    <label>Code de la Partie</label>
-                    <input type="text" id="room-code-input" placeholder="ABCDEF" maxlength="6" autocomplete="off">
-                </div>
-                <button class="btn-primary" data-action="join-with-code">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Rejoindre
-                </button>
-            </div>
-        </div>
-
-        <!-- Character Customizer Panel -->
-        <div id="character-customizer-panel" class="panel large-panel">
-            <div class="panel-header">
-                <h3>Personnalisation du Personnage</h3>
-                <div class="panel-actions">
-                    <button class="btn-secondary" onclick="characterCustomizer.saveCharacter()">
-                        <i class="fas fa-save"></i> Sauvegarder
-                    </button>
-                    <button class="panel-close" data-action="close-character-customizer">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="panel-content">
-                <div class="customizer-layout">
-                    <!-- Preview Section -->
-                    <div class="customizer-preview">
-                        <div class="preview-container">
-                            <canvas id="character-preview-canvas" width="300" height="300"></canvas>
-                        </div>
-                        <div class="preview-controls">
-                            <button class="btn-secondary" onclick="characterCustomizer.loadCharacter()">
-                                <i class="fas fa-upload"></i> Charger
-                            </button>
-                            <button class="btn-primary" onclick="characterCustomizer.saveCharacter()">
-                                <i class="fas fa-save"></i> Sauvegarder
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Customization Controls -->
-                    <div class="customizer-controls">
-                        <!-- Tabs -->
-                        <div class="customizer-tabs">
-                            <button class="tab-btn active" data-tab="colors">Couleurs</button>
-                            <button class="tab-btn" data-tab="anatomy">Anatomie</button>
-                            <button class="tab-btn" data-tab="accessories">Accessoires</button>
-                            <button class="tab-btn" data-tab="presets">Presets</button>
-                        </div>
-
-                        <!-- Colors Tab -->
-                        <div class="tab-content active" data-tab="colors">
-                            <div class="control-group">
-                                <label>Couleur du Corps</label>
-                                <div id="body-color-options" class="color-grid">
-                                    <!-- Populated by JavaScript -->
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label>Couleur de la Visière</label>
-                                <div id="visor-color-options" class="color-grid">
-                                    <!-- Populated by JavaScript -->
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Anatomy Tab -->
-                        <div class="tab-content" data-tab="anatomy">
-                            <div class="control-group">
-                                <label>Taille</label>
-                                <input type="range" id="height-slider" class="slider">
-                                <span class="slider-value" id="height-value">1.00</span>
-                            </div>
-                            <div class="control-group">
-                                <label>Largeur</label>
-                                <input type="range" id="width-slider" class="slider">
-                                <span class="slider-value" id="width-value">1.00</span>
-                            </div>
-                            <div class="control-group">
-                                <label>Ventre</label>
-                                <input type="range" id="belly-slider" class="slider">
-                                <span class="slider-value" id="belly-value">0.15</span>
-                            </div>
-                            <div class="control-group">
-                                <label>Épaules</label>
-                                <input type="range" id="shoulder-slider" class="slider">
-                                <span class="slider-value" id="shoulder-value">0.10</span>
-                            </div>
-                            <div class="control-group">
-                                <label>Inclinaison</label>
-                                <input type="range" id="tilt-slider" class="slider">
-                                <span class="slider-value" id="tilt-value">-0.04</span>
-                            </div>
-                            <div class="control-group">
-                                <label>Largeur Visière</label>
-                                <input type="range" id="visor-width-slider" class="slider">
-                                <span class="slider-value" id="visor-width-value">0.24</span>
-                            </div>
-                            <div class="control-group">
-                                <label>Hauteur Visière</label>
-                                <input type="range" id="visor-height-slider" class="slider">
-                                <span class="slider-value" id="visor-height-value">0.17</span>
-                            </div>
-                            <div class="control-group">
-                                <label>Inclinaison Visière</label>
-                                <input type="range" id="visor-tilt-slider" class="slider">
-                                <span class="slider-value" id="visor-tilt-value">-0.15</span>
-                            </div>
-                        </div>
-
-                        <!-- Accessories Tab -->
-                        <div class="tab-content" data-tab="accessories">
-                            <div class="control-group">
-                                <label>Accessoire</label>
-                                <div id="accessory-options" class="accessory-grid">
-                                    <!-- Populated by JavaScript -->
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label>Décoration</label>
-                                <div id="decal-options" class="decal-grid">
-                                    <!-- Populated by JavaScript -->
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Presets Tab -->
-                        <div class="tab-content" data-tab="presets">
-                            <div class="control-group">
-                                <label>Presets Prédéfinis</label>
-                                <div id="preset-options" class="preset-grid">
-                                    <!-- Populated by JavaScript -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notifications -->
-        <div id="notifications" class="notifications-container"></div>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/error-handler.js"></script>
-    <script src="js/v3-config.js"></script>
-    <script src="js/v3-audio.js"></script>
-    <script src="js/v3-graphics.js"></script>
-    <script src="js/v3-physics.js"></script>
-    <script src="js/v3-networking.js"></script>
+    <!-- Scripts V4 -->
+    <script src="js/v4-advanced-audio.js"></script>
+    <script src="js/v4-advanced-mapping.js"></script>
+    <script src="js/v4-advanced-characters.js"></script>
     <script src="js/v3-engine.js"></script>
-    <script src="js/v3-maps.js"></script>
-    <script src="js/v3-game-logic.js"></script>
-    <script src="js/mobile-controls.js"></script>
-    <script src="js/crewmate-generator.js"></script>
-    <script src="js/character-customizer.js"></script>
-    <script src="js/v3-app.js"></script>
+    <script src="js/v4-app.js"></script>
 </body>
 </html>

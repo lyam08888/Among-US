@@ -1,196 +1,150 @@
-# Among Us Interface Prototype
+# Among Us V4 - Mobile Game 2025 🚀
 
-A comprehensive HTML/CSS/JavaScript implementation of the Among Us game interface, built as a prototype that can later be ported to Unity or other game engines.
+## Nouvelles Fonctionnalités V4
 
-## Features
+### 🎨 Interface Mobile Moderne 2025
+- **Design Glassmorphism** : Interface avec effets de verre et transparence
+- **Animations Fluides** : Transitions avec spring bounce et effets élastiques
+- **Éclairage Néon** : Couleurs néon modernes (bleu, rose, vert, violet, orange)
+- **Hologrammes** : Personnages avec effets holographiques et particules
+- **Responsive Design** : Adaptation parfaite à tous les écrans mobiles
 
-### 🎮 Complete Interface Implementation
-- **Main Menu** - Navigation hub with all game options
-- **Quick Matchmaking** - Automated game finding with filters
-- **Custom Lobby** - Host and configure private games
-- **Cosmetics Shop** - Character customization system
-- **Settings** - Comprehensive game configuration
-- **In-Game HUD** - Full gameplay interface
-- **Missions System** - Daily and weekly challenges
+### 🗺️ Système de Mapping Avancé
+- **Assets Intégrés** : Utilisation complète des textures et décors
+- **Rendu Tuilé** : Sols et murs avec textures répétées
+- **Éclairage Dynamique** : Système d'éclairage par salle avec couleurs
+- **Audio Spatial** : Sons ambiants positionnés dans l'espace
+- **Objets Interactifs** : Consoles, ordinateurs, scanners avec surbrillance
+- **Système de Vents** : Réseau de ventilation complet avec connexions
 
-### 🎨 Visual Design
-- **Responsive Design** - Works on desktop, tablet, and mobile
-- **Dark Theme** - Modern Among Us-inspired color scheme
-- **Smooth Animations** - Polished transitions and effects
-- **Accessibility** - Screen reader support and keyboard navigation
-- **Touch Controls** - Virtual joystick and touch-optimized buttons
+### 👥 Système de Personnages Avancé
+- **Animations Complètes** : Idle, marche, kill, fantôme, utilisation, vent
+- **Spritesheets** : Utilisation des atlas de personnages pour toutes les couleurs
+- **États Visuels** : Effets de glow, traînées, particules
+- **Cosmétiques** : Support pour chapeaux, skins, pets (extensible)
+- **Interactions** : Système d'interaction avec objets et autres joueurs
 
-### ⚙️ Technical Features
-- **Modular Architecture** - Separate modules for each major component
-- **Local Storage** - Persistent settings and progress
-- **Progressive Web App** - Can be installed as an app
-- **Offline Support** - Works without internet connection
-- **Multi-language** - Support for multiple languages
+### 🔊 Système Audio Avancé
+- **Audio Spatial 3D** : Positionnement des sons dans l'espace
+- **Environnement Sonore** : Sons ambiants par salle
+- **Effets Audio** : Compresseur, filtres, réverbération
+- **Gestion Intelligente** : Fade-in/out, boucles, volumes adaptatifs
+- **Optimisation Mobile** : Gestion de la batterie et performances
 
-## File Structure
+### 📱 Optimisations Mobile
+- **Détection Automatique** : Adaptation selon les capacités du device
+- **Gestion Batterie** : Réduction automatique des performances
+- **Contrôles Tactiles** : Joystick virtuel et gestes avancés
+- **Orientation** : Support paysage/portrait avec adaptation UI
+- **Performances** : Limitation FPS, nettoyage mémoire, préchargement
+
+## Structure des Fichiers V4
 
 ```
 Among-US/
-├── index.html              # Main HTML file
+├── index-v4.html                    # Page principale V4
 ├── styles/
-│   ├── main.css           # Core styles and variables
-│   ├── components.css     # UI component styles
-│   ├── menus.css         # Menu-specific styles
-│   └── responsive.css    # Mobile and responsive styles
+│   └── v4-mobile-interface.css      # Interface moderne 2025
 ├── js/
-│   ├── app.js            # Main application logic
-│   ├── navigation.js     # Screen navigation and routing
-│   ├── lobby.js          # Lobby and game settings
-│   ├── matchmaking.js    # Quick matchmaking system
-│   ├── cosmetics.js      # Character customization
-│   ├── settings.js       # Game settings and preferences
-│   └── hud.js           # In-game HUD and controls
-└── README.md            # This file
+│   ├── v4-app.js                    # Application principale V4
+│   ├── v4-advanced-mapping.js       # Système de mapping avancé
+│   ├── v4-advanced-characters.js    # Système de personnages avancé
+│   ├── v4-advanced-audio.js         # Système audio avancé
+│   └── v4-mobile-optimizations.js   # Optimisations mobile
+└── assets/
+    ├── characters/                   # Spritesheets des personnages
+    ├── decor/                       # Textures de décoration
+    └── sounds/                      # Fichiers audio
 ```
 
-## Getting Started
+## Utilisation des Assets
 
-1. **Open the Interface**
-   ```bash
-   # Simply open index.html in a web browser
-   # Or serve it with a local server for best experience
-   python -m http.server 8000
-   # Then visit http://localhost:8000
-   ```
+### Personnages
+- **10 couleurs disponibles** : Rouge, Bleu, Vert, Jaune, Rose, Orange, Cyan, Lime, Violet, Noir
+- **Animations** : 4 frames idle, 8 frames marche, 6 frames kill, 8 frames fantôme
+- **Format** : Spritesheets 1024x512 avec atlas JSON
 
-2. **Navigate the Interface**
-   - Use the main menu to explore different sections
-   - Try creating a custom lobby to see game settings
-   - Check out the cosmetics shop and missions
-   - Test the in-game HUD interface
+### Décors
+- **Sols** : Metal, Hazard, Grate, Dots, Tech
+- **Murs** : Panel, Pipe, Trim-light
+- **Objets** : Console, Computer, Scanner, Reactor, Table, Crate, Barrel
+- **Interactifs** : Vent, Door, Camera, Screen
 
-3. **Mobile Testing**
-   - Open on mobile device or use browser dev tools
-   - Test touch controls and responsive layout
-   - Virtual joystick works with touch or mouse
+### Audio
+- **Interface** : Button-click, Menu-open/close
+- **Gameplay** : Footstep, Task-complete, Emergency, Kill, Vent
+- **Musique** : Lobby, Gameplay, Discussion, Victory, Defeat
+- **Ambiant** : Sons par salle (Electrical, Engine, MedBay, etc.)
 
-## Key Components
+## Fonctionnalités Techniques
 
-### Main Menu (`index.html`)
-- Central navigation hub
-- Server status and region selection
-- Language and PWA installation options
+### Rendu Optimisé
+- **Culling** : Rendu uniquement des éléments visibles
+- **Batching** : Regroupement des objets similaires
+- **Mise en Cache** : Textures et sons préchargés
+- **Scaling** : Adaptation automatique de la résolution
 
-### Matchmaking (`js/matchmaking.js`)
-- Filter-based game finding
-- Real-time search simulation
-- Auto-join countdown system
+### Contrôles Mobiles
+- **Joystick Virtuel** : Contrôle fluide avec retour haptique
+- **Boutons d'Action** : Use, Kill, Report avec feedback visuel
+- **Gestes** : Tap, Long press, Swipe pour interactions rapides
+- **Multi-touch** : Support des gestes à plusieurs doigts
 
-### Lobby System (`js/lobby.js`)
-- Host controls and player management
-- Comprehensive game settings
-- Real-time settings synchronization
+### Système de Jeu
+- **États** : Alive, Dead, Ghost, Using, Venting, Killing
+- **Interactions** : Détection automatique des objets utilisables
+- **Physique** : Collision et mouvement fluide
+- **Caméra** : Suivi du joueur avec lissage
 
-### Cosmetics (`js/cosmetics.js`)
-- Character customization options
-- Virtual currency system
-- Rarity-based item organization
+## Installation et Lancement
 
-### Settings (`js/settings.js`)
-- Audio, video, and control options
-- Accessibility features
-- Import/export functionality
+1. **Ouvrir** `index-v4.html` dans un navigateur mobile
+2. **Autoriser** l'audio quand demandé
+3. **Profiter** de l'expérience Among Us moderne !
 
-### In-Game HUD (`js/hud.js`)
-- Role-specific interfaces
-- Virtual controls for mobile
-- Meeting and voting system
+## Compatibilité
 
-## Customization
+- **iOS** : Safari 14+, Chrome 90+
+- **Android** : Chrome 90+, Firefox 88+, Samsung Internet 14+
+- **Résolution** : 360x640 à 1920x1080
+- **RAM** : Minimum 2GB, Recommandé 4GB+
 
-### Adding New Cosmetics
-```javascript
-// In js/cosmetics.js, add to generateCosmeticData()
-hats: [
-    {
-        id: 'new_hat',
-        name: 'New Hat',
-        emoji: '🎩',
-        price: 100,
-        rarity: 'rare'
-    }
-]
-```
+## Performances
 
-### Adding New Settings
-```javascript
-// In js/settings.js, add to renderTabContent()
-<div class="setting-row">
-    <div class="setting-info">
-        <div class="setting-label">New Setting</div>
-        <div class="setting-description">Description here</div>
-    </div>
-    <div class="setting-control">
-        <input type="checkbox" data-setting="newSetting">
-    </div>
-</div>
-```
+### Optimisations Automatiques
+- **Device faible** : Réduction FPS, désactivation effets
+- **Batterie faible** : Mode économie d'énergie
+- **Connexion lente** : Qualité réduite
+- **Arrière-plan** : Suspension activités non critiques
 
-### Modifying Colors
-```css
-/* In styles/main.css, update CSS variables */
-:root {
-    --primary-color: #your-color;
-    --secondary-color: #your-color;
-    /* etc... */
-}
-```
+### Métriques Cibles
+- **FPS** : 60 FPS (30 FPS sur devices faibles)
+- **Latence Audio** : < 50ms
+- **Temps de Chargement** : < 5 secondes
+- **Utilisation Mémoire** : < 200MB
 
-## Browser Support
+## Développement Futur
 
-- **Chrome/Edge** - Full support
-- **Firefox** - Full support
-- **Safari** - Full support (iOS 12+)
-- **Mobile Browsers** - Optimized for touch
+### Fonctionnalités Prévues
+- **Multijoueur** : Connexion réseau temps réel
+- **Cosmétiques** : Boutique de chapeaux et skins
+- **Cartes** : Polus, Airship, Fungle
+- **Modes** : Hide & Seek, Zombie
+- **Social** : Amis, classements, achievements
 
-## Performance
+### Améliorations Techniques
+- **WebGL** : Rendu 3D accéléré
+- **WebRTC** : Communication peer-to-peer
+- **PWA** : Installation comme app native
+- **WebAssembly** : Optimisations critiques
 
-- **Lightweight** - No external dependencies
-- **Fast Loading** - Optimized assets and code
-- **Smooth Animations** - Hardware-accelerated CSS
-- **Memory Efficient** - Proper cleanup and management
+## Crédits
 
-## Future Enhancements
-
-### Planned Features
-- [ ] Real multiplayer integration
-- [ ] Voice chat interface
-- [ ] Advanced role systems
-- [ ] Map editor interface
-- [ ] Statistics and analytics
-- [ ] Social features (friends, parties)
-
-### Unity Port Considerations
-- Modular design makes porting straightforward
-- UI layouts can be recreated in Unity UI
-- Game logic is separated from presentation
-- Settings system can be adapted to Unity PlayerPrefs
-
-## Contributing
-
-This is a prototype interface. To contribute:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test on multiple devices/browsers
-5. Submit a pull request
-
-## License
-
-This project is for educational and demonstration purposes. Among Us is a trademark of InnerSloth LLC.
-
-## Acknowledgments
-
-- **InnerSloth** - Original Among Us game design
-- **Web Technologies** - HTML5, CSS3, JavaScript ES6+
-- **Design Inspiration** - Modern game UI/UX patterns
+- **Design** : Interface moderne inspirée des tendances 2025
+- **Assets** : Sprites et sons style Among Us
+- **Optimisations** : Techniques avancées pour mobile
+- **Audio** : Système spatial 3D avec Web Audio API
 
 ---
 
-**Note**: This is a prototype interface only. It does not include actual game logic or multiplayer functionality. It's designed to demonstrate UI/UX concepts and serve as a foundation for a real implementation.
+**Among Us V4** - L'expérience mobile ultime pour 2025 ! 🎮✨
