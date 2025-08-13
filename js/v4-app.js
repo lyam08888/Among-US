@@ -121,6 +121,13 @@ class AmongUsV4App {
         this.updateLoadingProgress(10, 'Initialisation du système audio...');
         this.audioSystem = new AdvancedAudioSystem();
         await this.audioSystem.init();
+
+        document.addEventListener('pointerdown', async () => {
+            await this.audioSystem.resume();
+            if (this.gameState.gamePhase === 'lobby' && this.audioSystem.isReady?.()) {
+                this.audioSystem.startLobbyMusic();
+            }
+        }, { once: true });
         
         // Initialiser le moteur de jeu
         this.updateLoadingProgress(30, 'Initialisation du moteur de jeu...');
@@ -302,7 +309,6 @@ class AmongUsV4App {
         setTimeout(() => {
             this.hideLoadingScreen();
             this.showMainMenu();
-            this.audioSystem.startLobbyMusic();
         }, 1000);
         
         console.log('✅ Among Us V4 initialized successfully');
