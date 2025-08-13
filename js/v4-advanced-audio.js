@@ -1,7 +1,7 @@
 // Among Us V4 - Système Audio Avancé
 
 // Extensions audio à essayer (dans l'ordre de priorité)
-const AUDIO_EXTS = ['.mp3', '.wav', '.ogg'];
+const AUDIO_EXTS = ['.wav', '.mp3', '.ogg'];
 
 // Résolution du chemin réel d'un fichier audio
 async function resolveAudioUrl(basePathWithoutExt) {
@@ -315,7 +315,8 @@ class AdvancedAudioSystem {
                 return null;
             }
             
-            const audioBuffer = await this.audioContext.decodeAudioData(data.arrayBuffer);
+            // Clone the ArrayBuffer to avoid DataCloneError
+            const audioBuffer = await this.audioContext.decodeAudioData(data.arrayBuffer.slice(0));
             
             this.loadedBuffers.set(soundId, {
                 buffer: audioBuffer,

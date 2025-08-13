@@ -410,7 +410,7 @@ class AmongUsV3Audio {
             // First try to use preloaded resource
             const preloadedData = await this.tryPreloadedResource(url);
             if (preloadedData) {
-                return await this.audioContext.decodeAudioData(preloadedData);
+                return await this.audioContext.decodeAudioData(preloadedData.slice(0));
             }
         } catch (error) {
             console.warn('Failed to use preloaded resource, falling back to fetch:', error);
@@ -428,7 +428,7 @@ class AmongUsV3Audio {
                 throw new Error('Empty audio file');
             }
             
-            return await this.audioContext.decodeAudioData(arrayBuffer);
+            return await this.audioContext.decodeAudioData(arrayBuffer.slice(0));
         } catch (error) {
             console.error(`Failed to load audio from ${url}:`, error);
             throw error;
