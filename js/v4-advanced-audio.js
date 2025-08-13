@@ -8,7 +8,12 @@ async function resolveAudioUrl(basePathWithoutExt) {
     for (const ext of AUDIO_EXTS) {
         const url = `${basePathWithoutExt}${ext}`;
         try {
-            const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+            const res = await fetch(url, { 
+                method: 'HEAD', 
+                cache: 'no-store',
+                mode: 'cors',
+                credentials: 'omit'
+            });
             if (res.ok) return url;
         } catch(e) { 
             // Ignore les erreurs de réseau
@@ -20,7 +25,11 @@ async function resolveAudioUrl(basePathWithoutExt) {
 // Chargement robuste d'un ArrayBuffer
 async function fetchArrayBufferSafe(url) {
     try {
-        const res = await fetch(url, { cache: 'no-store' });
+        const res = await fetch(url, { 
+            cache: 'no-store',
+            mode: 'cors',
+            credentials: 'omit'
+        });
         if (!res.ok) return null;
         return await res.arrayBuffer();
     } catch(e) {

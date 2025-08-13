@@ -51,7 +51,8 @@ class V4AudioManager {
                 const response = await fetch(url, {
                     method: 'HEAD',
                     cache: 'no-store',
-                    mode: 'same-origin' // Fix credentials mode issue
+                    mode: 'cors',
+                    credentials: 'omit'
                 });
                 
                 if (response.ok) {
@@ -84,7 +85,8 @@ class V4AudioManager {
         try {
             const response = await fetch(url, {
                 cache: 'no-store',
-                mode: 'same-origin' // Fix credentials mode
+                mode: 'cors',
+                credentials: 'omit'
             });
             
             if (!response.ok) {
