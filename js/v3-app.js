@@ -1434,10 +1434,11 @@ class SpaceBackgroundAnimation {
     }
 }
 
+// V3 App - Désactivé pour utiliser V4
 // Initialize application when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.amongUsApp = new AmongUsV3App();
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     window.amongUsApp = new AmongUsV3App();
+// });
 
 // Export for debugging
 window.AmongUsV3App = AmongUsV3App;
