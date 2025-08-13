@@ -481,10 +481,17 @@ class AdvancedCharacterSystem {
         const texture = this.characterTextures.get(character.color);
         const colorAnimations = this.animations.get(character.color);
         
-        if (!texture || !colorAnimations) return;
+        // Si les textures ne sont pas chargées, utiliser le rendu de secours
+        if (!texture || !colorAnimations) {
+            this.renderCharacterFallback(ctx, character);
+            return;
+        }
         
         const animation = colorAnimations.get(character.animation);
-        if (!animation || animation.frames.length === 0) return;
+        if (!animation || animation.frames.length === 0) {
+            this.renderCharacterFallback(ctx, character);
+            return;
+        }
         
         const currentFrame = animation.frames[animation.currentFrame];
         

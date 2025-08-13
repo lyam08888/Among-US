@@ -205,7 +205,10 @@ class AmongUsV4App {
     
     initializeGameCanvas() {
         const canvas = document.getElementById('game-canvas');
-        if (!canvas) return;
+        if (!canvas) {
+            console.error('❌ Canvas not found!');
+            return;
+        }
         
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -218,8 +221,13 @@ class AmongUsV4App {
         this.ctx.imageSmoothingEnabled = true;
         this.ctx.imageSmoothingQuality = 'high';
         
-        // Démarrer la boucle de rendu
+        console.log('🎨 Canvas initialized:', canvas.width, 'x', canvas.height);
+        
+        // Démarrer la boucle de rendu immédiatement
         this.startRenderLoop();
+        
+        // Dessiner immédiatement pour tester
+        this.render();
     }
     
     setupEventListeners() {
@@ -331,6 +339,13 @@ class AmongUsV4App {
             this.networkingSystem.start();
         }
         this.startGameSystems();
+
+        // S'assurer que le canvas est visible
+        const canvas = document.getElementById('game-canvas');
+        if (canvas) {
+            canvas.style.display = 'block';
+            canvas.style.zIndex = '1';
+        }
 
         // Masquer l'écran de chargement
         setTimeout(() => {
@@ -672,20 +687,63 @@ class AmongUsV4App {
     }
     
     render() {
-        if (!this.ctx || this.currentScreen !== 'game-screen') return;
+        if (!this.ctx) return;
         
         // Nettoyer le canvas
         this.ctx.clearRect(0, 0, this.camera.width, this.camera.height);
         
-        // Rendre la carte
-        if (this.mappingSystem) {
-            this.mappingSystem.render(this.ctx, this.camera);
-        }
+        // Toujours dessiner un fond, même sur le menu
+        this.ctx.fillStyle = '#0a0a0f';
+        this.ctx.fillRect(0, 0, this.camera.width, this.camera.height);
         
-        // Rendre les personnages
-        if (this.characterSystem) {
-            this.characterSystem.render(this.ctx, this.camera);
+        // Si on est en jeu, rendre la carte et les personnages
+        if (this.currentScreen === 'game-screen') {
+            // Rendre la carte
+            if (this.mappingSystem) {
+                this.mappingSystem.render(this.ctx, this.camera);
+            }
+            
+            // Rendre les personnages
+            if (this.characterSystem) {
+                this.characterSystem.render(this.ctx, this.camera);
+            }
+        } else {
+            // Dessiner un personnage de démonstration sur le menu
+            this.renderMenuDemo();
         }
+    }
+    
+    renderMenuDemo() {
+        const centerX = this.camera.width / 2;
+        const centerY = this.camera.height / 2;
+        
+        // Dessiner un personnage simple au centre
+        this.ctx.fillStyle = '#ef4444';
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX, centerY, 40, 60, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Visière
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX, centerY - 20, 25, 20, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Reflet sur la visière
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        this.ctx.beginPath();
+        this.ctx.ellipse(centerX - 8, centerY - 25, 8, 6, 0, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Texte de démonstration
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '24px Inter, Arial, sans-serif';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Among Us V4', centerX, centerY - 120);
+        
+        this.ctx.font = '16px Inter, Arial, sans-serif';
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        this.ctx.fillText('Graphismes chargés avec succès', centerX, centerY + 120);
     }
     
     // Méthodes utilitaires
