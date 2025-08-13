@@ -327,6 +327,9 @@ class AdvancedAudioSystem {
             return true;
             
         } catch (error) {
+            if (error?.name === 'DataCloneError' || error.message?.includes('detached ArrayBuffer')) {
+                console.warn('DataCloneError: Cannot decode detached ArrayBuffer. Pass a copy using arrayBuffer.slice(0).');
+            }
             console.warn(`⚠️ Failed to decode sound ${soundId}:`, error);
             // Créer un buffer silencieux comme fallback
             try {

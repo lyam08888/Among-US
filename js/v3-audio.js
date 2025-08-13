@@ -430,6 +430,9 @@ class AmongUsV3Audio {
             
             return await this.audioContext.decodeAudioData(arrayBuffer.slice(0));
         } catch (error) {
+            if (error?.name === 'DataCloneError' || error.message?.includes('detached ArrayBuffer')) {
+                console.warn('DataCloneError: Cannot decode detached ArrayBuffer. Pass a copy using arrayBuffer.slice(0).');
+            }
             console.error(`Failed to load audio from ${url}:`, error);
             throw error;
         }
