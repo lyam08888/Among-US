@@ -1,0 +1,152 @@
+{
+  "version": 3,
+  "theme": "ship",
+  "tileSize": 256,
+  "charSize": 128,
+  "files": {
+    "decor/floor-metal.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/floor-hazard.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/floor-grate.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/floor-dots.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/floor-tech.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/wall-panel.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/wall-pipe.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/trim-light.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/vent.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/door.png": {
+      "w": 282,
+      "h": 410
+    },
+    "decor/table-round.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/table-rect.png": {
+      "w": 307,
+      "h": 179
+    },
+    "decor/crate.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/barrel.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/camera.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/lamp.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/screen.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/poster.png": {
+      "w": 256,
+      "h": 307
+    },
+    "decor/console.png": {
+      "w": 307,
+      "h": 205
+    },
+    "decor/computer.png": {
+      "w": 282,
+      "h": 230
+    },
+    "decor/scanner.png": {
+      "w": 256,
+      "h": 307
+    },
+    "decor/reactor.png": {
+      "w": 307,
+      "h": 307
+    },
+    "decor/wire-1.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/wire-2.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/wire-3.png": {
+      "w": 256,
+      "h": 256
+    },
+    "decor/wire-4.png": {
+      "w": 256,
+      "h": 256
+    },
+    "characters/crew-red-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-blue-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-green-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-yellow-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-pink-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-orange-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-cyan-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-lime-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-purple-sheet.png": {
+      "w": 1024,
+      "h": 512
+    },
+    "characters/crew-black-sheet.png": {
+      "w": 1024,
+      "h": 512
+    }
+  }
+}
