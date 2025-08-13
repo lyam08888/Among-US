@@ -125,10 +125,17 @@ class AmongUsV4App {
 
         document.addEventListener('pointerdown', async () => {
             await this.audioSystem.resume();
+            this.audioSystem.resumeAll();
             if (this.gameState.gamePhase === 'lobby' && this.audioSystem.isReady?.()) {
                 this.audioSystem.startLobbyMusic();
             }
         }, { once: true });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!this.audioSystem || !this.audioSystem.audioContext) return;  // évite l'appel avant init
+            if (document.hidden) this.audioSystem.pauseAll();
+            else this.audioSystem.resumeAll();
+        });
         
         // Initialiser le moteur de jeu
         this.updateLoadingProgress(30, 'Initialisation du moteur de jeu...');
@@ -213,12 +220,6 @@ class AmongUsV4App {
         // Événements de redimensionnement
         window.addEventListener('resize', this.handleResize.bind(this));
         
-        // Événements de visibilité
-        document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-        
-        // Événements audio (pour reprendre le contexte)
-        document.addEventListener('touchstart', this.resumeAudioContext.bind(this), { once: true });
-        document.addEventListener('click', this.resumeAudioContext.bind(this), { once: true });
     }
     
     initializeUI() {
@@ -601,20 +602,6 @@ class AmongUsV4App {
             canvas.height = window.innerHeight;
             this.camera.width = canvas.width;
             this.camera.height = canvas.height;
-        }
-    }
-    
-    handleVisibilityChange() {
-        if (document.hidden) {
-            this.audioSystem.pauseAll();
-        } else {
-            this.audioSystem.resumeAll();
-        }
-    }
-    
-    resumeAudioContext() {
-        if (this.audioSystem && this.audioSystem.audioContext.state === 'suspended') {
-            this.audioSystem.audioContext.resume();
         }
     }
     
