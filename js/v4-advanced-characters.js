@@ -383,9 +383,33 @@ class AdvancedCharacterSystem {
     teleportCharacter(id, position) {
         const character = this.characters.get(id);
         if (!character) return;
-        
+
         character.position = { ...position };
         character.velocity = { x: 0, y: 0 };
+    }
+
+    // API utilisée par v4-app.js pour mettre à jour la position d'un personnage
+    updateCharacterPosition(id, x, y, direction) {
+        // Si une méthode setPosition existe, l'utiliser
+        if (typeof this.setPosition === 'function') {
+            return this.setPosition(id, x, y, direction);
+        }
+
+        // Si une méthode updatePosition compatible existe, l'utiliser
+        if (typeof this.updatePosition === 'function' && this.updatePosition.length >= 3) {
+            return this.updatePosition(id, x, y, direction);
+        }
+
+        // Dernier recours : mettre à jour le modèle interne directement
+        const character = this.characters.get(id);
+        if (character) {
+            character.position.x = x;
+            character.position.y = y;
+            if (direction !== undefined) {
+                character.direction = direction;
+                character.flipX = direction === 'left';
+            }
+        }
     }
     
     setCharacterColor(id, colorName) {
