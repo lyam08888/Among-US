@@ -8,7 +8,7 @@ class V4AudioManager {
         this.audioContext = null;
         this.audioBuffers = new Map();
         this.loadedSounds = new Set();
-        this.extensionFallbacks = ['.wav', '.mp3', '.ogg'];
+        this.extensionFallbacks = ['.wav'];
         this.basePath = 'assets/sounds/';
         
         // Audio configuration

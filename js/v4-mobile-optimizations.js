@@ -227,7 +227,7 @@ class MobileOptimizations {
             if (asset.endsWith('.png')) {
                 const img = new Image();
                 img.src = asset;
-            } else if (asset.endsWith('.wav') || asset.endsWith('.mp3')) {
+            } else if (asset.endsWith('.wav')) {
                 const audio = new Audio();
                 audio.preload = 'metadata';
                 audio.src = asset;
