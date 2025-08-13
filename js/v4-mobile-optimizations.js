@@ -219,15 +219,15 @@ class MobileOptimizations {
         const criticalAssets = [
             'assets/characters/crew-red-sheet.png',
             'assets/decor/floor-metal.png',
-            'assets/sounds/button-click.mp3',
-            'assets/sounds/footstep.mp3'
+            'assets/sounds/button-click.wav',
+            'assets/sounds/footstep.wav'
         ];
         
         criticalAssets.forEach(asset => {
             if (asset.endsWith('.png')) {
                 const img = new Image();
                 img.src = asset;
-            } else if (asset.endsWith('.mp3')) {
+            } else if (asset.endsWith('.wav') || asset.endsWith('.mp3')) {
                 const audio = new Audio();
                 audio.preload = 'metadata';
                 audio.src = asset;

@@ -69,11 +69,11 @@ const AmongUsV3Config = {
         
         // Audio Files
         sounds: {
-            ambient: 'assets/sounds/ambient.mp3',
-            buttonClick: 'assets/sounds/button-click.mp3',
-            taskComplete: 'assets/sounds/task-complete.mp3',
-            emergency: 'assets/sounds/emergency.mp3',
-            kill: 'assets/sounds/kill.mp3'
+            ambient: 'assets/sounds/ambient.wav',
+            buttonClick: 'assets/sounds/button-click.wav',
+            taskComplete: 'assets/sounds/task-complete.wav',
+            emergency: 'assets/sounds/emergency.wav',
+            kill: 'assets/sounds/kill.wav'
         }
     },
     
