@@ -644,8 +644,11 @@
     </div>
 
     <!-- Scripts V3 (Legacy) -->
+    <!-- Load physics first so the engine and V4 app can use it -->
+    <script src="js/v3-physics.js"></script>
     <script src="js/v3-audio.js"></script>
     <script src="js/v3-graphics.js"></script>
+    <script src="js/v3-networking.js"></script>
     <script src="js/v3-engine.js"></script>
 
     <!-- Scripts V4 -->
@@ -656,6 +659,7 @@
     <script src="js/v4-game-logic.js"></script>
     <script src="js/v4-tasks-system.js"></script>
     <script src="js/v4-networking.js"></script>
+    <!-- Ensure the main V4 app loads after the legacy engine -->
     <script src="js/v4-app.js"></script>
 </body>
 </html>

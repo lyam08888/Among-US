@@ -3,6 +3,7 @@ class AmongUsV4App {
     constructor() {
         this.currentScreen = 'loading';
         this.isInitialized = false;
+        this.appReady = false;
         
         // Systèmes avancés
         this.audioSystem = null;
@@ -120,7 +121,31 @@ class AmongUsV4App {
         // Initialiser le système audio
         this.updateLoadingProgress(10, 'Initialisation du système audio...');
         this.audioSystem = new AdvancedAudioSystem();
-        await this.audioSystem.init();
+        try {
+            await Promise.race([
+                this.audioSystem.init(),
+                new Promise(r => setTimeout(r, 1200))
+            ]);
+        } catch (e) {
+            console.warn('Audio init failed (continuing):', e);
+        }
+
+        // démarrer le reste de l'app même si l'audio n'est pas prêt
+        this.startGameSystems?.();
+
+        document.addEventListener('pointerdown', async () => {
+            await this.audioSystem.resume();
+            this.audioSystem.resumeAll();
+            if (this.gameState.gamePhase === 'lobby' && this.audioSystem.isReady?.()) {
+                this.audioSystem.startLobbyMusic();
+            }
+        }, { once: true });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!this.audioSystem || !this.audioSystem.audioContext) return;  // évite l'appel avant init
+            if (document.hidden) this.audioSystem.pauseAll();
+            else this.audioSystem.resumeAll();
+        });
         
         // Initialiser le moteur de jeu
         this.updateLoadingProgress(30, 'Initialisation du moteur de jeu...');
@@ -147,6 +172,7 @@ class AmongUsV4App {
         // Initialiser le réseau
         this.updateLoadingProgress(85, 'Connexion réseau...');
         this.networkingSystem = new NetworkingSystem(this);
+        this.networkingSystem.init();
         
         // Créer le joueur local
         this.updateLoadingProgress(90, 'Création du personnage...');
@@ -204,12 +230,6 @@ class AmongUsV4App {
         // Événements de redimensionnement
         window.addEventListener('resize', this.handleResize.bind(this));
         
-        // Événements de visibilité
-        document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
-        
-        // Événements audio (pour reprendre le contexte)
-        document.addEventListener('touchstart', this.resumeAudioContext.bind(this), { once: true });
-        document.addEventListener('click', this.resumeAudioContext.bind(this), { once: true });
     }
     
     initializeUI() {
@@ -297,12 +317,16 @@ class AmongUsV4App {
     
     completeInitialization() {
         this.isInitialized = true;
+        this.appReady = true;
+
+        if (this.networkingSystem) {
+            this.networkingSystem.start();
+        }
         
         // Masquer l'écran de chargement
         setTimeout(() => {
             this.hideLoadingScreen();
             this.showMainMenu();
-            this.audioSystem.startLobbyMusic();
         }, 1000);
         
         console.log('✅ Among Us V4 initialized successfully');
@@ -588,20 +612,6 @@ class AmongUsV4App {
             canvas.height = window.innerHeight;
             this.camera.width = canvas.width;
             this.camera.height = canvas.height;
-        }
-    }
-    
-    handleVisibilityChange() {
-        if (document.hidden) {
-            this.audioSystem.pauseAll();
-        } else {
-            this.audioSystem.resumeAll();
-        }
-    }
-    
-    resumeAudioContext() {
-        if (this.audioSystem && this.audioSystem.audioContext.state === 'suspended') {
-            this.audioSystem.audioContext.resume();
         }
     }
     
@@ -926,9 +936,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Gérer les erreurs globales
 window.addEventListener('error', (e) => {
-    console.error('Global error:', e.error);
+    console.error('Global error:', e.error?.stack || e.message || e);
 });
 
 window.addEventListener('unhandledrejection', (e) => {
-    console.error('Unhandled promise rejection:', e.reason);
+    console.error('Global unhandled:', e.reason?.stack || e.reason || e);
 });

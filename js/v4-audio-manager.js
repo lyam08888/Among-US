@@ -8,7 +8,7 @@ class V4AudioManager {
         this.audioContext = null;
         this.audioBuffers = new Map();
         this.loadedSounds = new Set();
-        this.extensionFallbacks = ['.wav', '.mp3', '.ogg'];
+        this.extensionFallbacks = ['.wav'];
         this.basePath = 'assets/sounds/';
         
         // Audio configuration
@@ -112,6 +112,9 @@ class V4AudioManager {
             return audioBuffer;
             
         } catch (error) {
+            if (error?.name === 'DataCloneError' || error.message?.includes('detached ArrayBuffer')) {
+                console.warn('DataCloneError: Cannot decode detached ArrayBuffer. Pass a copy using arrayBuffer.slice(0).');
+            }
             console.error(`❌ Failed to load audio ${name}:`, error);
             return null;
         }

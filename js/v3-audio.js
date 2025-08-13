@@ -430,6 +430,9 @@ class AmongUsV3Audio {
             
             return await this.audioContext.decodeAudioData(arrayBuffer.slice(0));
         } catch (error) {
+            if (error?.name === 'DataCloneError' || error.message?.includes('detached ArrayBuffer')) {
+                console.warn('DataCloneError: Cannot decode detached ArrayBuffer. Pass a copy using arrayBuffer.slice(0).');
+            }
             console.error(`Failed to load audio from ${url}:`, error);
             throw error;
         }
@@ -437,7 +440,7 @@ class AmongUsV3Audio {
     
     async tryPreloadedResource(url) {
         // Check if the resource was preloaded
-        const preloadLinks = document.querySelectorAll('link[rel="preload"][as="audio"]');
+        const preloadLinks = document.querySelectorAll('link[rel="preload"][as="fetch"][type^="audio/"]');
         for (let link of preloadLinks) {
             if (link.href.includes(url) || url.includes(link.getAttribute('href'))) {
                 try {
@@ -455,7 +458,7 @@ class AmongUsV3Audio {
     
     usePreloadedResources() {
         // This method ensures preloaded resources are "used" to prevent browser warnings
-        const preloadLinks = document.querySelectorAll('link[rel="preload"][as="audio"]');
+        const preloadLinks = document.querySelectorAll('link[rel="preload"][as="fetch"][type^="audio/"]');
         preloadLinks.forEach(link => {
             const url = link.getAttribute('href');
             if (url) {
