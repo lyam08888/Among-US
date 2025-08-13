@@ -131,7 +131,9 @@ class AmongUsV4App {
         }
 
         // démarrer le reste de l'app même si l'audio n'est pas prêt
-        this.startGameSystems?.();
+        if (typeof this.startGameSystems === 'function') {
+            this.startGameSystems();
+        }
 
         document.addEventListener('pointerdown', async () => {
             await this.audioSystem.resume();
