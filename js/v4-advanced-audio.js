@@ -377,9 +377,17 @@ class AdvancedAudioSystem {
             return null;
         }
         
-        const soundData = this.loadedBuffers.get(soundId);
+        let soundData = this.loadedBuffers.get(soundId);
         if (!soundData) {
-            console.warn(`⚠️ Sound not found: ${soundId}`);
+            console.warn(`⚠️ Sound not found: ${soundId}, attempting to load on demand...`);
+            // Tentative de chargement à la demande (asynchrone, ne bloque pas)
+            this.loadSoundOnDemand(soundId).then(success => {
+                if (success) {
+                    console.log(`✅ Successfully loaded sound on demand: ${soundId}`);
+                }
+            }).catch(e => {
+                console.warn(`⚠️ Failed to load sound on demand: ${soundId}`, e);
+            });
             return null;
         }
         
