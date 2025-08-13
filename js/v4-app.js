@@ -121,7 +121,17 @@ class AmongUsV4App {
         // Initialiser le système audio
         this.updateLoadingProgress(10, 'Initialisation du système audio...');
         this.audioSystem = new AdvancedAudioSystem();
-        await this.audioSystem.init();
+        try {
+            await Promise.race([
+                this.audioSystem.init(),
+                new Promise(r => setTimeout(r, 1200))
+            ]);
+        } catch (e) {
+            console.warn('Audio init failed (continuing):', e);
+        }
+
+        // démarrer le reste de l'app même si l'audio n'est pas prêt
+        this.startGameSystems?.();
 
         document.addEventListener('pointerdown', async () => {
             await this.audioSystem.resume();
