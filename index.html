@@ -16,7 +16,7 @@
     
     <!-- Preload critical resources -->
     <link rel="preload" href="assets/characters/crew-red-sheet.png" as="image">
-    <link rel="preload" href="assets/sounds/ambient.wav" as="audio" type="audio/wav" crossorigin="anonymous">
+    <link rel="preload" href="assets/sounds/ambient.wav" as="audio" type="audio/wav">
     
     <style>
         /* Styles de base pour le canvas de jeu */
@@ -643,6 +643,11 @@
         </div>
     </div>
 
+    <!-- Scripts V3 (Legacy) -->
+    <script src="js/v3-audio.js"></script>
+    <script src="js/v3-graphics.js"></script>
+    <script src="js/v3-engine.js"></script>
+
     <!-- Scripts V4 -->
     <script src="js/v4-mobile-optimizations.js"></script>
     <script src="js/v4-advanced-audio.js"></script>
@@ -651,9 +656,6 @@
     <script src="js/v4-game-logic.js"></script>
     <script src="js/v4-tasks-system.js"></script>
     <script src="js/v4-networking.js"></script>
-    <script src="js/v3-audio.js"></script>
-    <script src="js/v3-graphics.js"></script>
-    <script src="js/v3-engine.js"></script>
     <script src="js/v4-app.js"></script>
 </body>
 </html>
