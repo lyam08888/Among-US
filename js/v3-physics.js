@@ -12,7 +12,7 @@ class AmongUsV3Physics {
         this.triggers = new Map();
         
         // Spatial partitioning for optimization
-        this.spatialGrid = new SpatialGrid(100); // 100px grid cells
+        this.spatialGrid = null; // Will be initialized later
         
         // Physics settings
         this.settings = {
@@ -47,7 +47,21 @@ class AmongUsV3Physics {
             surfaces: new Map() // Different surface types affecting movement
         };
         
+        // Initialize spatial grid after class definition is available
+        this.initializeSpatialGrid();
+        
         console.log('⚡ Physics engine initialized');
+    }
+    
+    initializeSpatialGrid() {
+        // This will be called after SpatialGrid class is defined
+        try {
+            this.spatialGrid = new SpatialGrid(100); // 100px grid cells
+            console.log('✅ Spatial grid initialized');
+        } catch (error) {
+            console.error('❌ Failed to initialize spatial grid:', error);
+            this.spatialGrid = null; // Fallback to no spatial partitioning
+        }
     }
     
     update(deltaTime) {
@@ -162,6 +176,10 @@ class AmongUsV3Physics {
     }
     
     updateSpatialGrid() {
+        if (!this.spatialGrid) {
+            return; // Skip if spatial grid is not initialized
+        }
+        
         this.spatialGrid.clear();
         
         for (let [id, body] of this.collisionBodies) {
@@ -185,7 +203,7 @@ class AmongUsV3Physics {
     getCollisionPairs() {
         const pairs = [];
         
-        if (this.settings.enableSpatialPartitioning) {
+        if (this.settings.enableSpatialPartitioning && this.spatialGrid) {
             // Use spatial grid for optimization
             const potentialPairs = this.spatialGrid.getPotentialCollisions();
             
@@ -626,7 +644,10 @@ class AmongUsV3Physics {
         this.collisionBodies.clear();
         this.staticBodies.clear();
         this.triggers.clear();
-        this.spatialGrid.clear();
+        
+        if (this.spatialGrid) {
+            this.spatialGrid.clear();
+        }
         
         console.log('⚡ Physics engine destroyed');
     }

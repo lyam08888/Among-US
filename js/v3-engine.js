@@ -32,17 +32,34 @@ class AmongUsV3Engine {
     init() {
         console.log('🔧 Initializing AmongUsV3Engine...');
         
-        // Initialize canvas
-        this.initCanvas();
-        
-        // Initialize subsystems
-        this.audio = new AmongUsV3Audio(this);
-        this.graphics = new AmongUsV3Graphics(this);
-        this.physics = new AmongUsV3Physics(this);
-        this.networking = new AmongUsV3Networking(this);
-        
-        this.isInitialized = true;
-        console.log('✅ AmongUsV3Engine initialized');
+        try {
+            // Initialize canvas
+            this.initCanvas();
+            
+            // Initialize subsystems with error handling
+            console.log('🔧 Initializing audio system...');
+            this.audio = new AmongUsV3Audio(this);
+            console.log('✅ Audio system initialized');
+            
+            console.log('🔧 Initializing graphics system...');
+            this.graphics = new AmongUsV3Graphics(this);
+            console.log('✅ Graphics system initialized');
+            
+            console.log('🔧 Initializing physics system...');
+            this.physics = new AmongUsV3Physics(this);
+            console.log('✅ Physics system initialized');
+            
+            console.log('🔧 Initializing networking system...');
+            this.networking = new AmongUsV3Networking(this);
+            console.log('✅ Networking system initialized');
+            
+            this.isInitialized = true;
+            console.log('✅ AmongUsV3Engine initialized');
+            
+        } catch (error) {
+            console.error('❌ Failed to initialize engine subsystem:', error);
+            throw error;
+        }
     }
     
     initCanvas() {

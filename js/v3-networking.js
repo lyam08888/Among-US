@@ -77,19 +77,51 @@ class AmongUsV3Networking {
     }
     
     setupMessageHandlers() {
-        this.messageHandlers.set('playerJoin', this.handlePlayerJoin.bind(this));
-        this.messageHandlers.set('playerLeave', this.handlePlayerLeave.bind(this));
-        this.messageHandlers.set('playerMove', this.handlePlayerMove.bind(this));
-        this.messageHandlers.set('playerKill', this.handlePlayerKill.bind(this));
-        this.messageHandlers.set('taskComplete', this.handleTaskComplete.bind(this));
-        this.messageHandlers.set('emergencyMeeting', this.handleEmergencyMeeting.bind(this));
-        this.messageHandlers.set('vote', this.handleVote.bind(this));
-        this.messageHandlers.set('chatMessage', this.handleChatMessage.bind(this));
-        this.messageHandlers.set('gameStart', this.handleGameStart.bind(this));
-        this.messageHandlers.set('gameEnd', this.handleGameEnd.bind(this));
-        this.messageHandlers.set('sabotage', this.handleSabotage.bind(this));
-        this.messageHandlers.set('ping', this.handlePing.bind(this));
-        this.messageHandlers.set('pong', this.handlePong.bind(this));
+        try {
+            // Safely bind message handlers, checking if methods exist
+            const handlers = [
+                ['playerJoin', 'handlePlayerJoin'],
+                ['playerLeave', 'handlePlayerLeave'],
+                ['playerMove', 'handlePlayerMove'],
+                ['playerKill', 'handlePlayerKill'],
+                ['taskComplete', 'handleTaskComplete'],
+                ['emergencyMeeting', 'handleEmergencyMeeting'],
+                ['vote', 'handleVote'],
+                ['chatMessage', 'handleChatMessage'],
+                ['gameStart', 'handleGameStart'],
+                ['gameEnd', 'handleGameEnd'],
+                ['sabotage', 'handleSabotage'],
+                ['ping', 'handlePing'],
+                ['pong', 'handlePong']
+            ];
+            
+            handlers.forEach(([eventName, methodName]) => {
+                console.log(`🔍 Checking method: ${methodName}`);
+                if (typeof this[methodName] === 'function') {
+                    console.log(`✅ Method ${methodName} found, binding...`);
+                    try {
+                        this.messageHandlers.set(eventName, this[methodName].bind(this));
+                        console.log(`✅ Method ${methodName} bound successfully`);
+                    } catch (bindError) {
+                        console.error(`❌ Failed to bind ${methodName}:`, bindError);
+                        this.messageHandlers.set(eventName, (message) => {
+                            console.log(`📨 Fallback handler for ${eventName}`, message);
+                        });
+                    }
+                } else {
+                    console.warn(`⚠️ Method ${methodName} not found (type: ${typeof this[methodName]}), creating placeholder`);
+                    this.messageHandlers.set(eventName, (message) => {
+                        console.log(`📨 Unhandled message: ${eventName}`, message);
+                    });
+                }
+            });
+            
+            console.log('✅ Message handlers setup complete');
+        } catch (error) {
+            console.error('❌ Failed to setup message handlers:', error);
+            // Create empty handlers map as fallback
+            this.messageHandlers.clear();
+        }
     }
     
     startNetworkLoop() {

@@ -269,40 +269,27 @@ class AmongUsV3Audio {
         }
         
         const soundList = [
-            { name: 'buttonClick', url: 'assets/sounds/button-click.mp3', fallbackUrl: 'assets/sounds/default-click.mp3', type: 'sfx' },
-            { name: 'taskComplete', url: 'assets/sounds/task-complete.mp3', fallbackUrl: 'assets/sounds/default-complete.mp3', type: 'sfx' },
-            { name: 'kill', url: 'assets/sounds/kill.mp3', fallbackUrl: 'assets/sounds/default-kill.mp3', type: 'sfx' },
-            { name: 'emergency', url: 'assets/sounds/emergency.mp3', fallbackUrl: 'assets/sounds/default-emergency.mp3', type: 'sfx' },
-            { name: 'sabotage', url: 'assets/sounds/sabotage.mp3', fallbackUrl: 'assets/sounds/default-sabotage.mp3', type: 'sfx' },
-            { name: 'vent', url: 'assets/sounds/vent.mp3', fallbackUrl: 'assets/sounds/default-vent.mp3', type: 'sfx' },
-            { name: 'footstep', url: 'assets/sounds/footstep.mp3', fallbackUrl: 'assets/sounds/default-footstep.mp3', type: 'sfx' },
-            { name: 'ambient', url: 'assets/sounds/ambient.mp3', fallbackUrl: 'assets/sounds/default-ambient.mp3', type: 'music' },
-            { name: 'lobby', url: 'assets/sounds/lobby.mp3', fallbackUrl: 'assets/sounds/default-lobby.mp3', type: 'music' },
-            { name: 'discussion', url: 'assets/sounds/discussion.mp3', fallbackUrl: 'assets/sounds/default-discussion.mp3', type: 'music' }
+            { name: 'buttonClick', type: 'sfx' },
+            { name: 'taskComplete', type: 'sfx' },
+            { name: 'kill', type: 'sfx' },
+            { name: 'emergency', type: 'sfx' },
+            { name: 'sabotage', type: 'sfx' },
+            { name: 'vent', type: 'sfx' },
+            { name: 'footstep', type: 'sfx' },
+            { name: 'ambient', type: 'music' },
+            { name: 'lobby', type: 'music' },
+            { name: 'discussion', type: 'music' }
         ];
         
-        console.log(`🔊 Loading ${soundList.length} audio files...`);
+        console.log(`🔊 Creating ${soundList.length} synthetic audio files...`);
         
-        // Load sounds with better error handling
-        const loadPromises = soundList.map(async (sound) => {
-            try {
-                await this.loadSound(sound.name, sound.url, sound.type);
-                console.log(`✅ Loaded ${sound.name}`);
-            } catch (error) {
-                console.warn(`⚠️ Failed to load ${sound.name}, trying fallback:`, error.message);
-                try {
-                    await this.loadSound(sound.name, sound.fallbackUrl, sound.type);
-                    console.log(`✅ Loaded ${sound.name} (fallback)`);
-                } catch (fallbackError) {
-                    console.warn(`❌ Failed to load fallback for ${sound.name}, creating synthetic sound:`, fallbackError.message);
-                    this.createSyntheticSound(sound.name, sound.type);
-                }
-            }
+        // Create synthetic sounds instead of loading files
+        soundList.forEach(sound => {
+            console.log(`🔊 Creating synthetic sound: ${sound.name}`);
+            this.createSyntheticSound(sound.name, sound.type);
         });
         
-        // Wait for all sounds to load (or fail)
-        await Promise.allSettled(loadPromises);
-        console.log(`🔊 Audio loading complete. Loaded ${this.sounds.size} sounds and ${this.music.size} music tracks.`);
+        console.log(`🔊 Audio loading complete. Created ${this.sounds.size} sounds and ${this.music.size} music tracks.`);
     }
     
     createSyntheticSound(name, type) {

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Among Us V3 - Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        #test-output {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .warning { color: #ff9800; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>Among Us V3 - Test d'initialisation</h1>
+    <div id="test-output"></div>
+    
+    <canvas id="game-canvas" width="800" height="600" style="border: 1px solid #333; display: none;"></canvas>
+
+    <!-- Scripts -->
+    <script>
+        // Capture console output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalInfo = console.info;
+        
+        const output = document.getElementById('test-output');
+        
+        function addToOutput(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToOutput(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToOutput(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToOutput(args.join(' '), 'warning');
+        };
+        
+        console.info = function(...args) {
+            originalInfo.apply(console, args);
+            addToOutput(args.join(' '), 'info');
+        };
+    </script>
+    
+    <script src="js/error-handler.js"></script>
+    <script src="js/v3-config.js"></script>
+    <script src="js/v3-audio.js"></script>
+    <script src="js/v3-graphics.js"></script>
+    <script src="js/v3-physics.js"></script>
+    <script src="js/v3-networking.js"></script>
+    <script src="js/v3-engine.js"></script>
+    
+    <script>
+        // Test initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Starting initialization test...');
+            
+            try {
+                console.log('🔧 Testing AmongUsV3Engine creation...');
+                const engine = new AmongUsV3Engine();
+                console.log('✅ AmongUsV3Engine created successfully!');
+                
+                // Test each subsystem
+                console.log('🔊 Audio system:', engine.audio ? '✅ OK' : '❌ Failed');
+                console.log('🎨 Graphics system:', engine.graphics ? '✅ OK' : '❌ Failed');
+                console.log('⚡ Physics system:', engine.physics ? '✅ OK' : '❌ Failed');
+                console.log('🌐 Networking system:', engine.networking ? '✅ OK' : '❌ Failed');
+                
+                console.log('🎉 All systems initialized successfully!');
+                
+            } catch (error) {
+                console.error('❌ Initialization failed:', error);
+                console.error('Stack trace:', error.stack);
+            }
+        });
+    </script>
+</body>
+</html>
