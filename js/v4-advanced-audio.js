@@ -1,4 +1,34 @@
 // Among Us V4 - Système Audio Avancé
+
+// Extensions audio à essayer (dans l'ordre de priorité)
+const AUDIO_EXTS = ['.mp3', '.wav', '.ogg'];
+
+// Résolution du chemin réel d'un fichier audio
+async function resolveAudioUrl(basePathWithoutExt) {
+    for (const ext of AUDIO_EXTS) {
+        const url = `${basePathWithoutExt}${ext}`;
+        try {
+            const res = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+            if (res.ok) return url;
+        } catch(e) { 
+            // Ignore les erreurs de réseau
+        }
+    }
+    return null;
+}
+
+// Chargement robuste d'un ArrayBuffer
+async function fetchArrayBufferSafe(url) {
+    try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) return null;
+        return await res.arrayBuffer();
+    } catch(e) {
+        console.warn(`🔇 Failed to fetch: ${url}`, e);
+        return null;
+    }
+}
+
 class AdvancedAudioSystem {
     constructor() {
         this.audioContext = null;
@@ -15,6 +45,7 @@ class AdvancedAudioSystem {
         this.musicTracks = new Map();
         this.ambientSounds = new Map();
         this.loadedBuffers = new Map();
+        this.pendingBuffers = new Map(); // Pour stocker les ArrayBuffers avant décodage
         
         // Sons en cours de lecture
         this.playingSounds = new Map();
@@ -50,48 +81,49 @@ class AdvancedAudioSystem {
             dopplerFactor: 1
         };
         
-        // Définition des sons du jeu
+        // Définition des sons du jeu (sans extensions - seront résolues automatiquement)
         this.soundDefinitions = {
             // Sons d'interface
-            'button-click': { file: 'button-click.mp3', volume: 0.6, category: 'sfx' },
-            'button-hover': { file: 'button-hover.mp3', volume: 0.4, category: 'sfx' },
-            'menu-open': { file: 'menu-open.mp3', volume: 0.5, category: 'sfx' },
-            'menu-close': { file: 'menu-close.mp3', volume: 0.5, category: 'sfx' },
+            'button-click': { file: 'button-click', volume: 0.6, category: 'sfx' },
+            'button-hover': { file: 'button-hover', volume: 0.4, category: 'sfx' },
+            'menu-open': { file: 'menu-open', volume: 0.5, category: 'sfx' },
+            'menu-close': { file: 'menu-close', volume: 0.5, category: 'sfx' },
             
             // Sons de gameplay
-            'footstep': { file: 'footstep.mp3', volume: 0.3, category: 'sfx', spatial: true },
-            'task-complete': { file: 'task-complete.mp3', volume: 0.7, category: 'sfx' },
-            'task-progress': { file: 'task-progress.mp3', volume: 0.5, category: 'sfx' },
-            'emergency': { file: 'emergency.mp3', volume: 0.9, category: 'sfx' },
-            'discussion': { file: 'discussion.mp3', volume: 0.8, category: 'sfx' },
-            'voting': { file: 'voting.mp3', volume: 0.6, category: 'sfx' },
-            'kill': { file: 'kill.mp3', volume: 0.8, category: 'sfx', spatial: true },
-            'vent': { file: 'vent.mp3', volume: 0.7, category: 'sfx', spatial: true },
-            'sabotage': { file: 'sabotage.mp3', volume: 0.8, category: 'sfx' },
-            'door-open': { file: 'door-open.mp3', volume: 0.5, category: 'sfx', spatial: true },
-            'door-close': { file: 'door-close.mp3', volume: 0.5, category: 'sfx', spatial: true },
+            'footstep': { file: 'footstep', volume: 0.3, category: 'sfx', spatial: true },
+            'task-complete': { file: 'task-complete', volume: 0.7, category: 'sfx' },
+            'task-progress': { file: 'task-progress', volume: 0.5, category: 'sfx' },
+            'emergency': { file: 'emergency', volume: 0.9, category: 'sfx' },
+            'discussion': { file: 'discussion', volume: 0.8, category: 'sfx' },
+            'voting': { file: 'voting', volume: 0.6, category: 'sfx' },
+            'kill': { file: 'kill', volume: 0.8, category: 'sfx', spatial: true },
+            'vent': { file: 'vent', volume: 0.7, category: 'sfx', spatial: true },
+            'sabotage': { file: 'sabotage', volume: 0.8, category: 'sfx' },
+            'door-open': { file: 'door-open', volume: 0.5, category: 'sfx', spatial: true },
+            'door-close': { file: 'door-close', volume: 0.5, category: 'sfx', spatial: true },
             
             // Musiques
-            'lobby': { file: 'lobby.mp3', volume: 0.6, category: 'music', loop: true },
-            'gameplay': { file: 'gameplay.mp3', volume: 0.4, category: 'music', loop: true },
-            'discussion-music': { file: 'discussion-music.mp3', volume: 0.5, category: 'music', loop: true },
-            'victory': { file: 'victory.mp3', volume: 0.7, category: 'music', loop: false },
-            'defeat': { file: 'defeat.mp3', volume: 0.7, category: 'music', loop: false },
+            'lobby': { file: 'lobby', volume: 0.6, category: 'music', loop: true },
+            'gameplay': { file: 'gameplay', volume: 0.4, category: 'music', loop: true },
+            'discussion-music': { file: 'discussion-music', volume: 0.5, category: 'music', loop: true },
+            'victory': { file: 'victory', volume: 0.7, category: 'music', loop: false },
+            'defeat': { file: 'defeat', volume: 0.7, category: 'music', loop: false },
             
             // Sons ambiants
-            'ambient-ship': { file: 'ambient-ship.mp3', volume: 0.3, category: 'ambient', loop: true, spatial: true },
-            'ambient-electrical': { file: 'ambient-electrical.mp3', volume: 0.4, category: 'ambient', loop: true, spatial: true },
-            'ambient-engine': { file: 'ambient-engine.mp3', volume: 0.5, category: 'ambient', loop: true, spatial: true },
-            'ambient-medbay': { file: 'ambient-medbay.mp3', volume: 0.3, category: 'ambient', loop: true, spatial: true },
-            'ambient-cafeteria': { file: 'ambient-cafeteria.mp3', volume: 0.2, category: 'ambient', loop: true, spatial: true },
-            'ambient-reactor': { file: 'ambient-reactor.mp3', volume: 0.6, category: 'ambient', loop: true, spatial: true },
-            'ambient-security': { file: 'ambient-security.mp3', volume: 0.3, category: 'ambient', loop: true, spatial: true },
-            'ambient-weapons': { file: 'ambient-weapons.mp3', volume: 0.4, category: 'ambient', loop: true, spatial: true },
-            'ambient-navigation': { file: 'ambient-navigation.mp3', volume: 0.3, category: 'ambient', loop: true, spatial: true },
-            'ambient-o2': { file: 'ambient-o2.mp3', volume: 0.4, category: 'ambient', loop: true, spatial: true },
-            'ambient-shields': { file: 'ambient-shields.mp3', volume: 0.4, category: 'ambient', loop: true, spatial: true },
-            'ambient-comms': { file: 'ambient-comms.mp3', volume: 0.3, category: 'ambient', loop: true, spatial: true },
-            'ambient-storage': { file: 'ambient-storage.mp3', volume: 0.2, category: 'ambient', loop: true, spatial: true }
+            'ambient': { file: 'ambient', volume: 0.3, category: 'ambient', loop: true, spatial: true },
+            'ambient-ship': { file: 'ambient-ship', volume: 0.3, category: 'ambient', loop: true, spatial: true },
+            'ambient-electrical': { file: 'ambient-electrical', volume: 0.4, category: 'ambient', loop: true, spatial: true },
+            'ambient-engine': { file: 'ambient-engine', volume: 0.5, category: 'ambient', loop: true, spatial: true },
+            'ambient-medbay': { file: 'ambient-medbay', volume: 0.3, category: 'ambient', loop: true, spatial: true },
+            'ambient-cafeteria': { file: 'ambient-cafeteria', volume: 0.2, category: 'ambient', loop: true, spatial: true },
+            'ambient-reactor': { file: 'ambient-reactor', volume: 0.6, category: 'ambient', loop: true, spatial: true },
+            'ambient-security': { file: 'ambient-security', volume: 0.3, category: 'ambient', loop: true, spatial: true },
+            'ambient-weapons': { file: 'ambient-weapons', volume: 0.4, category: 'ambient', loop: true, spatial: true },
+            'ambient-navigation': { file: 'ambient-navigation', volume: 0.3, category: 'ambient', loop: true, spatial: true },
+            'ambient-o2': { file: 'ambient-o2', volume: 0.4, category: 'ambient', loop: true, spatial: true },
+            'ambient-shields': { file: 'ambient-shields', volume: 0.4, category: 'ambient', loop: true, spatial: true },
+            'ambient-comms': { file: 'ambient-comms', volume: 0.3, category: 'ambient', loop: true, spatial: true },
+            'ambient-storage': { file: 'ambient-storage', volume: 0.2, category: 'ambient', loop: true, spatial: true }
         };
         
         this.init();
@@ -115,8 +147,8 @@ class AdvancedAudioSystem {
     }
     
     async prepareAudioSystem() {
-        // Charger les sons sans créer le contexte audio
-        await this.loadAllSounds();
+        // Charger les ArrayBuffers des sons sans créer le contexte audio
+        await this.loadAllSoundBuffers();
     }
     
     setupUserInteractionHandler() {
@@ -126,6 +158,7 @@ class AdvancedAudioSystem {
                     await this.initializeAudioContext();
                     this.createGainNodes();
                     this.createAudioEffects();
+                    await this.decodePendingBuffers();
                     this.applyStoredVolumeSettings();
                     this.isInitialized = true;
                     this.pendingUserInteraction = false;
@@ -215,37 +248,127 @@ class AdvancedAudioSystem {
         console.log('🎚️ Audio effects created');
     }
     
-    async loadAllSounds() {
+    async loadAllSoundBuffers() {
         const loadPromises = [];
         
         for (const [soundId, definition] of Object.entries(this.soundDefinitions)) {
-            loadPromises.push(this.loadSound(soundId, definition));
+            loadPromises.push(this.loadSoundBuffer(soundId, definition));
         }
         
-        await Promise.all(loadPromises);
-        console.log(`🎵 Loaded ${this.loadedBuffers.size} audio files`);
+        const results = await Promise.all(loadPromises);
+        const loaded = results.filter(Boolean).length;
+        console.log(`🎵 Loaded ${loaded}/${Object.keys(this.soundDefinitions).length} sound buffers`);
     }
     
-    async loadSound(soundId, definition) {
+    async loadSoundBuffer(soundId, definition) {
         try {
-            const response = await fetch(`assets/sounds/${definition.file}`);
-            const arrayBuffer = await response.arrayBuffer();
-            const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+            // Résoudre l'URL du fichier audio avec extension
+            const baseUrl = `assets/sounds/${definition.file}`;
+            const resolvedUrl = await resolveAudioUrl(baseUrl);
+            
+            if (!resolvedUrl) {
+                console.warn(`🔇 Sound not found: ${soundId} (tried ${AUDIO_EXTS.join(', ')})`);
+                return null;
+            }
+            
+            // Charger l'ArrayBuffer
+            const arrayBuffer = await fetchArrayBufferSafe(resolvedUrl);
+            if (!arrayBuffer) {
+                console.warn(`🔇 Failed to fetch: ${resolvedUrl}`);
+                return null;
+            }
+            
+            // Stocker l'ArrayBuffer pour décodage ultérieur
+            this.pendingBuffers.set(soundId, {
+                arrayBuffer: arrayBuffer,
+                definition: definition,
+                url: resolvedUrl
+            });
+            
+            return true;
+            
+        } catch (error) {
+            console.warn(`⚠️ Failed to load sound buffer ${soundId}:`, error);
+            return null;
+        }
+    }
+    
+    async decodePendingBuffers() {
+        const decodePromises = [];
+        
+        for (const [soundId, data] of this.pendingBuffers.entries()) {
+            decodePromises.push(this.decodeSoundBuffer(soundId, data));
+        }
+        
+        const results = await Promise.all(decodePromises);
+        const decoded = results.filter(Boolean).length;
+        console.log(`🎵 Decoded ${decoded}/${this.pendingBuffers.size} audio buffers`);
+        
+        // Nettoyer les buffers en attente
+        this.pendingBuffers.clear();
+    }
+    
+    async decodeSoundBuffer(soundId, data) {
+        try {
+            if (!this.audioContext) {
+                console.warn(`⚠️ Audio context not available for decoding ${soundId}`);
+                return null;
+            }
+            
+            const audioBuffer = await this.audioContext.decodeAudioData(data.arrayBuffer);
             
             this.loadedBuffers.set(soundId, {
                 buffer: audioBuffer,
-                definition: definition
+                definition: data.definition,
+                url: data.url
             });
             
+            return true;
+            
         } catch (error) {
-            console.warn(`⚠️ Failed to load sound ${soundId}:`, error);
+            console.warn(`⚠️ Failed to decode sound ${soundId}:`, error);
             // Créer un buffer silencieux comme fallback
-            const silentBuffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * 0.1, this.audioContext.sampleRate);
-            this.loadedBuffers.set(soundId, {
-                buffer: silentBuffer,
-                definition: definition
-            });
+            try {
+                const silentBuffer = this.audioContext.createBuffer(1, this.audioContext.sampleRate * 0.1, this.audioContext.sampleRate);
+                this.loadedBuffers.set(soundId, {
+                    buffer: silentBuffer,
+                    definition: data.definition,
+                    url: data.url
+                });
+                return true;
+            } catch (e) {
+                console.warn(`⚠️ Failed to create silent buffer for ${soundId}:`, e);
+                return null;
+            }
         }
+    }
+    
+    // Méthode pour charger un son à la demande
+    async loadSoundOnDemand(soundId) {
+        if (!this.soundDefinitions[soundId]) {
+            console.warn(`⚠️ Sound definition not found: ${soundId}`);
+            return false;
+        }
+        
+        if (this.loadedBuffers.has(soundId)) {
+            return true; // Déjà chargé
+        }
+        
+        const definition = this.soundDefinitions[soundId];
+        
+        // Charger l'ArrayBuffer
+        const loaded = await this.loadSoundBuffer(soundId, definition);
+        if (!loaded) return false;
+        
+        // Si le contexte audio est disponible, décoder immédiatement
+        if (this.audioContext && this.pendingBuffers.has(soundId)) {
+            const data = this.pendingBuffers.get(soundId);
+            const decoded = await this.decodeSoundBuffer(soundId, data);
+            this.pendingBuffers.delete(soundId);
+            return decoded;
+        }
+        
+        return true;
     }
     
     playSound(soundId, options = {}) {
