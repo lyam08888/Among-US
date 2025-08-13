@@ -314,7 +314,13 @@ class AmongUsV4App {
             });
         });
     }
-    
+
+    startGameSystems() {
+        if (this.engine && !this.engine.isRunning) {
+            this.engine.start();
+        }
+    }
+
     completeInitialization() {
         this.isInitialized = true;
         this.appReady = true;
@@ -322,7 +328,8 @@ class AmongUsV4App {
         if (this.networkingSystem) {
             this.networkingSystem.start();
         }
-        
+        this.startGameSystems();
+
         // Masquer l'écran de chargement
         setTimeout(() => {
             this.hideLoadingScreen();
