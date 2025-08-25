@@ -155,6 +155,11 @@ class SimpleRenderer {
     }
     
     createTestPlayer() {
+        // S'assurer que la carte existe
+        if (!this.map) {
+            this.createSimpleMap();
+        }
+        
         this.players.set('player1', {
             id: 'player1',
             x: this.map.width * this.config.tileSize / 2,

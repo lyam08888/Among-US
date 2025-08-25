@@ -93,7 +93,7 @@ class GameController {
         window.addEventListener('resize', () => {
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
-            if (this.renderer) {
+            if (this.renderer && this.renderer.camera) {
                 this.renderer.camera.x = 0;
                 this.renderer.camera.y = 0;
             }
@@ -109,8 +109,12 @@ class GameController {
             this.renderer = new SimpleRenderer(this.canvas, this.ctx);
             
             // S'assurer qu'il y a un joueur
-            if (this.renderer.players.size === 0) {
-                this.renderer.createTestPlayer();
+            if (this.renderer.players && this.renderer.players.size === 0) {
+                try {
+                    this.renderer.createTestPlayer();
+                } catch (playerError) {
+                    console.warn('⚠️ Failed to create test player:', playerError.message);
+                }
             }
             
             console.log('✅ Renderer setup complete');
