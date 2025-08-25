@@ -28,10 +28,14 @@ class GameStarter {
             this.renderer = new SimpleRenderer(this.canvas, this.ctx);
             
             // Attendre que le renderer soit initialisé
-            await this.renderer.init();
+            if (this.renderer.init) {
+                await this.renderer.init();
+            }
             
-            // Initialiser les contrôles de jeu
-            this.gameControls = new GameControls(this.renderer);
+            // Initialiser les contrôles de jeu si disponibles
+            if (typeof GameControls !== 'undefined') {
+                this.gameControls = new GameControls(this.renderer);
+            }
             
             // Démarrer la boucle de rendu
             this.startRenderLoop();
@@ -221,7 +225,7 @@ class GameStarter {
                 // Attendre l'initialisation
                 if (this.engine.isInitialized) {
                     console.log('✅ V3 Engine ready');
-                    this.startGameLoop();
+                    // Le render loop est déjà démarré
                 }
             }
             
@@ -238,7 +242,8 @@ class GameStarter {
             
         } catch (error) {
             console.error('❌ Failed to initialize advanced systems:', error);
-            this.showBasicMenu();
+            // Ne pas passer en mode basique, continuer avec le renderer
+            console.log('🎮 Continuing with graphics renderer...');
         }
     }
     
@@ -283,34 +288,8 @@ class GameStarter {
     }
     
     setupControls() {
-        // Contrôles clavier
-        document.addEventListener('keydown', (e) => {
-            if (this.renderer) {
-                this.renderer.handleKeyDown(e.key);
-            }
-        });
-        
-        document.addEventListener('keyup', (e) => {
-            if (this.renderer) {
-                this.renderer.handleKeyUp(e.key);
-            }
-        });
-        
-        // Contrôles souris/touch
-        this.canvas.addEventListener('click', (e) => {
-            const rect = this.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            if (this.renderer) {
-                this.renderer.handleClick(x, y);
-            }
-        });
-        
-        // Empêcher le menu contextuel sur le canvas
-        this.canvas.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
+        // Les contrôles sont gérés par GameControls, ne pas dupliquer
+        console.log('🎮 Controls managed by GameControls system');
     }
     
     showMainMenu() {
@@ -330,69 +309,19 @@ class GameStarter {
     }
     
     showBasicMenu() {
-        console.log('🎯 Showing basic menu...');
-        
-        const ctx = this.ctx;
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        
-        // Effacer l'écran
-        ctx.clearRect(0, 0, width, height);
-        
-        // Fond
-        const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, Math.max(width, height)/2);
-        gradient.addColorStop(0, '#1a1a2e');
-        gradient.addColorStop(1, '#0a0a0f');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
-        
-        // Menu de base
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 36px Inter, Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('AMONG US V4', width/2, height/2 - 100);
-        
-        ctx.font = '18px Inter, Arial';
-        ctx.fillStyle = '#667eea';
-        ctx.fillText('Basic Mode - Click to start', width/2, height/2);
-        
-        // Ajouter un event listener pour démarrer
-        this.canvas.addEventListener('click', () => {
-            this.startBasicGame();
-        });
+        console.log('🎯 Graphics mode active - renderer taking over...');
+        // Ne pas interférer avec le renderer graphique
+        // Le renderer prend le contrôle
     }
     
     startBasicGame() {
-        console.log('🎮 Starting basic game...');
-        
-        // Implémenter un jeu de base ici
-        this.renderBasicGame();
+        console.log('🎮 Using graphics renderer...');
+        // Le renderer graphique gère tout
     }
     
     renderBasicGame() {
-        const ctx = this.ctx;
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        
-        // Game area
-        ctx.clearRect(0, 0, width, height);
-        
-        // Fond de jeu
-        ctx.fillStyle = '#2a2a3e';
-        ctx.fillRect(0, 0, width, height);
-        
-        // Joueur simple
-        ctx.fillStyle = '#ef4444';
-        ctx.beginPath();
-        ctx.arc(width/2, height/2, 20, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // HUD
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '16px Inter, Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText('Among Us V4 - Basic Game Mode', 20, 30);
-        ctx.fillText('Use WASD or touch to move', 20, 50);
+        console.log('🎨 Graphics renderer active...');
+        // Le renderer graphique gère tout
     }
     
     showError(error) {

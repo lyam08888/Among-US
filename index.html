@@ -29,6 +29,22 @@
             background: #0a0a0f;
             touch-action: none;
             user-select: none;
+            z-index: 1;
+        }
+        
+        /* Affichage des écrans */
+        .screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .screen.active,
+        #game-screen {
+            display: block;
         }
         
         /* Interface de jeu overlay */
@@ -667,5 +683,11 @@
     
     <!-- Script de démarrage avec graphiques -->
     <script src="js/game-starter.js"></script>
+    
+    <!-- Script d'auto-start -->
+    <script src="js/auto-start.js"></script>
+    
+    <!-- Script de debug -->
+    <script src="js/debug-graphics.js"></script>
 </body>
 </html>

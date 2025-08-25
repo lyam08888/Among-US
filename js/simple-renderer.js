@@ -192,14 +192,10 @@ class SimpleRenderer {
             player.animationTime = 0;
         }
         
-        // Mouvement de test
+        // Mouvement basé sur la vélocité (contrôlée par GameControls)
         if (player.isLocal) {
-            const speed = 0.2;
-            player.velocity.x = Math.sin(Date.now() * 0.001) * speed;
-            player.velocity.y = Math.cos(Date.now() * 0.0008) * speed;
-            
-            player.x += player.velocity.x * deltaTime;
-            player.y += player.velocity.y * deltaTime;
+            player.x += player.velocity.x * deltaTime / 1000;
+            player.y += player.velocity.y * deltaTime / 1000;
             
             // Limites de la carte
             const tileSize = this.config.tileSize;
