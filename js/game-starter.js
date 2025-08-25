@@ -220,25 +220,35 @@ class GameStarter {
             // Vérifier si les classes existent
             if (typeof AmongUsV3Engine !== 'undefined') {
                 console.log('🔧 Starting V3 Engine...');
-                this.engine = new AmongUsV3Engine();
-                
-                // Attendre l'initialisation
-                if (this.engine.isInitialized) {
-                    console.log('✅ V3 Engine ready');
-                    // Le render loop est déjà démarré
+                try {
+                    this.engine = new AmongUsV3Engine();
+                    
+                    // Attendre l'initialisation
+                    if (this.engine.isInitialized) {
+                        console.log('✅ V3 Engine ready');
+                        // Le render loop est déjà démarré
+                    }
+                } catch (engineError) {
+                    console.warn('⚠️ V3 Engine failed to initialize:', engineError.message);
                 }
             }
             
             // Essayer V4 App
             if (typeof AmongUsV4App !== 'undefined') {
                 console.log('🔧 Starting V4 App...');
-                this.app = new AmongUsV4App();
-                
-                if (this.app.appReady) {
-                    console.log('✅ V4 App ready');
-                    this.showMainMenu();
+                try {
+                    this.app = new AmongUsV4App();
+                    
+                    if (this.app.appReady) {
+                        console.log('✅ V4 App ready');
+                        this.showMainMenu();
+                    }
+                } catch (appError) {
+                    console.warn('⚠️ V4 App failed to initialize:', appError.message);
                 }
             }
+            
+            console.log('✅ Advanced systems initialization completed');
             
         } catch (error) {
             console.error('❌ Failed to initialize advanced systems:', error);
@@ -365,14 +375,19 @@ class GameStarter {
 }
 
 // Démarrer le jeu quand c'est prêt
-let gameStarter;
+let gameStarter = null;
+
+function initGameStarter() {
+    gameStarter = new GameStarter();
+    // Export global immédiatement
+    window.gameStarter = gameStarter;
+    console.log('🎮 GameStarter available globally');
+}
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        gameStarter = new GameStarter();
-    });
+    document.addEventListener('DOMContentLoaded', initGameStarter);
 } else {
-    gameStarter = new GameStarter();
+    initGameStarter();
 }
 
 // Redimensionnement
@@ -381,6 +396,3 @@ window.addEventListener('resize', () => {
         gameStarter.resize();
     }
 });
-
-// Export global
-window.gameStarter = gameStarter;

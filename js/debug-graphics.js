@@ -1,8 +1,8 @@
 // Script de debug pour vérifier les graphiques
 console.log('🔍 Debug script loading...');
 
-// Attendre 2 secondes puis vérifier l'état
-setTimeout(() => {
+// Fonction pour vérifier l'état
+function checkGameState() {
     console.log('🔍 Checking game state...');
     
     // Vérifier le canvas
@@ -34,9 +34,14 @@ setTimeout(() => {
         }
     } else {
         console.log('❌ Game starter not found');
+        
+        // Attendre un peu plus et réessayer
+        setTimeout(checkGameState, 1000);
     }
-    
-}, 2000);
+}
+
+// Attendre que tout soit chargé
+setTimeout(checkGameState, 2000);
 
 // Créer un bouton de test
 setTimeout(() => {
@@ -73,8 +78,23 @@ setTimeout(() => {
             ctx.fillText('GRAPHICS TEST', 110, 130);
             
             console.log('✅ Graphics test drawn');
+            
+            // Forcer le rendu du jeu aussi
+            renderer.render();
         } else {
             console.log('❌ No renderer available for test');
+            
+            // Essayer de dessiner directement sur le canvas
+            const canvas = document.getElementById('game-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(50, 50, 150, 150);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '16px Arial';
+                ctx.fillText('DIRECT TEST', 60, 80);
+                console.log('✅ Direct canvas test drawn');
+            }
         }
     };
     
