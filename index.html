@@ -20,16 +20,19 @@
     
     <style>
         /* Styles de base pour le canvas de jeu */
-        #game-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #0a0a0f;
+        #game-canvas, canvas {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: #0a0a0f !important;
             touch-action: none;
             user-select: none;
-            z-index: 1;
+            z-index: 10 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         /* Affichage des écrans */
@@ -659,6 +662,9 @@
         </div>
     </div>
 
+    <!-- Scripts V4 - Diagnostic immédiat en premier -->
+    <script src="js/immediate-diagnostic.js"></script>
+    
     <!-- Scripts V4 - Application principale -->
     <script src="js/v3-physics.js"></script>
     <script src="js/v3-audio.js"></script>
@@ -695,5 +701,11 @@
     
     <!-- Script de vérification finale -->
     <script src="js/final-verification.js"></script>
+    
+    <!-- Script de debug rendu -->
+    <script src="js/render-debug.js"></script>
+    
+    <!-- Script de correction canvas -->
+    <script src="js/canvas-fix.js"></script>
 </body>
 </html>
