@@ -156,14 +156,19 @@ class SimpleRenderer {
     
     createTestPlayer() {
         // S'assurer que la carte existe
-        if (!this.map) {
+        if (!this.map || !this.map.width || !this.map.height) {
             this.createSimpleMap();
         }
         
+        // Vérification de sécurité supplémentaire
+        const mapWidth = this.map && this.map.width ? this.map.width : 20;
+        const mapHeight = this.map && this.map.height ? this.map.height : 15;
+        const tileSize = this.config ? this.config.tileSize : 64;
+        
         this.players.set('player1', {
             id: 'player1',
-            x: this.map.width * this.config.tileSize / 2,
-            y: this.map.height * this.config.tileSize / 2,
+            x: mapWidth * tileSize / 2,
+            y: mapHeight * tileSize / 2,
             color: 'red',
             name: 'Player',
             isLocal: true,

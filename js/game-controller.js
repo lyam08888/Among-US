@@ -93,9 +93,13 @@ class GameController {
         window.addEventListener('resize', () => {
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
-            if (this.renderer && this.renderer.camera) {
-                this.renderer.camera.x = 0;
-                this.renderer.camera.y = 0;
+            if (this.renderer && this.renderer.camera && typeof this.renderer.camera === 'object') {
+                try {
+                    this.renderer.camera.x = 0;
+                    this.renderer.camera.y = 0;
+                } catch (error) {
+                    console.warn('⚠️ Failed to reset camera position:', error.message);
+                }
             }
         });
         
@@ -245,9 +249,13 @@ class GameController {
         // Téléportation en mode debug
         if (this.renderer && this.renderer.players) {
             const player = Array.from(this.renderer.players.values()).find(p => p.isLocal);
-            if (player) {
-                player.x = x;
-                player.y = y;
+            if (player && typeof player === 'object') {
+                try {
+                    player.x = x;
+                    player.y = y;
+                } catch (error) {
+                    console.warn('⚠️ Failed to teleport player:', error.message);
+                }
             }
         }
     }
